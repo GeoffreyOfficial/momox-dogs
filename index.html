@@ -670,6 +670,15 @@ body.modal-open .hero-actions .btn-primary::before{ animation-play-state:paused;
 .contact-bg::after{ content:""; position:absolute; inset:0; background:linear-gradient(165deg, rgba(var(--pine-dark-rgb),.82), rgba(58,42,26,.92)); }
 .contact-inner{ position:relative; z-index:1; display:grid; grid-template-columns:1fr 1fr; gap:56px; align-items:stretch; }
 @media (max-width:860px){ .contact-inner{ grid-template-columns:1fr; gap:36px; } }
+/* Sans ça, les deux colonnes de la grille (texte+cartes de contact / carte
+   Google Maps) se dimensionnent sur la largeur "naturelle" de leur contenu
+   le plus large — ici la carte email avec l'adresse en une seule ligne —
+   au lieu de la largeur réellement disponible. Sur un écran étroit, ça
+   fait déborder toute la section à droite, hors de l'écran (texte et
+   carte coupés net, plus de marge à droite). min-width:0 empêche la
+   grille de gonfler ainsi ; le contenu interne (adresse email, etc.)
+   continue de tronquer proprement grâce aux règles overflow existantes. */
+.contact-inner > *{ min-width:0; }
 .contact h2{ color:var(--cream); font-size:clamp(1.9rem,4vw,2.6rem); }
 
 /* Deux grandes cartes cliquables — email et téléphone, les deux seuls
@@ -1447,6 +1456,13 @@ const galerieOk = Array.isArray(CONTENT.galerie) && CONTENT.galerie.length >= 5;
 const navItems = galerieOk
   ? [...CONTENT.nav, { id: 'galerie', label: 'Galerie' }]
   : CONTENT.nav;
+// On retire les liens de secours (ceux qui ne portent pas .nav-cta-mobile)
+// avant d'insérer les vrais liens, sinon les deux jeux de liens s'affichent
+// l'un après l'autre (menu en double). Le lien .nav-cta-mobile, lui, n'est
+// pas généré depuis CONTENT.nav : on le conserve tel quel.
+document.querySelectorAll('#navLinks > li').forEach(li => {
+  if (!li.querySelector('.nav-cta-mobile')) li.remove();
+});
 document.getElementById('navLinks').insertAdjacentHTML('afterbegin',
   navItems.map(item => `<li><a href="#${item.id}">${item.label}</a></li>`).join('')
 );
