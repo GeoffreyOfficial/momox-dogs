@@ -39,9 +39,17 @@
      ============================================================ -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500&family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<!-- Chargement non bloquant : sur une connexion lente, le navigateur affiche
+     tout de suite le texte avec la police de secours (system-ui) au lieu
+     d'attendre Google Fonts pour afficher quoi que ce soit ; la police
+     définitive s'applique dès qu'elle arrive (ou jamais, sans casser la page,
+     si le réseau ne le permet pas). -->
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500&family=Work+Sans:wght@400;500;600;700&display=swap" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500&family=Work+Sans:wght@400;500;600;700&display=swap"></noscript>
 
 <style>
+/* Tant que Fraunces/Work Sans ne sont pas chargées, on part sur des polices
+   système déjà présentes sur l'appareil — jamais de texte invisible. */
 /* =====================================================================
    1. VARIABLES — palette & rythme. Change les couleurs ici si besoin.
    ===================================================================== */
@@ -254,6 +262,12 @@ section{ padding:88px 0; position:relative; scroll-margin-top:84px; }
   transform:skewX(-18deg); animation:badgeShine 4.2s ease-in-out .9s infinite; z-index:-1;
 }
 @keyframes badgeShine{ 0%,60%{ left:-60%; } 85%,100%{ left:130%; } }
+/* En pause pendant qu'une modale est ouverte (voir .modal-open plus bas) :
+   sinon cette animation tourne en boucle indéfiniment derrière le flou
+   (backdrop-filter) de la modale, ce qui oblige le navigateur à recalculer
+   le flou à chaque frame et peut faire ramer le défilement dans la modale,
+   surtout sur mobile. */
+body.modal-open .hero-badge::after{ animation-play-state:paused; }
 .hero h1{ font-size:clamp(2.1rem, 6vw, 3.6rem); max-width:16ch; color:var(--cream); text-shadow:0 2px 18px rgba(0,0,0,.25); }
 .hero h1 em{ font-style:italic; color:var(--gold-light); }
 .hero p.lead{ font-size:1.1rem; max-width:46ch; color:rgba(var(--cream-rgb),.92); margin-bottom:32px; }
@@ -267,6 +281,8 @@ section{ padding:88px 0; position:relative; scroll-margin-top:84px; }
   animation:ctaPulse 2.6s ease-in-out 1.4s infinite;
 }
 @keyframes ctaPulse{ 0%,100%{ transform:scale(.94); opacity:.5; } 50%{ transform:scale(1.14); opacity:1; } }
+/* Même logique que badgeShine ci-dessus : en pause pendant qu'une modale est ouverte. */
+body.modal-open .hero-actions .btn-primary::before{ animation-play-state:paused; }
 
 .hero-fx{ opacity:0; transform:translateY(22px); animation:heroIn .8s cubic-bezier(.2,.8,.2,1) forwards; }
 .hero-fx:nth-child(1){ animation-delay:.05s; }
@@ -277,27 +293,18 @@ section{ padding:88px 0; position:relative; scroll-margin-top:84px; }
 @media (prefers-reduced-motion: reduce){ .hero-fx{ opacity:1; transform:none; animation:none; } .hero-bg{ transform:none !important; } .hero-badge::after, .hero-actions .btn-primary::before{ animation:none; display:none; } }
 
 .hills{ display:block; width:100%; height:auto; position:relative; z-index:2; }
-/* Grandes empreintes qui "atterrissent" une à une le long du bord en
-   coussinets, avec un léger effet ressort + halo lumineux, pour signer la
-   transition d'une patte d'éducatrice canine plutôt que d'une vague neutre. */
+/* Une empreinte discrète, nette et bien contrastée qui se dépose une fois
+   la vague dessinée, en signature du métier — plutôt que plusieurs halos
+   flous qui donnaient un rendu brouillon et peu lisible. */
 .hills-paw{
-  opacity:0; transform:scale(.35) translateY(14px); transform-box:fill-box; transform-origin:center;
-  fill:var(--gold-light);
-  animation:pawLand .62s cubic-bezier(.3,1.7,.4,1) forwards;
+  opacity:0; transform:scale(.5) translateY(10px); transform-box:fill-box; transform-origin:center;
+  fill:var(--gold);
+  animation:pawLand .5s cubic-bezier(.3,1.2,.4,1) .75s forwards;
 }
-.hills-paw:nth-child(1){ animation-delay:.15s; } .hills-paw:nth-child(2){ animation-delay:.32s; }
-.hills-paw:nth-child(3){ animation-delay:.49s; } .hills-paw:nth-child(4){ animation-delay:.66s; }
-.hills-paw:nth-child(5){ animation-delay:.83s; } .hills-paw:nth-child(6){ animation-delay:1s; }
-.hills-glow{
-  opacity:0; transform-box:fill-box; transform-origin:center; transform:scale(.2);
-  animation:glowPop .7s ease-out forwards;
-}
-.hills-glow:nth-child(1){ animation-delay:.15s; } .hills-glow:nth-child(2){ animation-delay:.32s; }
-.hills-glow:nth-child(3){ animation-delay:.49s; } .hills-glow:nth-child(4){ animation-delay:.66s; }
-.hills-glow:nth-child(5){ animation-delay:.83s; } .hills-glow:nth-child(6){ animation-delay:1s; }
-@keyframes pawLand{ 0%{ opacity:0; transform:scale(.35) translateY(14px); } 70%{ opacity:1; transform:scale(1.15) translateY(0); } 100%{ opacity:.92; transform:scale(1) translateY(0); } }
-@keyframes glowPop{ 0%{ opacity:0; transform:scale(.2); } 35%{ opacity:.55; transform:scale(1.6); } 100%{ opacity:0; transform:scale(2.2); } }
-@media (prefers-reduced-motion: reduce){ .hills-paw, .hills-glow{ animation:none; opacity:.9; transform:none; } .hills-glow{ display:none; } }
+.hills-paw:nth-child(2){ animation-delay:.92s; }
+.hills-paw:nth-child(3){ animation-delay:1.09s; }
+@keyframes pawLand{ 0%{ opacity:0; transform:scale(.5) translateY(10px); } 100%{ opacity:.85; transform:scale(1) translateY(0); } }
+@media (prefers-reduced-motion: reduce){ .hills-paw{ animation:none; opacity:.85; transform:none; } }
 
 /* Petites empreintes qui se déposent brièvement dans le sillage du chien
    qui court, pour renforcer l'effet "il vient de passer par ici". */
@@ -574,6 +581,12 @@ section{ padding:88px 0; position:relative; scroll-margin-top:84px; }
   .modal-media{ height:190px; }
   .modal-content{ padding:20px 18px 24px; }
   .modal-media-caption h3{ font-size:1.22rem; }
+  /* Flou allégé sur mobile : backdrop-filter est nettement plus coûteux à
+     recalculer sur les GPU mobiles que sur desktop, et un flou aussi marqué
+     n'apporte pas grand-chose en plus sur un petit écran où la modale
+     occupe déjà presque tout l'espace visible. Réduire l'intensité ici
+     limite le travail de rendu pendant qu'on scrolle une fiche cours. */
+  .modal-overlay{ backdrop-filter:blur(6px); -webkit-backdrop-filter:blur(6px); }
 }
 
 /* À partir d'un écran moyen/large, la fiche passe en 2 colonnes : la photo
@@ -745,7 +758,7 @@ section{ padding:88px 0; position:relative; scroll-margin-top:84px; }
   position:relative; border-radius:var(--radius); overflow:hidden;
   border:1px solid rgba(var(--cream-rgb),.22);
   box-shadow:0 20px 40px rgba(0,0,0,.28);
-  background:rgba(var(--cream-rgb),.06);
+  background:var(--pine-dark);
   transition:transform .35s cubic-bezier(.2,.8,.2,1), box-shadow .35s ease;
   min-height:340px;
 }
@@ -757,8 +770,46 @@ section{ padding:88px 0; position:relative; scroll-margin-top:84px; }
   -webkit-mask:linear-gradient(#000 0 0) padding-box, linear-gradient(#000 0 0);
   -webkit-mask-composite:xor; mask-composite:exclude;
   opacity:.5;
+  z-index:2;
 }
-.contact-map iframe{ width:100%; height:100%; border:0; display:block; filter:saturate(.92) contrast(1.02); position:absolute; inset:0; }
+.contact-map iframe{
+  width:100%; height:100%; border:0; display:block; filter:saturate(.92) contrast(1.02);
+  position:absolute; inset:0;
+  /* Tant que la carte n'a pas été "activée" par un tap/clic, elle ne capte
+     aucun geste : ça évite qu'un simple défilement de page se transforme en
+     glisser/zoomer sur la carte (comportement classique des iframes Google
+     Maps sur mobile, qui donne l'impression que "la carte s'ouvre toute
+     seule" pendant le scroll). */
+  pointer-events:none;
+  opacity:0; transition:opacity .4s ease;
+}
+.contact-map.is-loaded iframe{ opacity:1; }
+.contact-map.is-active iframe{ pointer-events:auto; }
+
+/* Squelette affiché tant que l'iframe n'a pas fini de charger, pour ne
+   jamais laisser voir un encart vide (le fond beige/blanc du site) le
+   temps que Google Maps réponde. */
+.contact-map::before{
+  content:""; position:absolute; inset:0; z-index:1;
+  background:
+    radial-gradient(circle at 50% 42%, rgba(var(--cream-rgb),.16) 0%, transparent 60%),
+    repeating-linear-gradient(100deg, rgba(var(--cream-rgb),.05) 0 40px, rgba(var(--cream-rgb),.09) 40px 80px);
+  opacity:1; transition:opacity .4s ease .1s;
+}
+.contact-map.is-loaded::before{ opacity:0; pointer-events:none; }
+
+.contact-map-hint{
+  position:absolute; z-index:3; left:50%; bottom:16px; transform:translateX(-50%);
+  display:flex; align-items:center; gap:8px;
+  font-family:var(--font-body); font-weight:600; font-size:.82rem; color:var(--cream);
+  background:rgba(var(--ink-rgb),.62); backdrop-filter:blur(3px);
+  border:1px solid rgba(var(--cream-rgb),.3); border-radius:999px;
+  padding:9px 16px; cursor:pointer; white-space:nowrap;
+  transition:opacity .3s ease, transform .3s ease;
+}
+.contact-map-hint svg{ width:16px; height:16px; flex:none; }
+.contact-map-hint:hover{ background:rgba(var(--ink-rgb),.78); }
+.contact-map.is-active .contact-map-hint{ opacity:0; pointer-events:none; transform:translateX(-50%) translateY(6px); }
 @media (max-width:860px){ .contact-map{ aspect-ratio:16/10; min-height:0; } }
 
 /* Réseaux sociaux — icônes rondes avec halo dégradé animé au survol,
@@ -859,6 +910,10 @@ footer{ background:linear-gradient(135deg,var(--pine-dark) 0%,#5f4626 100%); col
   animation:pawBob .55s ease-in-out infinite;
 }
 @keyframes pawBob{ 0%,100%{ transform:translate(-50%,-2px); } 50%{ transform:translate(-50%,-5px); } }
+/* Même logique : la trace de pattes est de toute façon masquée par la modale
+   (z-index inférieur), inutile de continuer à l'animer et à forcer le
+   recalcul du flou pendant qu'on scrolle une fiche cours. */
+body.modal-open .scroll-paw{ animation-play-state:paused; }
 .scroll-paw svg{ width:100%; height:100%; display:block; transition:transform .18s ease; }
 @media (prefers-reduced-motion: reduce){ .scroll-trail, .scroll-paw{ display:none; } }
 
@@ -887,7 +942,13 @@ a:focus-visible, button:focus-visible{ outline:3px solid var(--gold); outline-of
     </a>
 
     <ul class="nav-links" id="navLinks">
-      <!-- Liens du menu générés automatiquement depuis CONTENT.nav -->
+      <!-- Liens de secours, affichés tant que CONTENT.nav n'a pas été chargé
+           (connexion lente) ; remplacés automatiquement une fois les données
+           disponibles, donc rien à synchroniser ici. -->
+      <li><a href="#presentation">Présentation</a></li>
+      <li><a href="#pourquoi">Pourquoi moi</a></li>
+      <li><a href="#cours">Cours</a></li>
+      <li><a href="#contact">Contact</a></li>
       <li><a href="#contact" class="nav-cta-mobile">Me contacter</a></li>
     </ul>
 
@@ -916,26 +977,15 @@ a:focus-visible, button:focus-visible{ outline:3px solid var(--gold); outline-of
     </div>
   </div>
 
-  <!-- Transition en "coussinets" — bord scallopé façon empreinte de patte,
-       plus grandes empreintes qui atterrissent en cascade avec un halo,
-       en écho au métier d'éducatrice canine (plutôt qu'une vague neutre). -->
+  <!-- Transition en vague simple et épurée, signée par 3 empreintes nettes
+       qui se déposent le long de la crête — un rappel canin discret plutôt
+       qu'un bord scallopé chargé de halos flous. -->
   <svg class="hills" viewBox="0 0 1200 200" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-    <path d="M0,150 Q50,104 100,150 Q150,104 200,150 Q250,104 300,150 Q350,104 400,150 Q450,104 500,150 Q550,104 600,150 Q650,104 700,150 Q750,104 800,150 Q850,104 900,150 Q950,104 1000,150 Q1050,104 1100,150 Q1150,104 1200,150 L1200,200 L0,200 Z" style="fill:var(--pine-dark)"/>
-    <path d="M0,174 Q50,140 100,174 Q150,140 200,174 Q250,140 300,174 Q350,140 400,174 Q450,140 500,174 Q550,140 600,174 Q650,140 700,174 Q750,140 800,174 Q850,140 900,174 Q950,140 1000,174 Q1050,140 1100,174 Q1150,140 1200,174 L1200,200 L0,200 Z" style="fill:var(--paper)"/>
-    <g>
-      <circle class="hills-glow" cx="100" cy="108" r="26" fill="var(--gold-light)"/>
-      <circle class="hills-glow" cx="300" cy="108" r="26" fill="var(--gold-light)"/>
-      <circle class="hills-glow" cx="500" cy="108" r="26" fill="var(--gold-light)"/>
-      <circle class="hills-glow" cx="700" cy="108" r="26" fill="var(--gold-light)"/>
-      <circle class="hills-glow" cx="900" cy="108" r="26" fill="var(--gold-light)"/>
-      <circle class="hills-glow" cx="1100" cy="108" r="26" fill="var(--gold-light)"/>
-      <g class="hills-paw" transform="translate(88,96) scale(0.6) rotate(-8)"><circle cx="6" cy="6" r="3.1"/><circle cx="15" cy="3" r="3.3"/><circle cx="24" cy="8" r="2.9"/><path d="M15 16c-6 0-11 4.6-11 10.2 0 2.3 1.9 3.9 4.3 3.1 2-.6 4.2-1.4 6.7-1.4s4.7.8 6.7 1.4c2.4.8 4.3-.8 4.3-3.1C26 20.6 21 16 15 16Z"/></g>
-      <g class="hills-paw" transform="translate(288,96) scale(0.6) rotate(7)"><circle cx="6" cy="6" r="3.1"/><circle cx="15" cy="3" r="3.3"/><circle cx="24" cy="8" r="2.9"/><path d="M15 16c-6 0-11 4.6-11 10.2 0 2.3 1.9 3.9 4.3 3.1 2-.6 4.2-1.4 6.7-1.4s4.7.8 6.7 1.4c2.4.8 4.3-.8 4.3-3.1C26 20.6 21 16 15 16Z"/></g>
-      <g class="hills-paw" transform="translate(488,96) scale(0.6) rotate(-6)"><circle cx="6" cy="6" r="3.1"/><circle cx="15" cy="3" r="3.3"/><circle cx="24" cy="8" r="2.9"/><path d="M15 16c-6 0-11 4.6-11 10.2 0 2.3 1.9 3.9 4.3 3.1 2-.6 4.2-1.4 6.7-1.4s4.7.8 6.7 1.4c2.4.8 4.3-.8 4.3-3.1C26 20.6 21 16 15 16Z"/></g>
-      <g class="hills-paw" transform="translate(688,96) scale(0.6) rotate(9)"><circle cx="6" cy="6" r="3.1"/><circle cx="15" cy="3" r="3.3"/><circle cx="24" cy="8" r="2.9"/><path d="M15 16c-6 0-11 4.6-11 10.2 0 2.3 1.9 3.9 4.3 3.1 2-.6 4.2-1.4 6.7-1.4s4.7.8 6.7 1.4c2.4.8 4.3-.8 4.3-3.1C26 20.6 21 16 15 16Z"/></g>
-      <g class="hills-paw" transform="translate(888,96) scale(0.6) rotate(-9)"><circle cx="6" cy="6" r="3.1"/><circle cx="15" cy="3" r="3.3"/><circle cx="24" cy="8" r="2.9"/><path d="M15 16c-6 0-11 4.6-11 10.2 0 2.3 1.9 3.9 4.3 3.1 2-.6 4.2-1.4 6.7-1.4s4.7.8 6.7 1.4c2.4.8 4.3-.8 4.3-3.1C26 20.6 21 16 15 16Z"/></g>
-      <g class="hills-paw" transform="translate(1088,96) scale(0.6) rotate(6)"><circle cx="6" cy="6" r="3.1"/><circle cx="15" cy="3" r="3.3"/><circle cx="24" cy="8" r="2.9"/><path d="M15 16c-6 0-11 4.6-11 10.2 0 2.3 1.9 3.9 4.3 3.1 2-.6 4.2-1.4 6.7-1.4s4.7.8 6.7 1.4c2.4.8 4.3-.8 4.3-3.1C26 20.6 21 16 15 16Z"/></g>
-    </g>
+    <path d="M0,140 C200,190 380,90 600,120 C820,150 1000,70 1200,110 L1200,200 L0,200 Z" style="fill:var(--pine-dark)"/>
+    <path d="M0,164 C200,206 380,118 600,146 C820,174 1000,100 1200,136 L1200,200 L0,200 Z" style="fill:var(--paper)"/>
+    <g class="hills-paw" transform="translate(370,84) scale(0.72) rotate(-6)"><circle cx="6" cy="6" r="3.1"/><circle cx="15" cy="3" r="3.3"/><circle cx="24" cy="8" r="2.9"/><path d="M15 16c-6 0-11 4.6-11 10.2 0 2.3 1.9 3.9 4.3 3.1 2-.6 4.2-1.4 6.7-1.4s4.7.8 6.7 1.4c2.4.8 4.3-.8 4.3-3.1C26 20.6 21 16 15 16Z"/></g>
+    <g class="hills-paw" transform="translate(600,100) scale(0.72) rotate(4)"><circle cx="6" cy="6" r="3.1"/><circle cx="15" cy="3" r="3.3"/><circle cx="24" cy="8" r="2.9"/><path d="M15 16c-6 0-11 4.6-11 10.2 0 2.3 1.9 3.9 4.3 3.1 2-.6 4.2-1.4 6.7-1.4s4.7.8 6.7 1.4c2.4.8 4.3-.8 4.3-3.1C26 20.6 21 16 15 16Z"/></g>
+    <g class="hills-paw" transform="translate(985,58) scale(0.72) rotate(-4)"><circle cx="6" cy="6" r="3.1"/><circle cx="15" cy="3" r="3.3"/><circle cx="24" cy="8" r="2.9"/><path d="M15 16c-6 0-11 4.6-11 10.2 0 2.3 1.9 3.9 4.3 3.1 2-.6 4.2-1.4 6.7-1.4s4.7.8 6.7 1.4c2.4.8 4.3-.8 4.3-3.1C26 20.6 21 16 15 16Z"/></g>
   </svg>
   <div class="dog-runner" id="dogRunnerHero" style="bottom:4px; color:var(--pine);" aria-hidden="true"></div>
 </section>
@@ -982,7 +1032,7 @@ a:focus-visible, button:focus-visible{ outline:3px solid var(--gold); outline-of
 <!-- ============================================================
      POURQUOI L'ÉDUCATION CANINE
      ============================================================ -->
-<section class="why" id="pourquoi">
+<section class="why" id="pourquoi" data-requires-content>
   <div class="container why-inner reveal">
     <span class="eyebrow" id="whyEyebrow"></span>
     <h2 id="whyTitle"></h2>
@@ -1003,7 +1053,7 @@ a:focus-visible, button:focus-visible{ outline:3px solid var(--gold); outline-of
       <h2>Des formules pour chaque besoin.</h2>
       <p>Toutes les séances individuelles se déroulent en extérieur, dans un lieu choisi selon vos préférences et celles de votre chien.</p>
     </div>
-    <div class="cards reveal-stagger" id="cardsGrid"><!-- généré automatiquement depuis CONTENT.services --></div>
+    <div class="cards reveal-stagger" id="cardsGrid" data-requires-content><!-- généré automatiquement depuis CONTENT.services --></div>
   </div>
 </section>
 
@@ -1103,6 +1153,10 @@ a:focus-visible, button:focus-visible{ outline:3px solid var(--gold); outline-of
          maintenant que le formulaire a été retiré. -->
     <div class="contact-map reveal" id="contactMapWrap">
       <iframe id="contactMapFrame" src="" title="Localisation de Momox Dogs" loading="lazy" referrerpolicy="no-referrer-when-downgrade" allowfullscreen></iframe>
+      <button type="button" class="contact-map-hint" id="contactMapHint">
+        <svg viewBox="0 0 24 24" fill="none"><path d="M12 21s7-6.5 7-12a7 7 0 1 0-14 0c0 5.5 7 12 7 12Z" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="9" r="2.2" stroke="currentColor" stroke-width="1.8"/></svg>
+        Toucher pour interagir avec la carte
+      </button>
     </div>
   </div>
 </section>
@@ -1151,7 +1205,7 @@ a:focus-visible, button:focus-visible{ outline:3px solid var(--gold); outline-of
   <div class="container footer-inner">
     <div class="footer-brand">
       <img class="footer-logo" src="images/logo-full.jpg" alt="Logo Momox Dogs" width="40" height="40" loading="lazy" decoding="async">
-      <span>© <span id="year"></span> <span id="footerCopyright"></span></span>
+      <span>© <span id="year"></span> <span id="footerCopyright">Momox Dogs</span></span>
     </div>
     <span id="footerTagline"></span>
   </div>
@@ -1170,24 +1224,103 @@ a:focus-visible, button:focus-visible{ outline:3px solid var(--gold); outline-of
    plupart des navigateurs bloqueront la lecture de content.json. Pour tester en
    local, lance un petit serveur (ex. dans le dossier du site : `python3 -m http.server`
    puis ouvre http://localhost:8000).
+
+   ROBUSTESSE RÉSEAU : sur une connexion faible ou instable, ce chargement peut
+   échouer ou traîner. Trois filets de sécurité sont en place :
+   1) plusieurs tentatives avec délai d'attente, avant d'abandonner ;
+   2) une copie du dernier contenu chargé avec succès est gardée en local
+      (localStorage) et réutilisée si le réseau ne répond pas ;
+   3) si vraiment rien n'est disponible (première visite + réseau coupé), la
+      page ne s'efface JAMAIS : l'en-tête, l'accroche, la présentation et les
+      coordonnées de contact restent affichées (elles sont déjà écrites en dur
+      juste au-dessus, dans le HTML), seules les sections qui dépendent
+      entièrement de content.json (tarifs, section "pourquoi") s'effacent
+      proprement avec un message d'attente.
    ===================================================================================== */
+
+const CONTENT_CACHE_KEY = 'momoxdogs_content_cache_v1';
+
+// Récupère content.json en retentant plusieurs fois en cas d'échec ou de
+// lenteur excessive (utile sur 3G/4G faible, wifi public, etc.).
+async function fetchContentWithRetry(url, { retries = 3, timeoutMs = 7000 } = {}) {
+  let lastErr;
+  for (let attempt = 0; attempt <= retries; attempt++) {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), timeoutMs);
+    try {
+      const res = await fetch(url, { signal: controller.signal });
+      clearTimeout(timer);
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      return await res.json();
+    } catch (err) {
+      clearTimeout(timer);
+      lastErr = err;
+      if (attempt < retries) {
+        // Petite pause croissante avant de retenter (900ms, 1800ms, 2700ms...).
+        await new Promise(r => setTimeout(r, 900 * (attempt + 1)));
+      }
+    }
+  }
+  throw lastErr;
+}
+
+function readCachedContent() {
+  try {
+    const raw = localStorage.getItem(CONTENT_CACHE_KEY);
+    return raw ? JSON.parse(raw) : null;
+  } catch (e) { return null; }
+}
+
+function writeCachedContent(data) {
+  try { localStorage.setItem(CONTENT_CACHE_KEY, JSON.stringify(data)); } catch (e) { /* stockage indisponible : tant pis, pas bloquant */ }
+}
+
+// Affiche un message discret sans jamais toucher au reste de la page.
+function showNetworkNotice(text) {
+  const notice = document.createElement('div');
+  notice.setAttribute('role', 'status');
+  notice.style.cssText =
+    'position:fixed;left:12px;right:12px;bottom:12px;z-index:999;max-width:520px;' +
+    'margin:0 auto;background:#3d352c;color:#fffaf0;padding:12px 18px;border-radius:14px;' +
+    'font:600 .85rem/1.4 "Work Sans",sans-serif;box-shadow:0 10px 28px rgba(0,0,0,.35);';
+  notice.textContent = text;
+  document.body.appendChild(notice);
+  setTimeout(() => notice.remove(), 9000);
+}
+
 async function initSite() {
 
 let CONTENT;
-try {
-  const res = await fetch('content.json');
-  if (!res.ok) throw new Error('HTTP ' + res.status);
-  CONTENT = await res.json();
-} catch (err) {
-  console.error('Impossible de charger content.json :', err);
-  document.body.innerHTML =
-    '<div style="max-width:640px;margin:80px auto;padding:24px;font-family:sans-serif;line-height:1.5;">' +
-    '<h1 style="font-size:1.3rem;">Contenu introuvable</h1>' +
-    '<p>Le fichier <code>content.json</code> n\'a pas pu être chargé. Vérifie qu\'il est bien ' +
-    'présent à côté de <code>index.html</code>, et que le site est consulté via un serveur web ' +
-    '(http/https) plutôt qu\'ouvert directement depuis le disque.</p></div>';
-  return;
+const cached = readCachedContent();
+
+// Chargement "cache d'abord" : si une version précédente existe, on
+// l'affiche tout de suite (site utilisable instantanément, même hors-ligne),
+// puis on retente une mise à jour en tâche de fond sans bloquer l'affichage.
+if (cached) {
+  CONTENT = cached;
+  fetchContentWithRetry('content.json').then(fresh => writeCachedContent(fresh)).catch(() => {});
+} else {
+  try {
+    CONTENT = await fetchContentWithRetry('content.json');
+    writeCachedContent(CONTENT);
+  } catch (err) {
+    console.error('Impossible de charger content.json après plusieurs tentatives :', err);
+    // Pas de cache et réseau indisponible : on ne détruit pas la page. Le
+    // héros, la présentation et les coordonnées de contact restent affichés
+    // (déjà écrits en dur dans le HTML) ; on masque juste proprement les
+    // sections qui n'ont pas de contenu de secours possible (tarifs exacts,
+    // section "pourquoi"), et on prévient discrètement.
+    document.querySelectorAll('[data-requires-content]').forEach(el => { el.hidden = true; });
+    showNetworkNotice('Connexion trop faible pour charger tout le contenu. Les coordonnées ci-dessus restent valables — cette page se complètera automatiquement dès qu\'une meilleure connexion sera disponible.');
+    return;
+  }
 }
+
+// À partir d'ici, une erreur inattendue sur UNE valeur de content.json (champ
+// manquant, faute de frappe dans le fichier...) ne doit pas empêcher le reste
+// de la page de s'afficher : le HTML de secours déjà en dur (héros,
+// présentation, contact) reste visible si cette étape échoue en cours de route.
+try {
 
 // --- Thème de couleurs (CONTENT.theme) : appliqué sur les variables CSS ---
 // Pour changer les couleurs du site, modifie les codes hexadécimaux dans
@@ -1465,9 +1598,24 @@ document.querySelectorAll('.contact-cta-copy').forEach(btn => {
 // Carte : centrée sur la ville de Morgane (content.json → contact.ville),
 // via l'embed public Google Maps (aucune clé API requise).
 const mapFrame = document.getElementById('contactMapFrame');
-if (mapFrame) {
+const mapWrap = document.getElementById('contactMapWrap');
+const mapHint = document.getElementById('contactMapHint');
+if (mapFrame && mapWrap) {
   const ville = (CONTENT.contact && CONTENT.contact.ville) || 'Taverny, France';
+  // z=11 : zoom large pour montrer Taverny et les communes alentours où
+  // Morgane se déplace, pas seulement le point précis de la ville.
   mapFrame.src = 'https://www.google.com/maps?q=' + encodeURIComponent(ville) + '&z=11&output=embed';
+
+  // Le squelette (fond animé) reste visible tant que l'iframe n'a pas
+  // déclenché son évènement "load", donc jamais d'encart vide affiché.
+  mapFrame.addEventListener('load', () => mapWrap.classList.add('is-loaded'));
+
+  // Carte "verrouillée" par défaut (pointer-events:none sur l'iframe) pour
+  // qu'un simple défilement de la page ne soit jamais intercepté par
+  // Google Maps. Un tap/clic explicite l'active.
+  const activateMap = () => mapWrap.classList.add('is-active');
+  if (mapHint) mapHint.addEventListener('click', activateMap);
+  mapWrap.addEventListener('click', activateMap, { once: true });
 }
 
 // Réseaux sociaux : liens configurés dans content.json → contact.facebook /
@@ -1723,6 +1871,12 @@ document.querySelectorAll('.btn').forEach(btn => {
     document.body.style.left = '0';
     document.body.style.right = '0';
     document.body.style.width = '100%';
+    // Met en pause les animations décoratives infinies (halo du bouton héros,
+    // reflet du badge, trace de pattes) tant que la modale est ouverte : sinon
+    // elles continuent de tourner sous le flou (backdrop-filter) de la modale,
+    // ce qui force le navigateur à recalculer ce flou en continu et peut
+    // ralentir le défilement de la fiche cours, surtout sur mobile.
+    document.body.classList.add('modal-open');
   }
 
   function unlockBodyScroll() {
@@ -1731,6 +1885,7 @@ document.querySelectorAll('.btn').forEach(btn => {
     document.body.style.left = '';
     document.body.style.right = '';
     document.body.style.width = '';
+    document.body.classList.remove('modal-open');
     // Repositionnement immédiat : on désactive un instant le défilement fluide
     // du site pour éviter un effet de scroll animé au moment de refermer la fiche.
     const htmlEl = document.documentElement;
@@ -1829,6 +1984,15 @@ document.querySelectorAll('.btn').forEach(btn => {
     touchX = null;
   }, { passive: true });
 })();
+
+} catch (err) {
+  // Une erreur inattendue pendant le remplissage de la page (ex. champ
+  // manquant dans content.json) ne doit pas laisser un site à moitié cassé
+  // sans explication : on garde tout ce qui a déjà été affiché avec succès
+  // et on prévient discrètement plutôt que de laisser planter silencieusement.
+  console.error('Erreur pendant l\'affichage du contenu :', err);
+  showNetworkNotice('Un problème est survenu pendant le chargement de la page. Les coordonnées de contact restent valables ; essayez de recharger la page.');
+}
 
 } // fin de initSite()
 
