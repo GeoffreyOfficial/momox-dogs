@@ -6,6 +6,15 @@
 <title>Momox Dogs — Morgane, éducatrice canine</title>
 <meta name="description" id="metaDescription" content="Momox Dogs — Morgane, éducatrice canine (BPE) : cours individuels et collectifs, cours chiot, désensibilisation, bilans comportementaux, balades et pet sitting.">
 
+<!-- Favicon / icônes — générées depuis le logo Momox Dogs (images/logo-mark.png
+     pour les petites tailles, logo complet avec texte pour les grandes). -->
+<link rel="icon" href="images/favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="16x16" href="images/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="images/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="48x48" href="images/favicon-48x48.png">
+<link rel="apple-touch-icon" sizes="180x180" href="images/apple-touch-icon.png">
+<meta name="theme-color" content="#8c8068">
+
 <!-- ============================================================
      RÉSEAUX SOCIAUX (Open Graph / Twitter Card) + DONNÉES STRUCTURÉES
      Le contenu de ces balises (content="") est rempli dynamiquement en JS
@@ -146,7 +155,12 @@ section{ padding:88px 0; position:relative; scroll-margin-top:84px; }
 }
 .site-header.scrolled .nav{ padding-top:8px; padding-bottom:8px; }
 .brand{ display:flex; align-items:center; gap:10px; text-decoration:none; color:var(--ink); min-width:0; overflow:hidden; }
-.brand-mark{ width:34px; height:34px; flex:none; }
+.brand-mark{
+  width:34px; height:34px; flex:none; border-radius:50%; object-fit:cover;
+  background:var(--gold-light); box-shadow:0 2px 6px rgba(var(--ink-rgb),.18);
+  transition:transform .3s cubic-bezier(.34,1.56,.64,1);
+}
+.brand:hover .brand-mark{ transform:rotate(-8deg) scale(1.06); }
 .brand > span{ min-width:0; overflow:hidden; }
 .brand-name{ font-family:var(--font-display); font-weight:600; font-size:1.1rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; display:block; }
 .brand-tag{ display:block; font-family:var(--font-body); font-size:.64rem; letter-spacing:.06em; text-transform:uppercase; color:var(--olive); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
@@ -716,7 +730,12 @@ section{ padding:88px 0; position:relative; scroll-margin-top:84px; }
    9. PIED DE PAGE
    ===================================================================== */
 footer{ background:linear-gradient(135deg,var(--pine-dark) 0%,#5f4626 100%); color:rgba(var(--cream-rgb),.78); border-top:1px solid var(--line-dark); padding-bottom:calc(18px + env(safe-area-inset-bottom)); }
-.footer-inner{ display:flex; justify-content:space-between; align-items:center; padding:28px 0; font-size:.8rem; flex-wrap:wrap; gap:10px; }
+.footer-inner{ display:flex; justify-content:space-between; align-items:center; padding-top:28px; padding-bottom:28px; font-size:.8rem; flex-wrap:wrap; gap:10px; }
+.footer-brand{ display:flex; align-items:center; gap:12px; }
+.footer-logo{
+  width:36px; height:36px; border-radius:10px; object-fit:cover; flex:none;
+  box-shadow:0 4px 12px rgba(0,0,0,.25); border:1px solid rgba(var(--cream-rgb),.2);
+}
 
 /* =====================================================================
    10. RÉVÉLATION AU DÉFILEMENT
@@ -764,13 +783,7 @@ a:focus-visible, button:focus-visible{ outline:3px solid var(--gold); outline-of
 <header class="site-header">
   <nav class="nav">
     <a class="brand" href="#accueil">
-      <svg class="brand-mark" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <circle cx="20" cy="20" r="20" style="fill:var(--pine)"/>
-        <path d="M14 17c0-2 1.5-3.5 3-3.5s3 1.5 3 3.5-1.5 3.5-3 3.5-3-1.5-3-3.5Z" style="fill:var(--gold)"/>
-        <path d="M20 20c1.7 0 3-1.6 3-3.6S21.7 13 20 13s-3 1.6-3 3.6 1.3 3.4 3 3.4Z" style="fill:var(--gold-light)"/>
-        <path d="M24.5 19c1.4 0 2.5-1.4 2.5-3s-1.1-3-2.5-3S22 14.4 22 16s1.1 3 2.5 3Z" style="fill:var(--gold)"/>
-        <path d="M20 22c-4 0-7 3-7 6.5 0 1.5 1.2 2.5 2.7 2 1-.3 2.6-.9 4.3-.9s3.3.6 4.3.9c1.5.5 2.7-.5 2.7-2 0-3.5-3-6.5-7-6.5Z" style="fill:var(--gold-light)"/>
-      </svg>
+      <img class="brand-mark" src="images/logo-mark.png" alt="" width="40" height="40" loading="eager" decoding="async">
       <span>
         <span class="brand-name">Momox Dogs</span>
         <span class="brand-tag">Morgane, éducatrice canine</span>
@@ -1009,7 +1022,10 @@ a:focus-visible, button:focus-visible{ outline:3px solid var(--gold); outline-of
 
 <footer>
   <div class="container footer-inner">
-    <span>© <span id="year"></span> <span id="footerCopyright"></span></span>
+    <div class="footer-brand">
+      <img class="footer-logo" src="images/logo-full.jpg" alt="Logo Momox Dogs" width="40" height="40" loading="lazy" decoding="async">
+      <span>© <span id="year"></span> <span id="footerCopyright"></span></span>
+    </div>
     <span id="footerTagline"></span>
   </div>
 </footer>
@@ -1452,6 +1468,20 @@ document.querySelectorAll('.btn').forEach(btn => {
   let current = 0;
   let lastFocused = null;
 
+  // Slugs pour donner à chaque fiche cours sa propre URL (#cours-nom-du-cours),
+  // partageable et compatible avec le bouton retour du navigateur.
+  const slugify = (str) => (str || '')
+    .toLowerCase()
+    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/(^-|-$)/g, '');
+  const serviceSlugs = services.map(s => slugify(s.titre));
+  const slugToIndex = (hash) => {
+    const clean = (hash || '').replace(/^#/, '');
+    if (!clean.startsWith('cours-')) return -1;
+    return serviceSlugs.indexOf(clean.slice('cours-'.length));
+  };
+
   dotsEl.innerHTML = services.map((_, i) => `<span data-dot="${i}"></span>`).join('');
   const dotEls = dotsEl.querySelectorAll('span');
   dotEls.forEach((d, i) => d.addEventListener('click', () => goTo(i, i > current ? 'next' : 'prev')));
@@ -1482,6 +1512,9 @@ document.querySelectorAll('.btn').forEach(btn => {
       fill(current);
       modal.classList.remove(dirClass);
       requestAnimationFrame(() => imgEl.classList.remove('fading'));
+      // Met à jour l'URL sans empiler d'historique à chaque cours parcouru
+      // (seule l'ouverture initiale crée une entrée dans l'historique).
+      history.replaceState({ modalCours: serviceSlugs[current] }, '', '#cours-' + serviceSlugs[current]);
     }, reduceMotion ? 0 : 180);
   }
 
@@ -1511,7 +1544,7 @@ document.querySelectorAll('.btn').forEach(btn => {
     htmlEl.style.scrollBehavior = prevBehavior || '';
   }
 
-  function openModal(index, originEvent) {
+  function openModal(index, originEvent, opts = {}) {
     lastFocused = document.activeElement;
     current = index;
     fill(current);
@@ -1519,6 +1552,13 @@ document.querySelectorAll('.btn').forEach(btn => {
     overlay.setAttribute('aria-hidden', 'false');
     lockBodyScroll();
     closeBtn.focus();
+
+    // Donne à la fiche sa propre URL (#cours-nom-du-cours), pour pouvoir la
+    // partager ou la retrouver directement, et pour que le bouton retour du
+    // navigateur referme la fiche plutôt que de quitter la page.
+    if (!opts.skipHistory) {
+      history.pushState({ modalCours: serviceSlugs[index] }, '', '#cours-' + serviceSlugs[index]);
+    }
 
     // Petite empreinte de patte qui "tamponne" là où le clic a eu lieu
     if (originEvent && originEvent.clientX && !reduceMotion) {
@@ -1532,11 +1572,14 @@ document.querySelectorAll('.btn').forEach(btn => {
     }
   }
 
-  function closeModal() {
+  function closeModal(opts = {}) {
     overlay.classList.remove('open');
     overlay.setAttribute('aria-hidden', 'true');
     unlockBodyScroll();
     if (lastFocused) lastFocused.focus();
+    if (!opts.skipHistory && location.hash.startsWith('#cours-')) {
+      history.pushState({}, '', location.pathname + location.search);
+    }
   }
 
   document.querySelectorAll('.card').forEach(card => {
@@ -1559,6 +1602,26 @@ document.querySelectorAll('.btn').forEach(btn => {
     if (e.key === 'ArrowRight') goTo(current + 1, 'next');
     if (e.key === 'ArrowLeft') goTo(current - 1, 'prev');
   });
+
+  // Bouton retour/avancer du navigateur : referme la fiche si on quitte son
+  // URL, ou ouvre/change de fiche si on arrive/revient sur une URL #cours-...
+  window.addEventListener('popstate', () => {
+    const idx = slugToIndex(location.hash);
+    if (idx >= 0) {
+      if (!overlay.classList.contains('open') || idx !== current) {
+        openModal(idx, null, { skipHistory: true });
+      }
+    } else if (overlay.classList.contains('open')) {
+      closeModal({ skipHistory: true });
+    }
+  });
+
+  // Lien direct vers une fiche cours (#cours-nom-du-cours) : l'ouvre
+  // automatiquement à l'arrivée sur la page, sans empiler d'historique.
+  const initialIdx = slugToIndex(location.hash);
+  if (initialIdx >= 0) {
+    requestAnimationFrame(() => openModal(initialIdx, null, { skipHistory: true }));
+  }
 
   // Glisser à gauche/droite pour changer de cours (mobile)
   let touchX = null;

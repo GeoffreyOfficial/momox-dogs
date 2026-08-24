@@ -69,7 +69,7 @@
   "contact": {
     "email": "Morgane@momoxdogs.fr",
     "telephone": "07 82 25 26 88",
-    "zone": "Basée à Taverny (95), Morgane se déplace chez vous dans les communes alentours.",
+    "zone": "Je me déplace chez vous, à Taverny (95) et dans les communes alentours.",
     "ville": "Taverny, France",
     "facebook": "https://www.facebook.com/profile.php?id=61564959076095",
     "instagram": "https://www.instagram.com/momoxdogs95"
@@ -128,8 +128,8 @@
       "titre": "Pet sitting",
       "image": "images/service-petsitting.jpg",
       "description": "Ce service est destiné à vos animaux de compagnie, qu'il s'agisse de chiens, de chats ou d'autres animaux. Bien que je ne sois pas en mesure d'accueillir des animaux à mon domicile, je me déplace directement chez vous pour assurer les soins quotidiens de vos compagnons.\nPour les chiens, ce service inclut plusieurs promenades par jour, ainsi que l'alimentation et des moments de qualité en leur compagnie. Pour les chats, je me charge de l'entretien de la litière, des soins nécessaires et leur apporte les caresses quotidiennes dont ils ont besoin.",
-      "prix": "15 € chien · 10 € chat",
-      "unite": "/ nuitée"
+      "prix": "15 € · 10 €",
+      "unite": "chien / chat · nuitée"
     }
   ]
 }
