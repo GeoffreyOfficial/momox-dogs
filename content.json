@@ -1,13 +1,13 @@
 {
   "theme": {
-    "ink": "#3d3122",
+    "ink": "#3d352c",
     "paper": "#fbf7ec",
     "paperSoft": "#f4ecd8",
-    "pineDark": "#8a6a41",
-    "pine": "#c99a55",
-    "olive": "#967a52",
-    "gold": "#c1932c",
-    "goldLight": "#eecb85",
+    "pineDark": "#8c8068",
+    "pine": "#b8a47c",
+    "olive": "#8f8268",
+    "gold": "#ab8f66",
+    "goldLight": "#ddd0b0",
     "cream": "#fffaf0"
   },
 
@@ -19,7 +19,7 @@
 
   "seo": {
     "siteTitle": "Momox Dogs — Morgane, éducatrice canine (BPE)",
-    "description": "Momox Dogs — Morgane, éducatrice canine (BPE) : cours individuels et collectifs, cours chiot, désensibilisation, bilans comportementaux, balades et pet sitting dans le 95, le 92 et le 78.",
+    "description": "Momox Dogs — Morgane, éducatrice canine (BPE) : cours individuels et collectifs, cours chiot, désensibilisation, bilans comportementaux, balades et pet sitting. Basée à Taverny (95), intervention aux alentours.",
     "siteUrl": "https://momox-dogs.fr",
     "ogType": "website",
     "shareImage": "images/portrait-morgane.jpg"
@@ -69,9 +69,10 @@
   "contact": {
     "email": "Morgane@momoxdogs.fr",
     "telephone": "07 82 25 26 88",
-    "zone": "Intervention dans le 95, le 92 et le 78",
-    "formEndpoint": "",
-    "formAccessKey": ""
+    "zone": "Basée à Taverny (95), Morgane se déplace chez vous dans les communes alentours.",
+    "ville": "Taverny, France",
+    "facebook": "https://www.facebook.com/profile.php?id=61564959076095",
+    "instagram": "https://www.instagram.com/momoxdogs95"
   },
   "services": [
     {
