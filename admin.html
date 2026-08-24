@@ -1,0 +1,1279 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Momox Dogs — Édition du site</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" href="images/favicon.ico" sizes="any">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500&family=Work+Sans:wght@400;500;600;700&display=swap" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500&family=Work+Sans:wght@400;500;600;700&display=swap"></noscript>
+
+<style>
+/* =====================================================================
+   PALETTE — copiée telle quelle depuis index.html pour garder le même
+   look and feel. Si tu changes le thème dans content.json → theme,
+   ces valeurs par défaut servent d'aperçu tant que le fichier n'est pas
+   chargé, puis sont réappliquées automatiquement depuis le JSON chargé.
+   ===================================================================== */
+:root{
+  --ink:        #3d352c;
+  --paper:      #fbf7ec;
+  --paper-soft: #f4ecd8;
+  --pine-dark:  #8c8068;
+  --pine:       #b8a47c;
+  --olive:      #8f8268;
+  --gold:       #ab8f66;
+  --gold-light: #ddd0b0;
+  --cream:      #fffaf0;
+
+  --ink-rgb:       61,53,44;
+  --pine-dark-rgb: 140,128,104;
+  --cream-rgb:     255,250,240;
+  --paper-rgb:     251,247,236;
+
+  --line:       rgba(var(--ink-rgb),0.14);
+  --line-dark:  rgba(var(--cream-rgb),0.16);
+
+  --font-display: "Fraunces", Georgia, serif;
+  --font-body: "Work Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+
+  --radius: 18px;
+  --container: 1120px;
+
+  --danger: #b45341;
+  --danger-light: #f3ddd6;
+  --ok: #5f7a4f;
+}
+
+*,*::before,*::after{ box-sizing:border-box; }
+html{ -webkit-text-size-adjust:100%; scroll-behavior:smooth; }
+body{
+  margin:0;
+  font-family:var(--font-body);
+  color:var(--ink);
+  background:var(--paper);
+  line-height:1.55;
+  -webkit-font-smoothing:antialiased;
+  padding-bottom:110px; /* place pour la barre d'action fixe en bas (mobile) */
+}
+img{ max-width:100%; display:block; }
+a{ color:inherit; }
+h1,h2,h3{ font-family:var(--font-display); margin:0 0 .3em; font-weight:600; line-height:1.15; }
+p{ margin:0 0 1em; }
+.container{ width:100%; max-width:var(--container); margin:0 auto; padding:0 clamp(16px,4.5vw,24px); }
+.eyebrow{
+  font-family:var(--font-body); font-weight:700; letter-spacing:.12em; text-transform:uppercase;
+  font-size:.72rem; color:var(--gold);
+}
+
+/* ---------------------------------------------------------------------
+   Boutons — repris du site principal
+   --------------------------------------------------------------------- */
+.btn{
+  display:inline-flex; align-items:center; justify-content:center; gap:8px; white-space:nowrap;
+  font-family:var(--font-body); font-weight:600; font-size:.94rem;
+  padding:12px 22px; border-radius:999px; border:2px solid transparent;
+  text-decoration:none; cursor:pointer; transition:transform .18s cubic-bezier(.34,1.56,.64,1), box-shadow .18s ease, opacity .15s ease;
+  min-height:44px;
+}
+.btn:hover{ transform:translateY(-2px); }
+.btn:active{ transform:scale(.97); }
+.btn-primary{ background:linear-gradient(135deg,var(--gold-light) 0%,var(--gold) 100%); color:#3d2c0f; }
+.btn-primary:hover{ box-shadow:0 10px 22px rgba(193,147,44,.45); }
+.btn-outline{ background:transparent; border-color:var(--line); color:var(--ink); }
+.btn-outline:hover{ border-color:var(--gold); color:var(--gold); }
+.btn-danger{ background:transparent; border-color:var(--danger-light); color:var(--danger); }
+.btn-danger:hover{ background:var(--danger-light); }
+.btn-sm{ padding:8px 14px; font-size:.82rem; min-height:36px; }
+.btn-icon{ padding:8px; min-width:36px; min-height:36px; border-radius:50%; }
+.btn:disabled{ opacity:.45; cursor:not-allowed; transform:none; box-shadow:none; }
+
+/* ---------------------------------------------------------------------
+   En-tête
+   --------------------------------------------------------------------- */
+.admin-header{
+  position:sticky; top:0; z-index:50;
+  background:rgba(var(--paper-rgb),.97); backdrop-filter:blur(8px);
+  border-bottom:1px solid var(--line);
+}
+.admin-header .row{ display:flex; align-items:center; gap:14px; padding:14px 0; flex-wrap:wrap; }
+.admin-brand{ display:flex; align-items:center; gap:10px; margin-right:auto; }
+.admin-brand-mark{ width:34px; height:34px; border-radius:50%; background:var(--gold-light); flex:none; display:flex; align-items:center; justify-content:center; font-family:var(--font-display); font-weight:700; color:#5a4726; }
+.admin-brand-title{ font-family:var(--font-display); font-weight:600; font-size:1.15rem; line-height:1.1; }
+.admin-brand-sub{ font-size:.72rem; color:var(--olive); text-transform:uppercase; letter-spacing:.08em; }
+.status-pill{
+  font-size:.76rem; font-weight:600; padding:6px 12px; border-radius:999px;
+  background:var(--paper-soft); color:var(--olive); border:1px solid var(--line);
+  display:flex; align-items:center; gap:6px;
+}
+.status-pill.dirty{ background:#fdf1de; color:#8a5a1c; border-color:#eccd9a; }
+.status-pill.dirty::before{ content:"●"; color:#c98a2c; }
+.status-pill.saved::before{ content:"✓"; }
+
+/* ---------------------------------------------------------------------
+   Mise en page générale
+   --------------------------------------------------------------------- */
+.intro{ padding:26px 0 6px; }
+.intro h1{ font-size:1.6rem; }
+.intro p{ color:var(--olive); max-width:640px; }
+
+.panel{
+  background:#fff; border:1px solid var(--line); border-radius:var(--radius);
+  margin-bottom:20px; overflow:hidden;
+}
+.panel-head{
+  display:flex; align-items:center; justify-content:space-between; gap:10px;
+  padding:18px 22px; cursor:pointer; user-select:none; background:var(--paper-soft);
+}
+.panel-head h2{ font-size:1.05rem; margin:0; }
+.panel-head .hint{ font-size:.8rem; color:var(--olive); font-weight:400; font-family:var(--font-body); display:block; margin-top:2px; }
+.panel-chevron{ transition:transform .2s ease; flex:none; color:var(--olive); }
+.panel.open .panel-chevron{ transform:rotate(180deg); }
+.panel-body{ padding:22px; display:none; }
+.panel.open .panel-body{ display:block; }
+
+.field{ margin-bottom:16px; }
+.field:last-child{ margin-bottom:0; }
+.field label{ display:block; font-size:.82rem; font-weight:600; color:var(--olive); margin-bottom:6px; }
+.field .desc{ font-size:.76rem; color:#8a8171; margin-top:4px; }
+.grid-2{ display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+.grid-3{ display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px; }
+@media (max-width:640px){ .grid-2, .grid-3{ grid-template-columns:1fr; } }
+
+input[type=text], input[type=email], input[type=tel], input[type=url], textarea{
+  width:100%; font-family:var(--font-body); font-size:.95rem; color:var(--ink);
+  border:1.5px solid var(--line); border-radius:10px; padding:11px 13px;
+  background:#fffdf9; transition:border-color .15s ease, box-shadow .15s ease;
+}
+input:focus, textarea:focus{ outline:none; border-color:var(--gold); box-shadow:0 0 0 3px rgba(171,143,102,.18); }
+textarea{ resize:vertical; min-height:90px; line-height:1.5; font-family:var(--font-body); }
+textarea.tall{ min-height:200px; }
+input.invalid, textarea.invalid{ border-color:var(--danger); }
+
+/* Étiquettes / tags */
+.tag-list{ display:flex; flex-wrap:wrap; gap:8px; margin-bottom:12px; }
+.tag-chip{
+  display:inline-flex; align-items:center; gap:8px; background:var(--paper-soft);
+  border:1px solid var(--line); border-radius:999px; padding:6px 8px 6px 14px; font-size:.85rem;
+}
+.tag-chip button{ background:var(--line); border:none; width:20px; height:20px; border-radius:50%; cursor:pointer; color:var(--ink); font-size:.8rem; line-height:1; }
+.tag-chip button:hover{ background:var(--danger-light); color:var(--danger); }
+.add-row{ display:flex; gap:10px; }
+.add-row input{ flex:1; }
+
+/* Cartes de services (cours & tarifs) */
+.service-card{
+  border:1px solid var(--line); border-radius:14px; padding:18px; margin-bottom:16px;
+  background:#fffdf9; position:relative;
+}
+.service-card-top{ display:flex; align-items:flex-start; justify-content:space-between; gap:12px; margin-bottom:14px; }
+.service-card-title{ font-family:var(--font-display); font-size:1.05rem; font-weight:600; }
+.service-card-title .cat{ font-family:var(--font-body); font-size:.72rem; text-transform:uppercase; letter-spacing:.08em; color:var(--gold); display:block; font-weight:700; margin-bottom:2px; }
+.service-actions{ display:flex; gap:6px; flex:none; }
+.service-img-preview{
+  width:100%; height:120px; object-fit:cover; border-radius:10px; background:var(--paper-soft);
+  margin-bottom:12px; border:1px dashed var(--line);
+}
+.service-img-preview.empty::before{ content:"Aperçu image indisponible ici — sera visible sur le site en ligne"; }
+.img-fallback{ display:flex; align-items:center; justify-content:center; text-align:center; font-size:.75rem; color:#a99f8a; padding:10px; height:120px; border-radius:10px; background:var(--paper-soft); border:1px dashed var(--line); margin-bottom:12px; }
+.reorder-hint{ font-size:.72rem; color:var(--olive); }
+
+.add-service-btn{ width:100%; justify-content:center; border:2px dashed var(--line); background:transparent; color:var(--olive); padding:16px; }
+.add-service-btn:hover{ border-color:var(--gold); color:var(--gold); background:var(--paper-soft); }
+
+/* Barre d'action fixe */
+.actionbar{
+  position:fixed; left:0; right:0; bottom:0; z-index:60;
+  background:rgba(var(--paper-rgb),.98); backdrop-filter:blur(8px);
+  border-top:1px solid var(--line);
+  padding:12px 0; padding-bottom:calc(12px + env(safe-area-inset-bottom));
+}
+.actionbar .row{ display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
+.actionbar .spacer{ flex:1; }
+.file-input-label{ display:inline-flex; }
+.file-input-label input[type=file]{ display:none; }
+
+.toast{
+  position:fixed; top:14px; left:50%; transform:translateX(-50%) translateY(-140%) scale(.94);
+  background:var(--ink); color:var(--cream); padding:12px 20px; border-radius:12px;
+  font-size:.88rem; font-weight:600; z-index:200; box-shadow:0 10px 26px rgba(0,0,0,.25);
+  transition:transform .32s cubic-bezier(.34,1.56,.64,1), opacity .2s ease;
+  opacity:0; max-width:min(360px, calc(100vw - 32px));
+}
+.toast.show{ transform:translateX(-50%) translateY(0) scale(1); opacity:1; }
+.toast.error{ background:var(--danger); }
+
+/* Toast riche pour Annuler / Rétablir */
+.toast.action-toast{
+  padding:13px 16px 11px; text-align:left; border-left:4px solid var(--gold);
+  background:linear-gradient(165deg, #46392a 0%, #2f2619 100%);
+}
+.toast.action-toast.is-undo{ border-left-color:#e0ac4c; }
+.toast.action-toast.is-redo{ border-left-color:#8fbf7a; }
+.toast-row{ display:flex; align-items:center; gap:12px; }
+.toast-icon{
+  flex:none; width:32px; height:32px; border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+  animation:toastIconPop .38s cubic-bezier(.34,1.56,.64,1);
+}
+.toast-icon.undo{ background:rgba(224,172,76,.22); color:#f2d391; }
+.toast-icon.redo{ background:rgba(143,191,122,.22); color:#c3e6b0; }
+@keyframes toastIconPop{ from{ transform:scale(.3) rotate(-25deg); opacity:0; } to{ transform:scale(1) rotate(0); opacity:1; } }
+.toast-copy{ min-width:0; }
+.toast-title{ font-family:var(--font-display); font-weight:600; font-size:.98rem; letter-spacing:.01em; }
+.toast-desc{
+  font-family:var(--font-body); font-weight:500; font-size:.78rem; color:rgba(var(--cream-rgb),.72);
+  margin-top:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:250px;
+}
+.toast-progress{ height:3px; border-radius:3px; background:rgba(var(--cream-rgb),.16); margin-top:11px; overflow:hidden; }
+.toast-progress span{ display:block; height:100%; width:100%; transform-origin:left; }
+.is-undo .toast-progress span{ background:linear-gradient(90deg,#f2d391,#c98a2c); }
+.is-redo .toast-progress span{ background:linear-gradient(90deg,#c3e6b0,#5f7a4f); }
+.toast-progress span.run{ animation:toastShrink 3.1s linear forwards; }
+@keyframes toastShrink{ from{ transform:scaleX(1); } to{ transform:scaleX(0); } }
+
+.empty-state{
+  text-align:center; padding:60px 20px; color:var(--olive);
+}
+.empty-state h2{ color:var(--ink); }
+.empty-state .btn{ margin-top:16px; }
+
+.loading-overlay{
+  position:fixed; inset:0; background:var(--paper); z-index:300;
+  display:flex; align-items:center; justify-content:center; flex-direction:column; gap:14px;
+}
+.spinner{
+  width:34px; height:34px; border-radius:50%; border:3px solid var(--line); border-top-color:var(--gold);
+  animation:spin .8s linear infinite;
+}
+@keyframes spin{ to{ transform:rotate(360deg); } }
+
+.color-row{ display:flex; align-items:center; gap:10px; }
+.color-row input[type=color]{ width:44px; height:44px; padding:0; border:1.5px solid var(--line); border-radius:10px; background:none; cursor:pointer; }
+.color-row input[type=text]{ flex:1; }
+
+/* ---------------------------------------------------------------------
+   Aperçu du site (iframe plein écran)
+   --------------------------------------------------------------------- */
+.preview-overlay{
+  position:fixed; inset:0; z-index:500; background:#2b2620;
+  display:flex; flex-direction:column;
+}
+.preview-topbar{
+  display:flex; align-items:center; justify-content:space-between; gap:14px;
+  padding:10px 16px; padding-top:calc(10px + env(safe-area-inset-top));
+  background:var(--paper); border-bottom:1px solid var(--line); flex-wrap:wrap;
+}
+.preview-topbar-left{ display:flex; flex-direction:column; gap:2px; min-width:0; }
+.preview-topbar-left strong{ font-family:var(--font-display); font-size:1rem; }
+.preview-topbar-left .desc{ margin:0; max-width:520px; }
+.preview-topbar-actions{ display:flex; gap:8px; flex-wrap:wrap; }
+.preview-frame-wrap{
+  flex:1; overflow:auto; display:flex; justify-content:center; align-items:flex-start;
+  background:#2b2620; padding:18px;
+}
+#previewIframe{ border:none; background:#fff; width:100%; height:100%; border-radius:10px; box-shadow:0 14px 44px rgba(0,0,0,.4); }
+.preview-frame-wrap.mobile{ align-items:center; }
+.preview-frame-wrap.mobile #previewIframe{ width:min(390px, calc(100vw - 40px)); min-width:0; height:820px; border-radius:28px; }
+</style>
+</head>
+<body>
+
+<div id="loadingOverlay" class="loading-overlay">
+  <div class="spinner"></div>
+  <div style="font-family:var(--font-body); color:var(--olive); font-size:.9rem;">Chargement de content.json…</div>
+</div>
+
+<div id="toast" class="toast"></div>
+
+<header class="admin-header">
+  <div class="container row">
+    <div class="admin-brand">
+      <div class="admin-brand-mark">M</div>
+      <div>
+        <div class="admin-brand-title">Momox Dogs</div>
+        <div class="admin-brand-sub">Édition du site</div>
+      </div>
+    </div>
+    <button class="btn btn-outline btn-sm" id="previewBtn" type="button" style="display:none;">👁 Aperçu du site</button>
+    <div id="statusPill" class="status-pill saved">À jour</div>
+  </div>
+</header>
+
+<main id="appMain" class="container" style="display:none;">
+  <div class="intro">
+    <h1>Mettre à jour le site</h1>
+    <p>Modifie les textes, les prix, l'ordre des cours ou les informations de contact ci-dessous, puis clique sur « Télécharger content.json » en bas de page. Remplace ensuite ce fichier sur le serveur du site (à côté d'index.html) pour publier les changements.</p>
+  </div>
+
+  <!-- ============================= CONTACT ============================= -->
+  <section class="panel open" data-panel>
+    <div class="panel-head" data-toggle>
+      <div><h2>Coordonnées de contact</h2><span class="hint">Email, téléphone, zone d'intervention, réseaux sociaux</span></div>
+      <svg class="panel-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M6 9l6 6 6-6"/></svg>
+    </div>
+    <div class="panel-body">
+      <div class="grid-2">
+        <div class="field"><label>Email</label><input type="email" data-bind="contact.email"></div>
+        <div class="field"><label>Téléphone</label><input type="tel" data-bind="contact.telephone"></div>
+      </div>
+      <div class="grid-2">
+        <div class="field"><label>Ville</label><input type="text" data-bind="contact.ville"></div>
+        <div class="field"><label>Zone d'intervention (texte affiché)</label><input type="text" data-bind="contact.zone"></div>
+      </div>
+      <div class="grid-2">
+        <div class="field"><label>Lien Facebook</label><input type="url" data-bind="contact.facebook"></div>
+        <div class="field"><label>Lien Instagram</label><input type="url" data-bind="contact.instagram"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================= ACCUEIL (HERO) ============================= -->
+  <section class="panel" data-panel>
+    <div class="panel-head" data-toggle>
+      <div><h2>Page d'accueil</h2><span class="hint">Le grand titre affiché en haut du site</span></div>
+      <svg class="panel-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M6 9l6 6 6-6"/></svg>
+    </div>
+    <div class="panel-body">
+      <div class="field"><label>Badge (petit texte au-dessus du titre)</label><input type="text" data-bind="hero.badge"></div>
+      <div class="field">
+        <label>Titre principal</label>
+        <input type="text" data-bind="hero.titre">
+        <div class="desc">Astuce : entoure un mot de <code>&lt;em&gt;</code>...<code>&lt;/em&gt;</code> pour l'afficher en italique doré, ex. « Une éducation &lt;em&gt;sur-mesure&lt;/em&gt; ».</div>
+      </div>
+      <div class="field"><label>Texte d'introduction</label><textarea data-bind="hero.texte"></textarea></div>
+    </div>
+  </section>
+
+  <!-- ============================= PRESENTATION ============================= -->
+  <section class="panel" data-panel>
+    <div class="panel-head" data-toggle>
+      <div><h2>Présentation</h2><span class="hint">« Bonjour, je suis Morgane »</span></div>
+      <svg class="panel-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M6 9l6 6 6-6"/></svg>
+    </div>
+    <div class="panel-body">
+      <div class="field"><label>Titre</label><input type="text" data-bind="presentation.titre"></div>
+      <div class="field"><label>Premier paragraphe</label><textarea data-bind="presentation.texte1"></textarea></div>
+      <div class="field"><label>Second paragraphe</label><textarea data-bind="presentation.texte2"></textarea></div>
+    </div>
+  </section>
+
+  <!-- ============================= POURQUOI ============================= -->
+  <section class="panel" data-panel>
+    <div class="panel-head" data-toggle>
+      <div><h2>Section « Pourquoi »</h2><span class="hint">Pourquoi suivre des cours d'éducation canine</span></div>
+      <svg class="panel-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M6 9l6 6 6-6"/></svg>
+    </div>
+    <div class="panel-body">
+      <div class="grid-2">
+        <div class="field"><label>Eyebrow (petit texte au-dessus du titre)</label><input type="text" data-bind="pourquoi.eyebrow"></div>
+        <div class="field"><label>Titre</label><input type="text" data-bind="pourquoi.titre"></div>
+      </div>
+      <div class="field"><label>Premier paragraphe</label><textarea data-bind="pourquoi.texte1"></textarea></div>
+      <div class="field"><label>Second paragraphe</label><textarea data-bind="pourquoi.texte2"></textarea></div>
+      <div class="field"><label>Citation mise en avant</label><textarea data-bind="pourquoi.citation"></textarea></div>
+    </div>
+  </section>
+
+  <!-- ============================= ETIQUETTES ============================= -->
+  <section class="panel" data-panel>
+    <div class="panel-head" data-toggle>
+      <div><h2>Étiquettes</h2><span class="hint">Petits mots-clés affichés sur le site (ex. « Éducation canine »)</span></div>
+      <svg class="panel-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M6 9l6 6 6-6"/></svg>
+    </div>
+    <div class="panel-body">
+      <div id="tagList" class="tag-list"></div>
+      <div class="add-row">
+        <input type="text" id="newTagInput" placeholder="Ajouter une étiquette…">
+        <button class="btn btn-outline btn-sm" id="addTagBtn" type="button">Ajouter</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================= COURS & TARIFS ============================= -->
+  <section class="panel open" data-panel>
+    <div class="panel-head" data-toggle>
+      <div><h2>Cours &amp; tarifs</h2><span class="hint">Ajoute, modifie, réordonne ou supprime les prestations proposées</span></div>
+      <svg class="panel-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M6 9l6 6 6-6"/></svg>
+    </div>
+    <div class="panel-body">
+      <div id="servicesList"></div>
+      <button class="btn add-service-btn" id="addServiceBtn" type="button">+ Ajouter un cours / une prestation</button>
+    </div>
+  </section>
+
+  <!-- ============================= IMAGES PRINCIPALES ============================= -->
+  <section class="panel" data-panel>
+    <div class="panel-head" data-toggle>
+      <div><h2>Images principales</h2><span class="hint">Photo d'accueil, fond de la section contact, portrait</span></div>
+      <svg class="panel-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M6 9l6 6 6-6"/></svg>
+    </div>
+    <div class="panel-body" id="mainImagesBody"></div>
+  </section>
+
+  <!-- ============================= GALERIE ============================= -->
+  <section class="panel" data-panel>
+    <div class="panel-head" data-toggle>
+      <div><h2>Galerie photo</h2><span class="hint">La section « Galerie » n'apparaît sur le site qu'à partir de 5 photos</span></div>
+      <svg class="panel-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M6 9l6 6 6-6"/></svg>
+    </div>
+    <div class="panel-body">
+      <div id="galerieStatus" class="desc" style="margin-bottom:14px;"></div>
+      <div id="galerieList"></div>
+      <button class="btn add-service-btn" id="addGalerieBtn" type="button">+ Ajouter une photo</button>
+    </div>
+  </section>
+
+  <!-- ============================= MENU DE NAVIGATION ============================= -->
+  <section class="panel" data-panel>
+    <div class="panel-head" data-toggle>
+      <div><h2>Menu de navigation</h2><span class="hint">Le texte des liens en haut du site (l'ordre suit celui-ci)</span></div>
+      <svg class="panel-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M6 9l6 6 6-6"/></svg>
+    </div>
+    <div class="panel-body">
+      <div id="navList"></div>
+      <div class="desc" style="margin-top:6px;">Le lien « Galerie » s'ajoute automatiquement à la fin du menu dès que 5 photos ou plus sont ajoutées ci-dessus — pas besoin de le gérer ici.</div>
+    </div>
+  </section>
+
+  <!-- ============================= COULEURS DU SITE ============================= -->
+  <section class="panel" data-panel>
+    <div class="panel-head" data-toggle>
+      <div><h2>Couleurs du site</h2><span class="hint">Palette utilisée sur tout le site — à modifier avec précaution</span></div>
+      <svg class="panel-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M6 9l6 6 6-6"/></svg>
+    </div>
+    <div class="panel-body">
+      <div id="themeBody" class="grid-2"></div>
+      <button class="btn btn-outline btn-sm" id="resetThemeBtn" type="button" style="margin-top:8px;">Réinitialiser aux couleurs d'origine</button>
+    </div>
+  </section>
+
+  <!-- ============================= PIED DE PAGE ============================= -->
+  <section class="panel" data-panel>
+    <div class="panel-head" data-toggle>
+      <div><h2>Pied de page</h2><span class="hint">Copyright et petite phrase en bas du site</span></div>
+      <svg class="panel-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M6 9l6 6 6-6"/></svg>
+    </div>
+    <div class="panel-body">
+      <div class="field"><label>Copyright</label><input type="text" data-bind="footer.copyright"></div>
+      <div class="field"><label>Phrase de fin</label><input type="text" data-bind="footer.tagline"></div>
+    </div>
+  </section>
+
+  <!-- ============================= SEO ============================= -->
+  <section class="panel" data-panel>
+    <div class="panel-head" data-toggle>
+      <div><h2>Référencement (SEO)</h2><span class="hint">Titre et description utilisés par Google et les réseaux sociaux</span></div>
+      <svg class="panel-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M6 9l6 6 6-6"/></svg>
+    </div>
+    <div class="panel-body">
+      <div class="field"><label>Titre du site</label><input type="text" data-bind="seo.siteTitle"></div>
+      <div class="field"><label>Description</label><textarea data-bind="seo.description"></textarea></div>
+      <div class="field"><label>Adresse du site (URL)</label><input type="url" data-bind="seo.siteUrl"></div>
+    </div>
+  </section>
+
+  <div style="height:8px;"></div>
+</main>
+
+<div id="emptyState" class="empty-state" style="display:none;">
+  <h2>Impossible de charger content.json automatiquement</h2>
+  <p>Si tu ouvres cette page directement depuis ton ordinateur (sans serveur web), le navigateur bloque le chargement automatique du fichier.<br>Choisis-le manuellement ci-dessous :</p>
+  <label class="btn btn-primary file-input-label">
+    Choisir content.json
+    <input type="file" id="manualFileInput" accept="application/json,.json">
+  </label>
+</div>
+
+<div class="actionbar" id="actionbar" style="display:none;">
+  <div class="container row">
+    <button class="btn btn-icon btn-outline" id="undoBtn" type="button" title="Rien à annuler" disabled>
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 14 4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/></svg>
+    </button>
+    <button class="btn btn-icon btn-outline" id="redoBtn" type="button" title="Rien à rétablir" disabled>
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 14l5-5-5-5"/><path d="M20 9H9.5a5.5 5.5 0 0 0 0 11H13"/></svg>
+    </button>
+    <label class="btn btn-outline btn-sm file-input-label">
+      Charger un fichier
+      <input type="file" id="reloadFileInput" accept="application/json,.json">
+    </label>
+    <button class="btn btn-outline btn-sm" id="copyJsonBtn" type="button">Copier le JSON</button>
+    <div class="spacer"></div>
+    <button class="btn btn-primary" id="downloadBtn" type="button">⬇ Télécharger content.json</button>
+  </div>
+</div>
+
+<div id="previewOverlay" class="preview-overlay" style="display:none;">
+  <div class="preview-topbar">
+    <div class="preview-topbar-left">
+      <strong>Aperçu du site</strong>
+      <span class="desc" id="previewNote">Reflète tes modifications actuelles (même non téléchargées). Les images ne s'affichent que si les fichiers existent réellement à cet endroit.</span>
+    </div>
+    <div class="preview-topbar-actions">
+      <button class="btn btn-sm btn-outline" id="previewDesktopBtn" type="button">🖥 Ordinateur</button>
+      <button class="btn btn-sm btn-outline" id="previewMobileBtn" type="button">📱 Mobile</button>
+      <button class="btn btn-sm btn-outline" id="previewRefreshBtn" type="button">↻ Actualiser</button>
+      <button class="btn btn-sm btn-primary" id="previewCloseBtn" type="button">✕ Fermer</button>
+    </div>
+  </div>
+  <div class="preview-frame-wrap" id="previewFrameWrap">
+    <iframe id="previewIframe" title="Aperçu du site Momox Dogs"></iframe>
+  </div>
+</div>
+
+<script>
+/* =====================================================================
+   ÉTAT
+   ===================================================================== */
+let CONTENT = null;
+let dirty = false;
+const DRAFT_KEY = 'momoxdogs_admin_draft_v1';
+
+const $ = (sel, root=document) => root.querySelector(sel);
+const $$ = (sel, root=document) => Array.from(root.querySelectorAll(sel));
+
+function showToast(msg, isError=false){
+  const t = $('#toast');
+  t.textContent = msg;
+  t.className = 'toast show' + (isError ? ' error' : '');
+  clearTimeout(showToast._timer);
+  showToast._timer = setTimeout(()=> t.classList.remove('show'), 2600);
+}
+
+function setDirty(v){
+  dirty = v;
+  const pill = $('#statusPill');
+  if (v){
+    pill.textContent = 'Modifications non téléchargées';
+    pill.className = 'status-pill dirty';
+  } else {
+    pill.textContent = 'À jour';
+    pill.className = 'status-pill saved';
+  }
+}
+
+function markDirty(){
+  setDirty(true);
+  try { localStorage.setItem(DRAFT_KEY, JSON.stringify(CONTENT)); } catch(e){}
+}
+
+window.addEventListener('beforeunload', (e) => {
+  if (dirty){ e.preventDefault(); e.returnValue = ''; }
+});
+
+/* =====================================================================
+   HISTORIQUE — ANNULER / RÉTABLIR
+   Chaque action « significative » (champ modifié après une pause,
+   ajout/suppression/réorganisation…) enregistre un instantané complet
+   de CONTENT avec une description lisible. Les saisies au clavier sont
+   regroupées (debounce) pour qu'un « Annuler » corresponde à une vraie
+   étape plutôt qu'à une seule lettre tapée.
+   ===================================================================== */
+let HISTORY = [];
+let HISTORY_INDEX = -1;
+const HISTORY_LIMIT = 60;
+const HISTORY_DEBOUNCE = 700;
+let historyPendingLabel = null;
+let historyDebounceTimer = null;
+
+function snapshotContent(){
+  return JSON.stringify(CONTENT);
+}
+
+function seedHistory(label){
+  HISTORY = [{ label: label || 'État initial', state: snapshotContent() }];
+  HISTORY_INDEX = 0;
+  historyPendingLabel = null;
+  clearTimeout(historyDebounceTimer);
+  updateHistoryButtons();
+}
+
+function pushHistory(label){
+  HISTORY = HISTORY.slice(0, HISTORY_INDEX + 1);
+  HISTORY.push({ label, state: snapshotContent() });
+  if (HISTORY.length > HISTORY_LIMIT) HISTORY.shift();
+  HISTORY_INDEX = HISTORY.length - 1;
+  updateHistoryButtons();
+}
+
+function flushHistoryDebounce(){
+  if (historyDebounceTimer){
+    clearTimeout(historyDebounceTimer);
+    historyDebounceTimer = null;
+    if (historyPendingLabel){
+      pushHistory(historyPendingLabel);
+      historyPendingLabel = null;
+    }
+  }
+}
+
+/* À appeler après CHAQUE modification de CONTENT, à la place de markDirty()
+   seul. debounce:true pour les champs texte (regroupe la frappe). */
+function commitChange(label, opts){
+  const debounce = !!(opts && opts.debounce);
+  markDirty();
+  if (debounce){
+    historyPendingLabel = label;
+    clearTimeout(historyDebounceTimer);
+    historyDebounceTimer = setTimeout(() => {
+      historyDebounceTimer = null;
+      pushHistory(historyPendingLabel);
+      historyPendingLabel = null;
+    }, HISTORY_DEBOUNCE);
+  } else {
+    flushHistoryDebounce();
+    pushHistory(label);
+  }
+}
+
+function updateHistoryButtons(){
+  const undoBtn = $('#undoBtn'), redoBtn = $('#redoBtn');
+  if (!undoBtn || !redoBtn) return;
+  const canUndo = HISTORY_INDEX > 0;
+  const canRedo = HISTORY_INDEX < HISTORY.length - 1;
+  undoBtn.disabled = !canUndo;
+  redoBtn.disabled = !canRedo;
+  undoBtn.title = canUndo ? ('Annuler : ' + HISTORY[HISTORY_INDEX].label) : 'Rien à annuler';
+  redoBtn.title = canRedo ? ('Rétablir : ' + HISTORY[HISTORY_INDEX + 1].label) : 'Rien à rétablir';
+}
+
+function restoreHistoryState(index){
+  CONTENT = JSON.parse(HISTORY[index].state);
+  renderAll();
+  applyTheme(CONTENT.theme);
+  markDirty();
+  updateHistoryButtons();
+}
+
+function undo(){
+  flushHistoryDebounce();
+  if (HISTORY_INDEX <= 0) return;
+  const undoneLabel = HISTORY[HISTORY_INDEX].label;
+  HISTORY_INDEX--;
+  restoreHistoryState(HISTORY_INDEX);
+  showActionToast('undo', undoneLabel);
+}
+
+function redo(){
+  if (HISTORY_INDEX >= HISTORY.length - 1) return;
+  HISTORY_INDEX++;
+  restoreHistoryState(HISTORY_INDEX);
+  showActionToast('redo', HISTORY[HISTORY_INDEX].label);
+}
+
+$('#undoBtn').addEventListener('click', undo);
+$('#redoBtn').addEventListener('click', redo);
+
+window.addEventListener('keydown', (e) => {
+  const tag = document.activeElement && document.activeElement.tagName;
+  const typing = tag === 'INPUT' || tag === 'TEXTAREA';
+  if (!(e.ctrlKey || e.metaKey)) return;
+  const key = e.key.toLowerCase();
+  if (typing){
+    // Dans un champ texte, on laisse le undo natif du navigateur agir sur
+    // le texte ; on ne déclenche notre historique qu'une fois le champ quitté.
+    return;
+  }
+  if (key === 'z' && !e.shiftKey){ e.preventDefault(); undo(); }
+  else if ((key === 'z' && e.shiftKey) || key === 'y'){ e.preventDefault(); redo(); }
+});
+
+/* Toast riche et explicite pour Annuler / Rétablir */
+function showActionToast(kind, label){
+  const t = $('#toast');
+  clearTimeout(showToast._timer);
+  const isUndo = kind === 'undo';
+  const iconPath = isUndo
+    ? '<path d="M9 14 4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/>'
+    : '<path d="M15 14l5-5-5-5"/><path d="M20 9H9.5a5.5 5.5 0 0 0 0 11H13"/>';
+  t.innerHTML =
+    '<div class="toast-row">' +
+      '<div class="toast-icon ' + (isUndo ? 'undo' : 'redo') + '">' +
+        '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">' + iconPath + '</svg>' +
+      '</div>' +
+      '<div class="toast-copy">' +
+        '<div class="toast-title">' + (isUndo ? 'Annulé' : 'Rétabli') + '</div>' +
+        '<div class="toast-desc">' + escapeHtml(label) + '</div>' +
+      '</div>' +
+    '</div>' +
+    '<div class="toast-progress"><span></span></div>';
+  t.className = 'toast show action-toast ' + (isUndo ? 'is-undo' : 'is-redo');
+  const bar = t.querySelector('.toast-progress span');
+  requestAnimationFrame(() => bar.classList.add('run'));
+  showToast._timer = setTimeout(() => t.classList.remove('show'), 3100);
+}
+
+/* =====================================================================
+   CHARGEMENT
+   ===================================================================== */
+async function init(){
+  let loaded = null;
+  try {
+    const res = await fetch('content.json', { cache: 'no-store' });
+    if (res.ok) loaded = await res.json();
+  } catch(e){ /* pas de serveur / fichier introuvable — on proposera l'import manuel */ }
+
+  if (loaded){
+    checkDraftAndStart(loaded);
+  } else {
+    $('#loadingOverlay').style.display = 'none';
+    $('#emptyState').style.display = 'block';
+  }
+}
+
+function checkDraftAndStart(freshContent){
+  let draft = null;
+  try {
+    const raw = localStorage.getItem(DRAFT_KEY);
+    if (raw) draft = JSON.parse(raw);
+  } catch(e){}
+
+  if (draft && JSON.stringify(draft) !== JSON.stringify(freshContent)){
+    const keep = confirm("Un brouillon non téléchargé a été retrouvé (modifications précédentes non publiées). Veux-tu le reprendre ?\n\nOK = reprendre le brouillon\nAnnuler = repartir du fichier content.json actuel");
+    startWith(keep ? draft : freshContent);
+  } else {
+    startWith(freshContent);
+  }
+}
+
+let ORIGINAL_THEME = null;
+
+function startWith(data){
+  CONTENT = normalizeContent(data);
+  ORIGINAL_THEME = JSON.parse(JSON.stringify(CONTENT.theme));
+  $('#loadingOverlay').style.display = 'none';
+  $('#emptyState').style.display = 'none';
+  $('#appMain').style.display = 'block';
+  $('#actionbar').style.display = 'block';
+  $('#previewBtn').style.display = 'inline-flex';
+  renderAll();
+  applyTheme(CONTENT.theme);
+  setDirty(false);
+  seedHistory('État initial');
+}
+
+function normalizeContent(data){
+  data.tags = data.tags || [];
+  data.services = data.services || [];
+  data.nav = data.nav || [];
+  data.galerie = data.galerie || [];
+  data.contact = data.contact || {};
+  data.hero = data.hero || {};
+  data.presentation = data.presentation || {};
+  data.pourquoi = data.pourquoi || {};
+  data.footer = data.footer || {};
+  data.seo = data.seo || {};
+  data.images = data.images || {};
+  data.theme = data.theme || {};
+  return data;
+}
+
+/* Import manuel (premier chargement, sans serveur) */
+$('#manualFileInput').addEventListener('change', async (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+  try {
+    const text = await file.text();
+    const data = JSON.parse(text);
+    checkDraftAndStart(data);
+  } catch(err){
+    showToast('Fichier JSON invalide : ' + err.message, true);
+  }
+});
+
+/* Recharger un fichier depuis la barre d'action (remplace le contenu en cours) */
+$('#reloadFileInput').addEventListener('change', async (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+  if (dirty && !confirm("Charger ce fichier remplacera tes modifications en cours (non téléchargées). Continuer ?")) {
+    e.target.value = '';
+    return;
+  }
+  try {
+    const text = await file.text();
+    const data = JSON.parse(text);
+    CONTENT = normalizeContent(data);
+    renderAll();
+    setDirty(false);
+    seedHistory('Fichier chargé');
+    showToast('Fichier chargé.');
+  } catch(err){
+    showToast('Fichier JSON invalide : ' + err.message, true);
+  }
+  e.target.value = '';
+});
+
+/* =====================================================================
+   RENDU
+   ===================================================================== */
+function renderAll(){
+  bindSimpleFields();
+  renderTags();
+  renderServices();
+  renderMainImages();
+  renderGalerie();
+  renderNav();
+  renderTheme();
+}
+
+function getPath(obj, path){
+  return path.split('.').reduce((o,k)=> (o==null? undefined : o[k]), obj);
+}
+function setPath(obj, path, value){
+  const parts = path.split('.');
+  const last = parts.pop();
+  let o = obj;
+  for (const p of parts){ o[p] = o[p] || {}; o = o[p]; }
+  o[last] = value;
+}
+
+function fieldLabelFor(el){
+  const field = el.closest('.field');
+  const lbl = field && field.querySelector('label');
+  return lbl ? lbl.textContent.trim() : null;
+}
+
+function bindSimpleFields(){
+  $$('[data-bind]').forEach(el => {
+    const path = el.getAttribute('data-bind');
+    const val = getPath(CONTENT, path);
+    el.value = (val === undefined || val === null) ? '' : val;
+    const label = 'Modification : ' + (fieldLabelFor(el) || path);
+    el.oninput = () => {
+      setPath(CONTENT, path, el.value);
+      commitChange(label, { debounce: true });
+    };
+    el.addEventListener('blur', flushHistoryDebounce);
+  });
+}
+
+/* --------------------------- Étiquettes / tags --------------------------- */
+function renderTags(){
+  const list = $('#tagList');
+  list.innerHTML = '';
+  CONTENT.tags.forEach((tag, i) => {
+    const chip = document.createElement('span');
+    chip.className = 'tag-chip';
+    chip.innerHTML = `<span></span><button type="button" title="Supprimer" aria-label="Supprimer">✕</button>`;
+    chip.querySelector('span').textContent = tag;
+    chip.querySelector('button').onclick = () => {
+      CONTENT.tags.splice(i,1);
+      renderTags();
+      commitChange('Suppression de l\u2019étiquette « ' + tag + ' »');
+    };
+    list.appendChild(chip);
+  });
+}
+function addTag(){
+  const input = $('#newTagInput');
+  const val = input.value.trim();
+  if (!val) return;
+  CONTENT.tags.push(val);
+  input.value = '';
+  renderTags();
+  commitChange('Ajout de l\u2019étiquette « ' + val + ' »');
+}
+$('#addTagBtn').addEventListener('click', addTag);
+$('#newTagInput').addEventListener('keydown', (e) => { if (e.key === 'Enter'){ e.preventDefault(); addTag(); } });
+
+/* --------------------------- Cours & tarifs --------------------------- */
+function renderServices(){
+  const list = $('#servicesList');
+  list.innerHTML = '';
+  CONTENT.services.forEach((svc, i) => {
+    const card = document.createElement('div');
+    card.className = 'service-card';
+    card.innerHTML = `
+      <div class="service-card-top">
+        <div class="service-card-title">
+          <span class="cat">Prestation ${i+1}</span>
+          ${escapeHtml(svc.titre || '(sans titre)')}
+        </div>
+        <div class="service-actions">
+          <button type="button" class="btn btn-icon btn-outline" data-act="up" title="Monter">↑</button>
+          <button type="button" class="btn btn-icon btn-outline" data-act="down" title="Descendre">↓</button>
+          <button type="button" class="btn btn-icon btn-outline" data-act="dup" title="Dupliquer">⧉</button>
+          <button type="button" class="btn btn-icon btn-danger" data-act="del" title="Supprimer">🗑</button>
+        </div>
+      </div>
+      <div class="img-fallback" data-img-fallback style="display:none;"></div>
+      <img class="service-img-preview" data-img-preview alt="">
+      <div class="grid-3">
+        <div class="field"><label>Catégorie</label><input type="text" data-f="categorie"></div>
+        <div class="field"><label>Titre</label><input type="text" data-f="titre"></div>
+        <div class="field"><label>Chemin de l'image</label><input type="text" data-f="image" placeholder="images/service-xxx.jpg"></div>
+      </div>
+      <div class="grid-2">
+        <div class="field"><label>Prix</label><input type="text" data-f="prix" placeholder="ex. 50 €"></div>
+        <div class="field"><label>Unité</label><input type="text" data-f="unite" placeholder="ex. / heure"></div>
+      </div>
+      <div class="field"><label>Description</label><textarea class="tall" data-f="description"></textarea></div>
+    `;
+
+    // valeurs
+    card.querySelector('[data-f=categorie]').value = svc.categorie || '';
+    card.querySelector('[data-f=titre]').value = svc.titre || '';
+    card.querySelector('[data-f=image]').value = svc.image || '';
+    card.querySelector('[data-f=prix]').value = svc.prix || '';
+    card.querySelector('[data-f=unite]').value = svc.unite || '';
+    card.querySelector('[data-f=description]').value = svc.description || '';
+
+    // aperçu image
+    const imgEl = card.querySelector('[data-img-preview]');
+    const fallbackEl = card.querySelector('[data-img-fallback]');
+    function refreshImg(){
+      if (!svc.image){ imgEl.style.display='none'; fallbackEl.style.display='flex'; fallbackEl.textContent = "Aucun chemin d'image renseigné"; return; }
+      imgEl.src = svc.image;
+      imgEl.style.display = 'block';
+      fallbackEl.style.display = 'none';
+      imgEl.onerror = () => { imgEl.style.display='none'; fallbackEl.style.display='flex'; fallbackEl.textContent = 'Aperçu indisponible ici (' + svc.image + ') — sera visible sur le site en ligne si le fichier existe au bon endroit'; };
+    }
+    refreshImg();
+
+    // bindings des champs texte
+    const FIELD_LABELS = { categorie:'Catégorie', titre:'Titre', image:"Chemin de l'image", prix:'Prix', unite:'Unité', description:'Description' };
+    $$('[data-f]', card).forEach(el => {
+      const key = el.getAttribute('data-f');
+      el.oninput = () => {
+        svc[key] = el.value;
+        commitChange('Modification : ' + FIELD_LABELS[key] + ' (Prestation ' + (i+1) + ')', { debounce:true });
+        if (key === 'titre'){ card.querySelector('.service-card-title').lastChild.textContent = ' ' + (svc.titre || '(sans titre)'); }
+        if (key === 'image'){ refreshImg(); }
+      };
+      el.addEventListener('blur', flushHistoryDebounce);
+    });
+
+    // actions
+    card.querySelector('[data-act=up]').onclick = () => {
+      if (i === 0) return;
+      [CONTENT.services[i-1], CONTENT.services[i]] = [CONTENT.services[i], CONTENT.services[i-1]];
+      renderServices(); commitChange('Réorganisation des prestations');
+    };
+    card.querySelector('[data-act=down]').onclick = () => {
+      if (i === CONTENT.services.length-1) return;
+      [CONTENT.services[i+1], CONTENT.services[i]] = [CONTENT.services[i], CONTENT.services[i+1]];
+      renderServices(); commitChange('Réorganisation des prestations');
+    };
+    card.querySelector('[data-act=dup]').onclick = () => {
+      const copy = JSON.parse(JSON.stringify(svc));
+      copy.titre = (copy.titre || '') + ' (copie)';
+      CONTENT.services.splice(i+1, 0, copy);
+      renderServices(); commitChange('Duplication de « ' + (svc.titre || 'une prestation') + ' »');
+    };
+    card.querySelector('[data-act=del]').onclick = () => {
+      if (!confirm(`Supprimer « ${svc.titre || 'cette prestation'} » ?`)) return;
+      CONTENT.services.splice(i,1);
+      renderServices(); commitChange('Suppression de « ' + (svc.titre || 'une prestation') + ' »');
+    };
+    card.querySelector('[data-act=up]').disabled = (i===0);
+    card.querySelector('[data-act=down]').disabled = (i===CONTENT.services.length-1);
+
+    list.appendChild(card);
+  });
+}
+
+$('#addServiceBtn').addEventListener('click', () => {
+  CONTENT.services.push({ categorie:'', titre:'Nouvelle prestation', image:'', description:'', prix:'', unite:'' });
+  renderServices();
+  commitChange('Ajout d\u2019une prestation');
+  const cards = $$('.service-card');
+  cards[cards.length-1].scrollIntoView({ behavior:'smooth', block:'center' });
+});
+
+function escapeHtml(s){
+  return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+/* --------------------------- Images principales --------------------------- */
+const MAIN_IMAGE_FIELDS = [
+  { key: 'hero', label: 'Photo d\u2019accueil (héros)', desc: 'Grande photo affichée tout en haut du site.' },
+  { key: 'contact', label: 'Fond de la section contact', desc: 'Image de fond derrière le bloc de contact.' },
+  { key: 'portrait', label: 'Portrait', desc: 'Photo de profil affichée dans la section « Présentation ».' }
+];
+function renderMainImages(){
+  const body = $('#mainImagesBody');
+  body.innerHTML = '';
+  MAIN_IMAGE_FIELDS.forEach(f => {
+    const wrap = document.createElement('div');
+    wrap.className = 'field';
+    wrap.innerHTML = `
+      <label>${f.label}</label>
+      <div class="img-fallback" data-fb style="display:none;"></div>
+      <img class="service-img-preview" data-prev alt="">
+      <input type="text" data-inp placeholder="images/exemple.jpg">
+      <div class="desc">${f.desc}</div>
+    `;
+    const input = wrap.querySelector('[data-inp]');
+    const img = wrap.querySelector('[data-prev]');
+    const fb = wrap.querySelector('[data-fb]');
+    input.value = CONTENT.images[f.key] || '';
+    function refresh(){
+      const path = CONTENT.images[f.key];
+      if (!path){ img.style.display='none'; fb.style.display='flex'; fb.textContent = 'Aucune image renseignée'; return; }
+      img.src = path; img.style.display='block'; fb.style.display='none';
+      img.onerror = () => { img.style.display='none'; fb.style.display='flex'; fb.textContent = 'Aperçu indisponible ici (' + path + ') — sera visible sur le site en ligne'; };
+    }
+    refresh();
+    input.oninput = () => { CONTENT.images[f.key] = input.value; refresh(); commitChange('Modification de l\u2019image « ' + f.label + ' »', { debounce:true }); };
+    input.addEventListener('blur', flushHistoryDebounce);
+    body.appendChild(wrap);
+  });
+}
+
+/* --------------------------- Galerie --------------------------- */
+function renderGalerie(){
+  const list = $('#galerieList');
+  list.innerHTML = '';
+  const count = CONTENT.galerie.length;
+  const statusEl = $('#galerieStatus');
+  statusEl.innerHTML = count >= 5
+    ? `<strong style="color:var(--ok);">${count} photo(s)</strong> — la section Galerie est visible sur le site.`
+    : `<strong style="color:var(--danger);">${count} photo(s)</strong> — il en faut au moins 5 pour que la section apparaisse sur le site (encore ${5-count} à ajouter).`;
+
+  CONTENT.galerie.forEach((photo, i) => {
+    const card = document.createElement('div');
+    card.className = 'service-card';
+    card.innerHTML = `
+      <div class="service-card-top">
+        <div class="service-card-title"><span class="cat">Photo ${i+1}</span></div>
+        <div class="service-actions">
+          <button type="button" class="btn btn-icon btn-outline" data-act="up" title="Monter">↑</button>
+          <button type="button" class="btn btn-icon btn-outline" data-act="down" title="Descendre">↓</button>
+          <button type="button" class="btn btn-icon btn-danger" data-act="del" title="Supprimer">🗑</button>
+        </div>
+      </div>
+      <div class="img-fallback" data-fb style="display:none;"></div>
+      <img class="service-img-preview" data-prev alt="" style="height:140px;">
+      <div class="field"><label>Chemin de l'image</label><input type="text" data-f="src" placeholder="images/galerie/photo1.jpg"></div>
+      <div class="field"><label>Texte alternatif (description courte de la photo)</label><input type="text" data-f="alt" placeholder="ex. Chien en balade en forêt"></div>
+    `;
+    const img = card.querySelector('[data-prev]');
+    const fb = card.querySelector('[data-fb]');
+    function refresh(){
+      if (!photo.src){ img.style.display='none'; fb.style.display='flex'; fb.textContent='Aucun chemin d\u2019image renseigné'; return; }
+      img.src = photo.src; img.style.display='block'; fb.style.display='none';
+      img.onerror = () => { img.style.display='none'; fb.style.display='flex'; fb.textContent = 'Aperçu indisponible ici (' + photo.src + ')'; };
+    }
+    card.querySelector('[data-f=src]').value = photo.src || '';
+    card.querySelector('[data-f=alt]').value = photo.alt || '';
+    refresh();
+    const GAL_LABELS = { src:"Chemin de l'image", alt:'Texte alternatif' };
+    $$('[data-f]', card).forEach(el => {
+      const key = el.getAttribute('data-f');
+      el.oninput = () => { photo[key] = el.value; commitChange('Modification : ' + GAL_LABELS[key] + ' (Photo ' + (i+1) + ')', { debounce:true }); if (key==='src') refresh(); };
+      el.addEventListener('blur', flushHistoryDebounce);
+    });
+    card.querySelector('[data-act=up]').onclick = () => { if (i===0) return; [CONTENT.galerie[i-1],CONTENT.galerie[i]]=[CONTENT.galerie[i],CONTENT.galerie[i-1]]; renderGalerie(); commitChange('Réorganisation de la galerie'); };
+    card.querySelector('[data-act=down]').onclick = () => { if (i===CONTENT.galerie.length-1) return; [CONTENT.galerie[i+1],CONTENT.galerie[i]]=[CONTENT.galerie[i],CONTENT.galerie[i+1]]; renderGalerie(); commitChange('Réorganisation de la galerie'); };
+    card.querySelector('[data-act=del]').onclick = () => { if(!confirm('Supprimer cette photo de la galerie ?')) return; CONTENT.galerie.splice(i,1); renderGalerie(); commitChange('Suppression d\u2019une photo de la galerie'); };
+    card.querySelector('[data-act=up]').disabled = (i===0);
+    card.querySelector('[data-act=down]').disabled = (i===CONTENT.galerie.length-1);
+    list.appendChild(card);
+  });
+}
+$('#addGalerieBtn').addEventListener('click', () => {
+  CONTENT.galerie.push({ src:'', alt:'' });
+  renderGalerie();
+  commitChange('Ajout d\u2019une photo à la galerie');
+  const cards = $$('#galerieList .service-card');
+  if (cards.length) cards[cards.length-1].scrollIntoView({ behavior:'smooth', block:'center' });
+});
+
+/* --------------------------- Menu de navigation --------------------------- */
+function renderNav(){
+  const list = $('#navList');
+  list.innerHTML = '';
+  CONTENT.nav.forEach((item, i) => {
+    const row = document.createElement('div');
+    row.className = 'field';
+    row.style.display = 'flex';
+    row.style.alignItems = 'center';
+    row.style.gap = '10px';
+    row.innerHTML = `
+      <div style="flex:1;">
+        <label>Lien vers « ${escapeHtml(item.id || '')} »</label>
+        <input type="text" data-inp>
+      </div>
+      <button type="button" class="btn btn-icon btn-outline" data-act="up" title="Monter" style="margin-top:20px;">↑</button>
+      <button type="button" class="btn btn-icon btn-outline" data-act="down" title="Descendre" style="margin-top:20px;">↓</button>
+    `;
+    const input = row.querySelector('[data-inp]');
+    input.value = item.label || '';
+    input.oninput = () => { item.label = input.value; commitChange('Modification du lien « ' + (item.id || '') + ' »', { debounce:true }); };
+    input.addEventListener('blur', flushHistoryDebounce);
+    row.querySelector('[data-act=up]').onclick = () => { if (i===0) return; [CONTENT.nav[i-1],CONTENT.nav[i]]=[CONTENT.nav[i],CONTENT.nav[i-1]]; renderNav(); commitChange('Réorganisation du menu'); };
+    row.querySelector('[data-act=down]').onclick = () => { if (i===CONTENT.nav.length-1) return; [CONTENT.nav[i+1],CONTENT.nav[i]]=[CONTENT.nav[i],CONTENT.nav[i+1]]; renderNav(); commitChange('Réorganisation du menu'); };
+    row.querySelector('[data-act=up]').disabled = (i===0);
+    row.querySelector('[data-act=down]').disabled = (i===CONTENT.nav.length-1);
+    list.appendChild(row);
+  });
+}
+
+/* --------------------------- Couleurs / thème --------------------------- */
+const THEME_FIELDS = [
+  { key:'ink', label:'Texte principal' },
+  { key:'paper', label:'Fond général' },
+  { key:'paperSoft', label:'Fond des sections alternées' },
+  { key:'pineDark', label:'Fonds foncés (héros, pied de page)' },
+  { key:'pine', label:'Accent (boutons, icônes)' },
+  { key:'olive', label:'Accent secondaire (labels, textes)' },
+  { key:'gold', label:'Accent doré' },
+  { key:'goldLight', label:'Beige clair lumineux' },
+  { key:'cream', label:'Texte clair sur fond foncé' }
+];
+function hexToRgb(hex){
+  if (!hex) return null;
+  const m = hex.replace('#','').match(/.{1,2}/g);
+  if (!m || m.length < 3) return null;
+  return m.map(h => parseInt(h,16)).join(',');
+}
+function applyTheme(t){
+  if (!t) return;
+  const root = document.documentElement.style;
+  const cssVarMap = { ink:'--ink', paper:'--paper', paperSoft:'--paper-soft', pineDark:'--pine-dark', pine:'--pine', olive:'--olive', gold:'--gold', goldLight:'--gold-light', cream:'--cream' };
+  Object.entries(cssVarMap).forEach(([key, cssVar]) => { if (t[key]) root.setProperty(cssVar, t[key]); });
+  if (t.ink) root.setProperty('--ink-rgb', hexToRgb(t.ink));
+  if (t.pineDark) root.setProperty('--pine-dark-rgb', hexToRgb(t.pineDark));
+  if (t.cream) root.setProperty('--cream-rgb', hexToRgb(t.cream));
+  if (t.paper) root.setProperty('--paper-rgb', hexToRgb(t.paper));
+}
+function renderTheme(){
+  const body = $('#themeBody');
+  body.innerHTML = '';
+  THEME_FIELDS.forEach(f => {
+    const wrap = document.createElement('div');
+    wrap.className = 'field';
+    wrap.innerHTML = `<label>${f.label}</label><div class="color-row"><input type="color" data-c><input type="text" data-t></div>`;
+    const colorInp = wrap.querySelector('[data-c]');
+    const textInp = wrap.querySelector('[data-t]');
+    const val = CONTENT.theme[f.key] || '#000000';
+    colorInp.value = /^#[0-9a-fA-F]{6}$/.test(val) ? val : '#000000';
+    textInp.value = CONTENT.theme[f.key] || '';
+    function commitColor(v){
+      CONTENT.theme[f.key] = v;
+      applyTheme(CONTENT.theme);
+      commitChange('Modification de la couleur « ' + f.label + ' »', { debounce:true });
+    }
+    colorInp.oninput = () => { textInp.value = colorInp.value; commitColor(colorInp.value); };
+    textInp.oninput = () => { if (/^#[0-9a-fA-F]{6}$/.test(textInp.value)) colorInp.value = textInp.value; commitColor(textInp.value); };
+    colorInp.addEventListener('change', flushHistoryDebounce);
+    textInp.addEventListener('blur', flushHistoryDebounce);
+    body.appendChild(wrap);
+  });
+}
+$('#resetThemeBtn').addEventListener('click', () => {
+  if (!confirm('Revenir aux couleurs telles qu\u2019elles étaient au chargement de la page ?')) return;
+  CONTENT.theme = JSON.parse(JSON.stringify(ORIGINAL_THEME));
+  renderTheme();
+  applyTheme(CONTENT.theme);
+  commitChange('Réinitialisation des couleurs');
+});
+
+/* =====================================================================
+   APERÇU DU SITE — charge le vrai index.html dans une iframe et lui
+   injecte le contenu en cours d'édition (même non téléchargé), en
+   interceptant son fetch('content.json') interne. Rien n'est modifié
+   sur le vrai fichier index.html.
+   ===================================================================== */
+let INDEX_HTML_SOURCE = null;
+
+async function ensureIndexSource(){
+  if (INDEX_HTML_SOURCE) return INDEX_HTML_SOURCE;
+  const res = await fetch('index.html', { cache: 'no-store' });
+  if (!res.ok) throw new Error('HTTP ' + res.status);
+  INDEX_HTML_SOURCE = await res.text();
+  return INDEX_HTML_SOURCE;
+}
+
+function buildPreviewDocument(){
+  const jsonInner = JSON.stringify(JSON.stringify(CONTENT));
+  let inner = '(function(){'
+    + 'var DATA=' + jsonInner + ';'
+    + 'var PARSED=JSON.parse(DATA);'
+    + 'var originalFetch=window.fetch.bind(window);'
+    + 'window.fetch=function(url,opts){'
+    +   'if(typeof url==="string"&&url.indexOf("content.json")!==-1){'
+    +     'return Promise.resolve(new Response(JSON.stringify(PARSED),{status:200,headers:{"Content-Type":"application/json"}}));'
+    +   '}'
+    +   'return originalFetch(url,opts);'
+    + '};'
+    + 'try{localStorage.removeItem("momoxdogs_content_cache_v1");}catch(e){}'
+    + '})();';
+  // Sécurité : si un texte édité contient la séquence "</script", on
+  // l'échappe pour ne pas couper prématurément la balise <script> injectée
+  // ci-dessous (le reste du fichier index.html n'est jamais touché).
+  inner = inner.replace(/<\/script/gi, '<\\/script');
+  const overrideScript = '<script>' + inner + '</scr' + 'ipt>';
+  return INDEX_HTML_SOURCE.replace('<head>', '<head>' + overrideScript);
+}
+
+async function openPreview(){
+  try {
+    await ensureIndexSource();
+  } catch(err){
+    showToast("Aperçu indisponible : impossible de charger index.html (" + err.message + "). Ouvre cette page via un serveur local, à côté d'index.html.", true);
+    return;
+  }
+  $('#previewIframe').srcdoc = buildPreviewDocument();
+  $('#previewOverlay').style.display = 'flex';
+}
+function closePreview(){
+  $('#previewOverlay').style.display = 'none';
+  $('#previewIframe').srcdoc = 'about:blank';
+}
+function refreshPreview(){
+  if ($('#previewOverlay').style.display === 'none') return;
+  $('#previewIframe').srcdoc = buildPreviewDocument();
+}
+
+$('#previewBtn').addEventListener('click', openPreview);
+$('#previewCloseBtn').addEventListener('click', closePreview);
+$('#previewRefreshBtn').addEventListener('click', refreshPreview);
+$('#previewDesktopBtn').addEventListener('click', () => $('#previewFrameWrap').classList.remove('mobile'));
+$('#previewMobileBtn').addEventListener('click', () => $('#previewFrameWrap').classList.add('mobile'));
+
+/* =====================================================================
+   EXPORT
+   ===================================================================== */
+function downloadJson(){
+  const blob = new Blob([JSON.stringify(CONTENT, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'content.json';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  setDirty(false);
+  try { localStorage.removeItem(DRAFT_KEY); } catch(e){}
+  showToast('content.json téléchargé — pense à le remplacer sur le serveur du site.');
+}
+$('#downloadBtn').addEventListener('click', downloadJson);
+
+$('#copyJsonBtn').addEventListener('click', async () => {
+  try {
+    await navigator.clipboard.writeText(JSON.stringify(CONTENT, null, 2));
+    showToast('JSON copié dans le presse-papiers.');
+  } catch(e){
+    showToast('Impossible de copier automatiquement.', true);
+  }
+});
+
+/* =====================================================================
+   PANNEAUX PLIABLES
+   ===================================================================== */
+$$('[data-toggle]').forEach(head => {
+  head.addEventListener('click', () => {
+    head.closest('[data-panel]').classList.toggle('open');
+  });
+});
+
+init();
+</script>
+</body>
+</html>
