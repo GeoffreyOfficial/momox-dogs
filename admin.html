@@ -58,7 +58,7 @@ body{
   background:var(--paper);
   line-height:1.55;
   -webkit-font-smoothing:antialiased;
-  padding-bottom:110px; /* place pour la barre d'action fixe en bas (mobile) */
+  padding-bottom:190px; /* repli initial — recalculé précisément en JS via syncActionbarSpacing() dès que la barre est mesurable, pour s'adapter au nombre de lignes réellement affichées */
 }
 img{ max-width:100%; display:block; }
 a{ color:inherit; }
@@ -152,7 +152,24 @@ input[type=text], input[type=email], input[type=tel], input[type=url], textarea{
 input:focus, textarea:focus{ outline:none; border-color:var(--gold); box-shadow:0 0 0 3px rgba(171,143,102,.18); }
 textarea{ resize:vertical; min-height:90px; line-height:1.5; font-family:var(--font-body); }
 textarea.tall{ min-height:200px; }
-input.invalid, textarea.invalid{ border-color:var(--danger); }
+input.invalid, textarea.invalid{ border-color:var(--danger); background:#fff8f6; }
+input.invalid:focus, textarea.invalid:focus{ box-shadow:0 0 0 3px rgba(180,83,65,.18); }
+.field-error{
+  display:none; font-size:.78rem; font-weight:600; color:var(--danger); margin-top:6px;
+  align-items:flex-start; gap:6px; line-height:1.4;
+}
+.field-error.show{ display:flex; }
+.field-error::before{ content:"⚠"; flex:none; }
+
+/* Champ « nom de fichier + dossier forcé » */
+.filepath-row{ display:flex; align-items:stretch; }
+.filepath-prefix{
+  display:flex; align-items:center; padding:0 12px; white-space:nowrap;
+  background:var(--paper-soft); border:1.5px solid var(--line); border-right:none;
+  border-radius:10px 0 0 10px; font-size:.85rem; color:var(--olive); font-family:var(--font-body);
+}
+.filepath-row input{ border-radius:0 10px 10px 0; }
+.filepath-row:has(input.invalid) .filepath-prefix{ border-color:var(--danger); color:var(--danger); }
 
 /* Étiquettes / tags */
 .tag-list{ display:flex; flex-wrap:wrap; gap:8px; margin-bottom:12px; }
@@ -308,6 +325,7 @@ input.invalid, textarea.invalid{ border-color:var(--danger); }
   <div class="intro">
     <h1>Mettre à jour le site</h1>
     <p>Modifie les textes, les prix, l'ordre des cours ou les informations de contact ci-dessous, puis clique sur « Télécharger content.json » en bas de page. Remplace ensuite ce fichier sur le serveur du site (à côté d'index.html) pour publier les changements.</p>
+    <p class="desc">Les champs marqués d'un <strong>*</strong> sont obligatoires. Pour les images, indique uniquement le nom du fichier (ex. <code>chien.jpg</code>) : le dossier est ajouté automatiquement.</p>
   </div>
 
   <!-- ============================= CONTACT ============================= -->
@@ -318,12 +336,12 @@ input.invalid, textarea.invalid{ border-color:var(--danger); }
     </div>
     <div class="panel-body">
       <div class="grid-2">
-        <div class="field"><label>Email</label><input type="email" data-bind="contact.email"></div>
-        <div class="field"><label>Téléphone</label><input type="tel" data-bind="contact.telephone"></div>
+        <div class="field"><label>Email *</label><input type="email" data-bind="contact.email"></div>
+        <div class="field"><label>Téléphone *</label><input type="tel" data-bind="contact.telephone"></div>
       </div>
       <div class="grid-2">
-        <div class="field"><label>Ville</label><input type="text" data-bind="contact.ville"></div>
-        <div class="field"><label>Zone d'intervention (texte affiché)</label><input type="text" data-bind="contact.zone"></div>
+        <div class="field"><label>Ville *</label><input type="text" data-bind="contact.ville"></div>
+        <div class="field"><label>Zone d'intervention (texte affiché) *</label><input type="text" data-bind="contact.zone"></div>
       </div>
       <div class="grid-2">
         <div class="field"><label>Lien Facebook</label><input type="url" data-bind="contact.facebook"></div>
@@ -341,11 +359,11 @@ input.invalid, textarea.invalid{ border-color:var(--danger); }
     <div class="panel-body">
       <div class="field"><label>Badge (petit texte au-dessus du titre)</label><input type="text" data-bind="hero.badge"></div>
       <div class="field">
-        <label>Titre principal</label>
+        <label>Titre principal *</label>
         <input type="text" data-bind="hero.titre">
         <div class="desc">Astuce : entoure un mot de <code>&lt;em&gt;</code>...<code>&lt;/em&gt;</code> pour l'afficher en italique doré, ex. « Une éducation &lt;em&gt;sur-mesure&lt;/em&gt; ».</div>
       </div>
-      <div class="field"><label>Texte d'introduction</label><textarea data-bind="hero.texte"></textarea></div>
+      <div class="field"><label>Texte d'introduction *</label><textarea data-bind="hero.texte"></textarea></div>
     </div>
   </section>
 
@@ -356,9 +374,9 @@ input.invalid, textarea.invalid{ border-color:var(--danger); }
       <svg class="panel-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M6 9l6 6 6-6"/></svg>
     </div>
     <div class="panel-body">
-      <div class="field"><label>Titre</label><input type="text" data-bind="presentation.titre"></div>
-      <div class="field"><label>Premier paragraphe</label><textarea data-bind="presentation.texte1"></textarea></div>
-      <div class="field"><label>Second paragraphe</label><textarea data-bind="presentation.texte2"></textarea></div>
+      <div class="field"><label>Titre *</label><input type="text" data-bind="presentation.titre"></div>
+      <div class="field"><label>Premier paragraphe *</label><textarea data-bind="presentation.texte1"></textarea></div>
+      <div class="field"><label>Second paragraphe *</label><textarea data-bind="presentation.texte2"></textarea></div>
     </div>
   </section>
 
@@ -371,11 +389,11 @@ input.invalid, textarea.invalid{ border-color:var(--danger); }
     <div class="panel-body">
       <div class="grid-2">
         <div class="field"><label>Eyebrow (petit texte au-dessus du titre)</label><input type="text" data-bind="pourquoi.eyebrow"></div>
-        <div class="field"><label>Titre</label><input type="text" data-bind="pourquoi.titre"></div>
+        <div class="field"><label>Titre *</label><input type="text" data-bind="pourquoi.titre"></div>
       </div>
-      <div class="field"><label>Premier paragraphe</label><textarea data-bind="pourquoi.texte1"></textarea></div>
-      <div class="field"><label>Second paragraphe</label><textarea data-bind="pourquoi.texte2"></textarea></div>
-      <div class="field"><label>Citation mise en avant</label><textarea data-bind="pourquoi.citation"></textarea></div>
+      <div class="field"><label>Premier paragraphe *</label><textarea data-bind="pourquoi.texte1"></textarea></div>
+      <div class="field"><label>Second paragraphe *</label><textarea data-bind="pourquoi.texte2"></textarea></div>
+      <div class="field"><label>Citation mise en avant *</label><textarea data-bind="pourquoi.citation"></textarea></div>
     </div>
   </section>
 
@@ -391,6 +409,7 @@ input.invalid, textarea.invalid{ border-color:var(--danger); }
         <input type="text" id="newTagInput" placeholder="Ajouter une étiquette…">
         <button class="btn btn-outline btn-sm" id="addTagBtn" type="button">Ajouter</button>
       </div>
+      <div id="tagError" class="field-error"></div>
     </div>
   </section>
 
@@ -459,7 +478,7 @@ input.invalid, textarea.invalid{ border-color:var(--danger); }
       <svg class="panel-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M6 9l6 6 6-6"/></svg>
     </div>
     <div class="panel-body">
-      <div class="field"><label>Copyright</label><input type="text" data-bind="footer.copyright"></div>
+      <div class="field"><label>Copyright *</label><input type="text" data-bind="footer.copyright"></div>
       <div class="field"><label>Phrase de fin</label><input type="text" data-bind="footer.tagline"></div>
     </div>
   </section>
@@ -471,9 +490,9 @@ input.invalid, textarea.invalid{ border-color:var(--danger); }
       <svg class="panel-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M6 9l6 6 6-6"/></svg>
     </div>
     <div class="panel-body">
-      <div class="field"><label>Titre du site</label><input type="text" data-bind="seo.siteTitle"></div>
-      <div class="field"><label>Description</label><textarea data-bind="seo.description"></textarea></div>
-      <div class="field"><label>Adresse du site (URL)</label><input type="url" data-bind="seo.siteUrl"></div>
+      <div class="field"><label>Titre du site *</label><input type="text" data-bind="seo.siteTitle"></div>
+      <div class="field"><label>Description *</label><textarea data-bind="seo.description"></textarea></div>
+      <div class="field"><label>Adresse du site (URL) *</label><input type="url" data-bind="seo.siteUrl"></div>
     </div>
   </section>
 
@@ -542,6 +561,179 @@ function showToast(msg, isError=false){
   t.className = 'toast show' + (isError ? ' error' : '');
   clearTimeout(showToast._timer);
   showToast._timer = setTimeout(()=> t.classList.remove('show'), 2600);
+}
+
+/* =====================================================================
+   VALIDATION DES FORMULAIRES
+   Chaque champ « validable » est enregistré dans un « bucket » par
+   section (contact/héros/services/galerie/...). validateAll() relance
+   la vérification de tous les champs (utilisé avant le téléchargement
+   ou la copie du JSON) et renvoie le premier champ en erreur pour
+   pouvoir l'amener à l'écran.
+   ===================================================================== */
+const SECTION_VALIDATORS = {};
+function setSectionValidators(section, arr){ SECTION_VALIDATORS[section] = arr; }
+
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+const URL_RE = /^https?:\/\/[^\s]+\.[^\s]+/i;
+const IMAGE_EXT_RE = /\.(jpe?g|png|webp|gif|svg|avif)$/i;
+const SAFE_FILENAME_RE = /^[a-zA-Z0-9._-]+$/;
+
+function isValidPhone(v){
+  if (!/^[0-9+()\-.\s]+$/.test(v)) return false;
+  const digits = v.replace(/\D/g, '');
+  return digits.length >= 6 && digits.length <= 15;
+}
+
+/* Affiche/efface le message d'erreur juste sous un champ. Réutilise la
+   div .field-error déjà présente si l'on revalide plusieurs fois. */
+/* `anchorEl` : l'élément après lequel insérer le message d'erreur dans
+   le DOM. Par défaut, c'est le champ lui-même ; pour un champ composé
+   (ex. dossier forcé + nom de fichier dans une rangée flex), on passe
+   plutôt la rangée entière pour ne pas casser sa mise en page. */
+function setFieldError(el, message, anchorEl){
+  anchorEl = anchorEl || el;
+  let holder = anchorEl.nextElementSibling;
+  if (!holder || !holder.classList || !holder.classList.contains('field-error')){
+    holder = document.createElement('div');
+    holder.className = 'field-error';
+    anchorEl.insertAdjacentElement('afterend', holder);
+  }
+  if (message){
+    el.classList.add('invalid');
+    holder.textContent = message;
+    holder.classList.add('show');
+  } else {
+    el.classList.remove('invalid');
+    holder.textContent = '';
+    holder.classList.remove('show');
+  }
+  return holder;
+}
+
+/* Relie un champ à une fonction de validation. La vérification se
+   déclenche à la perte de focus (pour ne pas asséner des erreurs
+   pendant la frappe), puis en direct dès que le champ a été « touché »
+   une première fois, pour que l'erreur disparaisse aussitôt corrigée.
+   La fonction renvoyée (poussée dans `bucket`) sert à la vérification
+   groupée avant téléchargement : elle force alors l'affichage.
+   `anchorEl` (facultatif) : voir setFieldError. */
+function attachFieldValidation(el, computeMessage, bucket, anchorEl){
+  let touched = false;
+  function run(forceShow){
+    const msg = computeMessage(el.value);
+    if (forceShow || touched) setFieldError(el, msg, anchorEl);
+    if (forceShow) touched = true;
+    return { valid: !msg, el };
+  }
+  el.addEventListener('blur', () => run(true));
+  el.addEventListener('input', () => { if (touched) run(true); });
+  if (bucket) bucket.push(run);
+  return run;
+}
+
+/* --------------------------- Chemins d'image forcés --------------------------- */
+/* Sépare un chemin complet ("images/xxx.jpg") en nom de fichier affiché
+   dans le champ, en retirant le dossier attendu s'il est bien présent.
+   Si le chemin existant ne commence pas par le dossier attendu (donnée
+   ancienne / déplacée), on le laisse tel quel dans le champ : la
+   validation signalera alors qu'il faut n'indiquer qu'un nom de fichier,
+   plutôt que d'écraser silencieusement une donnée existante. */
+function splitImagePath(full, prefix){
+  const v = (full || '').trim();
+  if (!v) return '';
+  if (v.startsWith(prefix)) return v.slice(prefix.length);
+  return v;
+}
+/* Recompose le chemin complet à partir du nom de fichier saisi. Si
+   l'utilisateur a quand même tapé un chemin avec un « / », on le garde
+   tel quel (sans double préfixe) : la validation le signalera comme
+   invalide tant qu'il n'aura pas été corrigé en simple nom de fichier. */
+function composeImagePath(filenameRaw, prefix){
+  const v = (filenameRaw || '').trim();
+  if (!v) return '';
+  if (v.includes('/') || v.includes('\\')) return v;
+  return prefix + v;
+}
+/* Message d'erreur pour un champ « nom de fichier image ». `required`
+   détermine si un champ vide est tout de même signalé. */
+function validateImageFilename(value, required){
+  const v = (value || '').trim();
+  if (!v) return required ? 'Indique un nom de fichier image.' : null;
+  if (v.includes('/') || v.includes('\\')) return 'N\u2019indique que le nom du fichier, sans dossier (ex. « chien.jpg ») — le dossier est ajouté automatiquement.';
+  if (/\s/.test(v)) return 'Évite les espaces dans le nom du fichier — utilise des tirets, ex. « photo-chien-1.jpg ».';
+  if (!IMAGE_EXT_RE.test(v)) return 'Le nom doit se terminer par une extension d\u2019image valide (.jpg, .jpeg, .png, .webp, .gif ou .svg).';
+  const withoutExt = v.slice(0, v.lastIndexOf('.'));
+  if (!withoutExt) return 'Il manque un nom avant l\u2019extension (ex. « chien.jpg », pas juste « .jpg »).';
+  if (!SAFE_FILENAME_RE.test(v)) return 'Utilise uniquement des lettres non accentuées, chiffres, tirets ( - _ ) et un point avant l\u2019extension.';
+  return null;
+}
+
+/* Construit un champ « nom de fichier » avec dossier forcé affiché en
+   préfixe, un aperçu image, et le branchement à CONTENT. Renvoie un
+   objet avec refresh()/validate() pour l'appelant. */
+function buildImageFilenameField(wrapEl, { prefix, getFull, setFull, onCommit, imgEl, fallbackEl, required=false, bucket }){
+  const row = document.createElement('div');
+  row.className = 'filepath-row';
+  const input = document.createElement('input');
+  input.type = 'text';
+  input.placeholder = 'nom-de-fichier.jpg';
+  const prefixSpan = document.createElement('span');
+  prefixSpan.className = 'filepath-prefix';
+  prefixSpan.textContent = prefix;
+  row.appendChild(prefixSpan);
+  row.appendChild(input);
+  wrapEl.appendChild(row);
+
+  input.value = splitImagePath(getFull(), prefix);
+
+  function refreshPreview(){
+    const full = getFull();
+    if (!imgEl) return;
+    if (!full){ imgEl.style.display='none'; if (fallbackEl){ fallbackEl.style.display='flex'; fallbackEl.textContent = 'Aucune image renseignée'; } return; }
+    imgEl.src = full;
+    imgEl.style.display = 'block';
+    if (fallbackEl) fallbackEl.style.display = 'none';
+    imgEl.onerror = () => { imgEl.style.display='none'; if (fallbackEl){ fallbackEl.style.display='flex'; fallbackEl.textContent = 'Aperçu indisponible ici (' + full + ') — sera visible sur le site en ligne si le fichier existe à cet endroit'; } };
+  }
+  refreshPreview();
+
+  input.oninput = () => {
+    setFull(composeImagePath(input.value, prefix));
+    refreshPreview();
+    onCommit();
+  };
+  const runValidation = attachFieldValidation(input, (v) => validateImageFilename(v, required), bucket, row);
+  input.addEventListener('blur', flushHistoryDebounce);
+  return { refreshPreview, runValidation };
+}
+
+/* Ouvre le panneau contenant un champ, le fait défiler à l'écran et lui
+   donne le focus — utilisé pour amener l'utilisateur au premier champ
+   en erreur avant le téléchargement. */
+function revealField(el){
+  const panel = el.closest('[data-panel]');
+  if (panel && !panel.classList.contains('open')) panel.classList.add('open');
+  if (typeof el.scrollIntoView === 'function') el.scrollIntoView({ behavior:'smooth', block:'center' });
+  try { el.focus({ preventScroll:true }); } catch(e){ try { el.focus(); } catch(e2){} }
+}
+
+/* Relance la validation de TOUS les champs enregistrés (tous en mode
+   "forceShow" pour que chaque erreur s'affiche), et renvoie le nombre
+   d'erreurs ainsi que le premier champ fautif. */
+function validateAll(){
+  let invalidCount = 0;
+  let firstInvalidEl = null;
+  Object.values(SECTION_VALIDATORS).forEach(bucket => {
+    (bucket || []).forEach(run => {
+      const res = run(true);
+      if (!res.valid){
+        invalidCount++;
+        if (!firstInvalidEl) firstInvalidEl = res.el;
+      }
+    });
+  });
+  return { ok: invalidCount === 0, invalidCount, firstInvalidEl };
 }
 
 function setDirty(v){
@@ -754,6 +946,37 @@ function startWith(data){
   applyTheme(CONTENT.theme);
   setDirty(false);
   seedHistory('État initial');
+  initActionbarSpacing();
+}
+
+/* =====================================================================
+   ESPACE RÉSERVÉ POUR LA BARRE D'ACTION FIXE
+   La barre du bas peut occuper 1, 2 ou 3 lignes selon la largeur d'écran
+   et le nombre de boutons (Annuler/Rétablir, Charger, Copier, Télécharger).
+   On mesure sa vraie hauteur et on ajuste le padding du body en
+   conséquence, pour ne jamais recouvrir ni couper le contenu — plutôt
+   que de figer une valeur qui casse dès qu'un bouton est ajouté.
+   ===================================================================== */
+let actionbarSpacingInited = false;
+function syncActionbarSpacing(){
+  const bar = $('#actionbar');
+  if (!bar || bar.style.display === 'none') return;
+  const h = Math.ceil(bar.getBoundingClientRect().height);
+  if (h > 0) document.body.style.paddingBottom = (h + 24) + 'px';
+}
+function initActionbarSpacing(){
+  syncActionbarSpacing();
+  if (actionbarSpacingInited) return;
+  actionbarSpacingInited = true;
+  const bar = $('#actionbar');
+  if (window.ResizeObserver){
+    new ResizeObserver(syncActionbarSpacing).observe(bar);
+  }
+  window.addEventListener('resize', syncActionbarSpacing);
+  window.addEventListener('orientationchange', () => setTimeout(syncActionbarSpacing, 250));
+  if (window.visualViewport){
+    window.visualViewport.addEventListener('resize', syncActionbarSpacing);
+  }
 }
 
 function normalizeContent(data){
@@ -837,7 +1060,41 @@ function fieldLabelFor(el){
   return lbl ? lbl.textContent.trim() : null;
 }
 
+/* Règles de validation des champs simples (liés via data-bind). Un champ
+   sans règle ici reste libre (facultatif, sans contrainte de format). */
+const FIELD_RULES = {
+  'contact.email':       { required:true, type:'email' },
+  'contact.telephone':   { required:true, type:'phone' },
+  'contact.ville':       { required:true },
+  'contact.zone':        { required:true },
+  'contact.facebook':    { type:'url' },
+  'contact.instagram':   { type:'url' },
+  'hero.titre':          { required:true },
+  'hero.texte':          { required:true },
+  'presentation.titre':  { required:true },
+  'presentation.texte1': { required:true },
+  'presentation.texte2': { required:true },
+  'pourquoi.titre':      { required:true },
+  'pourquoi.texte1':     { required:true },
+  'pourquoi.texte2':     { required:true },
+  'pourquoi.citation':   { required:true },
+  'footer.copyright':    { required:true },
+  'seo.siteTitle':       { required:true },
+  'seo.description':     { required:true },
+  'seo.siteUrl':         { required:true, type:'url' }
+};
+function validateByRule(value, rule){
+  const v = (value || '').trim();
+  if (rule.required && !v) return 'Ce champ est obligatoire.';
+  if (!v) return null;
+  if (rule.type === 'email' && !EMAIL_RE.test(v)) return 'Adresse e-mail invalide (ex. contact@exemple.fr).';
+  if (rule.type === 'phone' && !isValidPhone(v)) return 'Numéro de téléphone invalide (au moins 6 chiffres, seuls chiffres, espaces, +, -, ( ) et . sont autorisés).';
+  if (rule.type === 'url' && !URL_RE.test(v)) return 'Adresse invalide : elle doit commencer par http:// ou https:// et contenir un domaine (ex. https://exemple.fr).';
+  return null;
+}
+
 function bindSimpleFields(){
+  const validators = [];
   $$('[data-bind]').forEach(el => {
     const path = el.getAttribute('data-bind');
     const val = getPath(CONTENT, path);
@@ -848,7 +1105,10 @@ function bindSimpleFields(){
       commitChange(label, { debounce: true });
     };
     el.addEventListener('blur', flushHistoryDebounce);
+    const rule = FIELD_RULES[path];
+    if (rule) attachFieldValidation(el, (v) => validateByRule(v, rule), validators);
   });
+  setSectionValidators('simple', validators);
 }
 
 /* --------------------------- Étiquettes / tags --------------------------- */
@@ -870,8 +1130,19 @@ function renderTags(){
 }
 function addTag(){
   const input = $('#newTagInput');
+  const errEl = $('#tagError');
   const val = input.value.trim();
-  if (!val) return;
+  function fail(msg){
+    input.classList.add('invalid');
+    errEl.textContent = msg;
+    errEl.classList.add('show');
+  }
+  if (!val){ fail('Indique une étiquette avant de l\u2019ajouter.'); input.focus(); return; }
+  const exists = CONTENT.tags.some(t => t.trim().toLowerCase() === val.toLowerCase());
+  if (exists){ fail('Cette étiquette existe déjà.'); input.focus(); return; }
+  input.classList.remove('invalid');
+  errEl.textContent = '';
+  errEl.classList.remove('show');
   CONTENT.tags.push(val);
   input.value = '';
   renderTags();
@@ -879,11 +1150,21 @@ function addTag(){
 }
 $('#addTagBtn').addEventListener('click', addTag);
 $('#newTagInput').addEventListener('keydown', (e) => { if (e.key === 'Enter'){ e.preventDefault(); addTag(); } });
+$('#newTagInput').addEventListener('input', function(){
+  this.classList.remove('invalid');
+  const errEl = $('#tagError');
+  errEl.textContent = '';
+  errEl.classList.remove('show');
+});
 
 /* --------------------------- Cours & tarifs --------------------------- */
+const SERVICE_REQUIRED = { categorie:true, titre:true, prix:true, unite:false, description:true };
+const SERVICE_FIELD_LABELS = { categorie:'Catégorie', titre:'Titre', prix:'Prix', unite:'Unité', description:'Description' };
+
 function renderServices(){
   const list = $('#servicesList');
   list.innerHTML = '';
+  const validators = [];
   CONTENT.services.forEach((svc, i) => {
     const card = document.createElement('div');
     card.className = 'service-card';
@@ -903,48 +1184,49 @@ function renderServices(){
       <div class="img-fallback" data-img-fallback style="display:none;"></div>
       <img class="service-img-preview" data-img-preview alt="">
       <div class="grid-3">
-        <div class="field"><label>Catégorie</label><input type="text" data-f="categorie"></div>
-        <div class="field"><label>Titre</label><input type="text" data-f="titre"></div>
-        <div class="field"><label>Chemin de l'image</label><input type="text" data-f="image" placeholder="images/service-xxx.jpg"></div>
+        <div class="field"><label>Catégorie *</label><input type="text" data-f="categorie"></div>
+        <div class="field"><label>Titre *</label><input type="text" data-f="titre"></div>
+        <div class="field"><label>Nom du fichier image</label><div data-img-field></div><div class="desc">Le fichier doit se trouver dans le dossier <code>images/</code> du site.</div></div>
       </div>
       <div class="grid-2">
-        <div class="field"><label>Prix</label><input type="text" data-f="prix" placeholder="ex. 50 €"></div>
+        <div class="field"><label>Prix *</label><input type="text" data-f="prix" placeholder="ex. 50 €"></div>
         <div class="field"><label>Unité</label><input type="text" data-f="unite" placeholder="ex. / heure"></div>
       </div>
-      <div class="field"><label>Description</label><textarea class="tall" data-f="description"></textarea></div>
+      <div class="field"><label>Description *</label><textarea class="tall" data-f="description"></textarea><div class="desc">Les sauts de ligne, apostrophes et caractères spéciaux (é, «, —…) sont conservés tels quels.</div></div>
     `;
 
     // valeurs
     card.querySelector('[data-f=categorie]').value = svc.categorie || '';
     card.querySelector('[data-f=titre]').value = svc.titre || '';
-    card.querySelector('[data-f=image]').value = svc.image || '';
     card.querySelector('[data-f=prix]').value = svc.prix || '';
     card.querySelector('[data-f=unite]').value = svc.unite || '';
     card.querySelector('[data-f=description]').value = svc.description || '';
 
-    // aperçu image
+    // champ image (dossier forcé)
     const imgEl = card.querySelector('[data-img-preview]');
     const fallbackEl = card.querySelector('[data-img-fallback]');
-    function refreshImg(){
-      if (!svc.image){ imgEl.style.display='none'; fallbackEl.style.display='flex'; fallbackEl.textContent = "Aucun chemin d'image renseigné"; return; }
-      imgEl.src = svc.image;
-      imgEl.style.display = 'block';
-      fallbackEl.style.display = 'none';
-      imgEl.onerror = () => { imgEl.style.display='none'; fallbackEl.style.display='flex'; fallbackEl.textContent = 'Aperçu indisponible ici (' + svc.image + ') — sera visible sur le site en ligne si le fichier existe au bon endroit'; };
-    }
-    refreshImg();
+    buildImageFilenameField(card.querySelector('[data-img-field]'), {
+      prefix: 'images/',
+      getFull: () => svc.image || '',
+      setFull: (v) => { svc.image = v; },
+      onCommit: () => commitChange('Modification : Image (Prestation ' + (i+1) + ')', { debounce:true }),
+      imgEl, fallbackEl,
+      required: false,
+      bucket: validators
+    });
 
     // bindings des champs texte
-    const FIELD_LABELS = { categorie:'Catégorie', titre:'Titre', image:"Chemin de l'image", prix:'Prix', unite:'Unité', description:'Description' };
     $$('[data-f]', card).forEach(el => {
       const key = el.getAttribute('data-f');
       el.oninput = () => {
         svc[key] = el.value;
-        commitChange('Modification : ' + FIELD_LABELS[key] + ' (Prestation ' + (i+1) + ')', { debounce:true });
+        commitChange('Modification : ' + SERVICE_FIELD_LABELS[key] + ' (Prestation ' + (i+1) + ')', { debounce:true });
         if (key === 'titre'){ card.querySelector('.service-card-title').lastChild.textContent = ' ' + (svc.titre || '(sans titre)'); }
-        if (key === 'image'){ refreshImg(); }
       };
       el.addEventListener('blur', flushHistoryDebounce);
+      if (SERVICE_REQUIRED[key]){
+        attachFieldValidation(el, (v) => (v || '').trim() ? null : 'Ce champ est obligatoire.', validators);
+      }
     });
 
     // actions
@@ -974,6 +1256,7 @@ function renderServices(){
 
     list.appendChild(card);
   });
+  setSectionValidators('services', validators);
 }
 
 $('#addServiceBtn').addEventListener('click', () => {
@@ -997,6 +1280,7 @@ const MAIN_IMAGE_FIELDS = [
 function renderMainImages(){
   const body = $('#mainImagesBody');
   body.innerHTML = '';
+  const validators = [];
   MAIN_IMAGE_FIELDS.forEach(f => {
     const wrap = document.createElement('div');
     wrap.className = 'field';
@@ -1004,30 +1288,30 @@ function renderMainImages(){
       <label>${f.label}</label>
       <div class="img-fallback" data-fb style="display:none;"></div>
       <img class="service-img-preview" data-prev alt="">
-      <input type="text" data-inp placeholder="images/exemple.jpg">
-      <div class="desc">${f.desc}</div>
+      <div data-img-field></div>
+      <div class="desc">${f.desc} Le fichier doit se trouver dans le dossier <code>images/</code> du site.</div>
     `;
-    const input = wrap.querySelector('[data-inp]');
     const img = wrap.querySelector('[data-prev]');
     const fb = wrap.querySelector('[data-fb]');
-    input.value = CONTENT.images[f.key] || '';
-    function refresh(){
-      const path = CONTENT.images[f.key];
-      if (!path){ img.style.display='none'; fb.style.display='flex'; fb.textContent = 'Aucune image renseignée'; return; }
-      img.src = path; img.style.display='block'; fb.style.display='none';
-      img.onerror = () => { img.style.display='none'; fb.style.display='flex'; fb.textContent = 'Aperçu indisponible ici (' + path + ') — sera visible sur le site en ligne'; };
-    }
-    refresh();
-    input.oninput = () => { CONTENT.images[f.key] = input.value; refresh(); commitChange('Modification de l\u2019image « ' + f.label + ' »', { debounce:true }); };
-    input.addEventListener('blur', flushHistoryDebounce);
+    buildImageFilenameField(wrap.querySelector('[data-img-field]'), {
+      prefix: 'images/',
+      getFull: () => CONTENT.images[f.key] || '',
+      setFull: (v) => { CONTENT.images[f.key] = v; },
+      onCommit: () => commitChange('Modification de l\u2019image « ' + f.label + ' »', { debounce:true }),
+      imgEl: img, fallbackEl: fb,
+      required: false,
+      bucket: validators
+    });
     body.appendChild(wrap);
   });
+  setSectionValidators('mainImages', validators);
 }
 
 /* --------------------------- Galerie --------------------------- */
 function renderGalerie(){
   const list = $('#galerieList');
   list.innerHTML = '';
+  const validators = [];
   const count = CONTENT.galerie.length;
   const statusEl = $('#galerieStatus');
   statusEl.innerHTML = count >= 5
@@ -1048,25 +1332,27 @@ function renderGalerie(){
       </div>
       <div class="img-fallback" data-fb style="display:none;"></div>
       <img class="service-img-preview" data-prev alt="" style="height:140px;">
-      <div class="field"><label>Chemin de l'image</label><input type="text" data-f="src" placeholder="images/galerie/photo1.jpg"></div>
-      <div class="field"><label>Texte alternatif (description courte de la photo)</label><input type="text" data-f="alt" placeholder="ex. Chien en balade en forêt"></div>
+      <div class="field"><label>Nom du fichier image *</label><div data-img-field></div><div class="desc">Le fichier doit se trouver dans le dossier <code>images/galerie/</code> du site.</div></div>
+      <div class="field"><label>Texte alternatif (description courte de la photo) *</label><input type="text" data-f="alt" placeholder="ex. Chien en balade en forêt"></div>
     `;
     const img = card.querySelector('[data-prev]');
     const fb = card.querySelector('[data-fb]');
-    function refresh(){
-      if (!photo.src){ img.style.display='none'; fb.style.display='flex'; fb.textContent='Aucun chemin d\u2019image renseigné'; return; }
-      img.src = photo.src; img.style.display='block'; fb.style.display='none';
-      img.onerror = () => { img.style.display='none'; fb.style.display='flex'; fb.textContent = 'Aperçu indisponible ici (' + photo.src + ')'; };
-    }
-    card.querySelector('[data-f=src]').value = photo.src || '';
-    card.querySelector('[data-f=alt]').value = photo.alt || '';
-    refresh();
-    const GAL_LABELS = { src:"Chemin de l'image", alt:'Texte alternatif' };
-    $$('[data-f]', card).forEach(el => {
-      const key = el.getAttribute('data-f');
-      el.oninput = () => { photo[key] = el.value; commitChange('Modification : ' + GAL_LABELS[key] + ' (Photo ' + (i+1) + ')', { debounce:true }); if (key==='src') refresh(); };
-      el.addEventListener('blur', flushHistoryDebounce);
+    buildImageFilenameField(card.querySelector('[data-img-field]'), {
+      prefix: 'images/galerie/',
+      getFull: () => photo.src || '',
+      setFull: (v) => { photo.src = v; },
+      onCommit: () => commitChange('Modification : Image (Photo ' + (i+1) + ')', { debounce:true }),
+      imgEl: img, fallbackEl: fb,
+      required: true,
+      bucket: validators
     });
+
+    card.querySelector('[data-f=alt]').value = photo.alt || '';
+    const altInput = card.querySelector('[data-f=alt]');
+    altInput.oninput = () => { photo.alt = altInput.value; commitChange('Modification : Texte alternatif (Photo ' + (i+1) + ')', { debounce:true }); };
+    altInput.addEventListener('blur', flushHistoryDebounce);
+    attachFieldValidation(altInput, (v) => (v || '').trim() ? null : 'Indique un texte alternatif décrivant la photo (accessibilité et référencement).', validators);
+
     card.querySelector('[data-act=up]').onclick = () => { if (i===0) return; [CONTENT.galerie[i-1],CONTENT.galerie[i]]=[CONTENT.galerie[i],CONTENT.galerie[i-1]]; renderGalerie(); commitChange('Réorganisation de la galerie'); };
     card.querySelector('[data-act=down]').onclick = () => { if (i===CONTENT.galerie.length-1) return; [CONTENT.galerie[i+1],CONTENT.galerie[i]]=[CONTENT.galerie[i],CONTENT.galerie[i+1]]; renderGalerie(); commitChange('Réorganisation de la galerie'); };
     card.querySelector('[data-act=del]').onclick = () => { if(!confirm('Supprimer cette photo de la galerie ?')) return; CONTENT.galerie.splice(i,1); renderGalerie(); commitChange('Suppression d\u2019une photo de la galerie'); };
@@ -1074,6 +1360,7 @@ function renderGalerie(){
     card.querySelector('[data-act=down]').disabled = (i===CONTENT.galerie.length-1);
     list.appendChild(card);
   });
+  setSectionValidators('galerie', validators);
 }
 $('#addGalerieBtn').addEventListener('click', () => {
   CONTENT.galerie.push({ src:'', alt:'' });
@@ -1087,6 +1374,7 @@ $('#addGalerieBtn').addEventListener('click', () => {
 function renderNav(){
   const list = $('#navList');
   list.innerHTML = '';
+  const validators = [];
   CONTENT.nav.forEach((item, i) => {
     const row = document.createElement('div');
     row.className = 'field';
@@ -1105,12 +1393,14 @@ function renderNav(){
     input.value = item.label || '';
     input.oninput = () => { item.label = input.value; commitChange('Modification du lien « ' + (item.id || '') + ' »', { debounce:true }); };
     input.addEventListener('blur', flushHistoryDebounce);
+    attachFieldValidation(input, (v) => (v || '').trim() ? null : 'Le texte du lien ne peut pas être vide.', validators);
     row.querySelector('[data-act=up]').onclick = () => { if (i===0) return; [CONTENT.nav[i-1],CONTENT.nav[i]]=[CONTENT.nav[i],CONTENT.nav[i-1]]; renderNav(); commitChange('Réorganisation du menu'); };
     row.querySelector('[data-act=down]').onclick = () => { if (i===CONTENT.nav.length-1) return; [CONTENT.nav[i+1],CONTENT.nav[i]]=[CONTENT.nav[i],CONTENT.nav[i+1]]; renderNav(); commitChange('Réorganisation du menu'); };
     row.querySelector('[data-act=up]').disabled = (i===0);
     row.querySelector('[data-act=down]').disabled = (i===CONTENT.nav.length-1);
     list.appendChild(row);
   });
+  setSectionValidators('nav', validators);
 }
 
 /* --------------------------- Couleurs / thème --------------------------- */
@@ -1144,6 +1434,7 @@ function applyTheme(t){
 function renderTheme(){
   const body = $('#themeBody');
   body.innerHTML = '';
+  const validators = [];
   THEME_FIELDS.forEach(f => {
     const wrap = document.createElement('div');
     wrap.className = 'field';
@@ -1162,8 +1453,14 @@ function renderTheme(){
     textInp.oninput = () => { if (/^#[0-9a-fA-F]{6}$/.test(textInp.value)) colorInp.value = textInp.value; commitColor(textInp.value); };
     colorInp.addEventListener('change', flushHistoryDebounce);
     textInp.addEventListener('blur', flushHistoryDebounce);
+    attachFieldValidation(textInp, (v) => {
+      const t = (v || '').trim();
+      if (!t) return 'Ce champ est obligatoire.';
+      return /^#[0-9a-fA-F]{6}$/.test(t) ? null : 'Format hexadécimal invalide, ex. #ab8f66.';
+    }, validators);
     body.appendChild(wrap);
   });
+  setSectionValidators('theme', validators);
 }
 $('#resetThemeBtn').addEventListener('click', () => {
   if (!confirm('Revenir aux couleurs telles qu\u2019elles étaient au chargement de la page ?')) return;
@@ -1239,7 +1536,27 @@ $('#previewMobileBtn').addEventListener('click', () => $('#previewFrameWrap').cl
 /* =====================================================================
    EXPORT
    ===================================================================== */
+/* Vérifie tous les champs avant une action d'export. En cas d'erreur,
+   ouvre le panneau du premier champ fautif, l'amène à l'écran et
+   affiche un message clair plutôt que de laisser exporter des données
+   incomplètes ou mal formées. Renvoie true si tout est valide. */
+function checkFormBeforeExport(){
+  const { ok, invalidCount, firstInvalidEl } = validateAll();
+  if (!ok){
+    showToast(
+      invalidCount === 1
+        ? 'Un champ contient une erreur — corrige-le avant de continuer (voir le message en rouge).'
+        : invalidCount + ' champs contiennent une erreur — corrige-les avant de continuer (voir les messages en rouge).',
+      true
+    );
+    if (firstInvalidEl) revealField(firstInvalidEl);
+    return false;
+  }
+  return true;
+}
+
 function downloadJson(){
+  if (!checkFormBeforeExport()) return;
   const blob = new Blob([JSON.stringify(CONTENT, null, 2)], { type: 'application/json' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
@@ -1256,6 +1573,7 @@ function downloadJson(){
 $('#downloadBtn').addEventListener('click', downloadJson);
 
 $('#copyJsonBtn').addEventListener('click', async () => {
+  if (!checkFormBeforeExport()) return;
   try {
     await navigator.clipboard.writeText(JSON.stringify(CONTENT, null, 2));
     showToast('JSON copié dans le presse-papiers.');
