@@ -188,6 +188,7 @@ section{ padding:88px 0; position:relative; scroll-margin-top:84px; }
 @media (prefers-reduced-motion: reduce){ .hero-fx{ opacity:1; transform:none; animation:none; } .hero-bg{ transform:none !important; } }
 
 .hills{ display:block; width:100%; height:auto; position:relative; z-index:2; }
+.hills-paws{ fill:var(--pine); opacity:.55; }
 
 /* =====================================================================
    4. PRÉSENTATION
@@ -217,15 +218,8 @@ section{ padding:88px 0; position:relative; scroll-margin-top:84px; }
 /* =====================================================================
    5. POURQUOI L'ÉDUCATION CANINE
    ===================================================================== */
-.why{ background:var(--paper-soft); position:relative; overflow:hidden; }
-.why::before{
-  content:""; position:absolute; inset:-15% -10%; z-index:0; pointer-events:none;
-  background-image:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%22120%22%20height%3D%22120%22%20viewBox%3D%220%200%20120%20120%22%3E%3Cg%20fill%3D%22%235c6e3c%22%20fill-opacity%3D%220.5%22%3E%3Cg%20transform%3D%22translate%2814%2C18%29%20scale%281.15%29%22%3E%3Ccircle%20cx%3D%226%22%20cy%3D%226%22%20r%3D%223.1%22/%3E%3Ccircle%20cx%3D%2215%22%20cy%3D%223%22%20r%3D%223.3%22/%3E%3Ccircle%20cx%3D%2224%22%20cy%3D%228%22%20r%3D%222.9%22/%3E%3Cpath%20d%3D%22M15%2016c-6%200-11%204.6-11%2010.2%200%202.3%201.9%203.9%204.3%203.1%202-.6%204.2-1.4%206.7-1.4s4.7.8%206.7%201.4c2.4.8%204.3-.8%204.3-3.1C26%2020.6%2021%2016%2015%2016Z%22/%3E%3C/g%3E%3Cg%20transform%3D%22translate%2872%2C60%29%20scale%280.9%29%20rotate%2818%29%22%3E%3Ccircle%20cx%3D%226%22%20cy%3D%226%22%20r%3D%223.1%22/%3E%3Ccircle%20cx%3D%2215%22%20cy%3D%223%22%20r%3D%223.3%22/%3E%3Ccircle%20cx%3D%2224%22%20cy%3D%228%22%20r%3D%222.9%22/%3E%3Cpath%20d%3D%22M15%2016c-6%200-11%204.6-11%2010.2%200%202.3%201.9%203.9%204.3%203.1%202-.6%204.2-1.4%206.7-1.4s4.7.8%206.7%201.4c2.4.8%204.3-.8%204.3-3.1C26%2020.6%2021%2016%2015%2016Z%22/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
-  background-size:120px 120px;
-  opacity:.55;
-  transform:rotate(-4deg);
-}
-.why-inner{ max-width:820px; position:relative; z-index:1; }
+.why{ background:var(--paper-soft); }
+.why-inner{ max-width:820px; }
 .why blockquote{
   font-family:var(--font-display); font-style:italic; font-size:1.3rem; color:var(--pine);
   margin:32px 0; padding-left:24px; border-left:4px solid var(--gold);
@@ -497,6 +491,13 @@ a:focus-visible, button:focus-visible{ outline:3px solid var(--gold); outline-of
   <svg class="hills" viewBox="0 0 1200 180" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
     <path d="M0 160 C120 90 220 130 320 100 C420 70 480 40 600 55 C700 68 760 110 860 95 C960 80 1040 40 1200 70 L1200 180 L0 180 Z" fill="#2c3a1f"/>
     <path d="M0 175 C150 130 260 165 380 140 C520 110 620 150 760 130 C880 112 980 145 1200 120 L1200 180 L0 180 Z" fill="#efe7d2"/>
+    <g class="hills-paws">
+      <g transform="translate(122,110) scale(0.48) rotate(-10)"><circle cx="6" cy="6" r="3.1"/><circle cx="15" cy="3" r="3.3"/><circle cx="24" cy="8" r="2.9"/><path d="M15 16c-6 0-11 4.6-11 10.2 0 2.3 1.9 3.9 4.3 3.1 2-.6 4.2-1.4 6.7-1.4s4.7.8 6.7 1.4c2.4.8 4.3-.8 4.3-3.1C26 20.6 21 16 15 16Z"/></g>
+      <g transform="translate(365,118) scale(0.44) rotate(8)"><circle cx="6" cy="6" r="3.1"/><circle cx="15" cy="3" r="3.3"/><circle cx="24" cy="8" r="2.9"/><path d="M15 16c-6 0-11 4.6-11 10.2 0 2.3 1.9 3.9 4.3 3.1 2-.6 4.2-1.4 6.7-1.4s4.7.8 6.7 1.4c2.4.8 4.3-.8 4.3-3.1C26 20.6 21 16 15 16Z"/></g>
+      <g transform="translate(605,108) scale(0.48) rotate(-8)"><circle cx="6" cy="6" r="3.1"/><circle cx="15" cy="3" r="3.3"/><circle cx="24" cy="8" r="2.9"/><path d="M15 16c-6 0-11 4.6-11 10.2 0 2.3 1.9 3.9 4.3 3.1 2-.6 4.2-1.4 6.7-1.4s4.7.8 6.7 1.4c2.4.8 4.3-.8 4.3-3.1C26 20.6 21 16 15 16Z"/></g>
+      <g transform="translate(845,82) scale(0.44) rotate(10)"><circle cx="6" cy="6" r="3.1"/><circle cx="15" cy="3" r="3.3"/><circle cx="24" cy="8" r="2.9"/><path d="M15 16c-6 0-11 4.6-11 10.2 0 2.3 1.9 3.9 4.3 3.1 2-.6 4.2-1.4 6.7-1.4s4.7.8 6.7 1.4c2.4.8 4.3-.8 4.3-3.1C26 20.6 21 16 15 16Z"/></g>
+      <g transform="translate(1065,98) scale(0.48) rotate(-6)"><circle cx="6" cy="6" r="3.1"/><circle cx="15" cy="3" r="3.3"/><circle cx="24" cy="8" r="2.9"/><path d="M15 16c-6 0-11 4.6-11 10.2 0 2.3 1.9 3.9 4.3 3.1 2-.6 4.2-1.4 6.7-1.4s4.7.8 6.7 1.4c2.4.8 4.3-.8 4.3-3.1C26 20.6 21 16 15 16Z"/></g>
+    </g>
   </svg>
 </section>
 
