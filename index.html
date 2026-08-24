@@ -4,7 +4,26 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Momox Dogs — Morgane, éducatrice canine</title>
-<meta name="description" content="Momox Dogs — Morgane, éducatrice canine (BPE) : cours individuels et collectifs, cours chiot, désensibilisation, bilans comportementaux, balades et pet sitting.">
+<meta name="description" id="metaDescription" content="Momox Dogs — Morgane, éducatrice canine (BPE) : cours individuels et collectifs, cours chiot, désensibilisation, bilans comportementaux, balades et pet sitting.">
+
+<!-- ============================================================
+     RÉSEAUX SOCIAUX (Open Graph / Twitter Card) + DONNÉES STRUCTURÉES
+     Le contenu de ces balises (content="") est rempli dynamiquement en JS
+     depuis content.json → "seo", au chargement du site (voir initSite()).
+     Rien à modifier ici : change les valeurs dans content.json → seo.
+     ============================================================ -->
+<meta property="og:title" content="" id="ogTitle">
+<meta property="og:description" content="" id="ogDescription">
+<meta property="og:type" content="website" id="ogType">
+<meta property="og:image" content="" id="ogImage">
+<meta property="og:url" content="" id="ogUrl">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="" id="twitterTitle">
+<meta name="twitter:description" content="" id="twitterDescription">
+<meta name="twitter:image" content="" id="twitterImage">
+<link rel="canonical" href="" id="canonicalLink">
+<!-- Données structurées schema.org (LocalBusiness), générées en JS à partir de CONTENT -->
+<script type="application/ld+json" id="jsonLdSchema"></script>
 
 <!-- ============================================================
      POLICES — Fraunces (titres) + Work Sans (texte courant)
@@ -54,7 +73,7 @@
 }
 
 *,*::before,*::after{ box-sizing:border-box; }
-html{ -webkit-text-size-adjust:100%; scroll-behavior:smooth; overflow-x:hidden; width:100%; }
+html{ -webkit-text-size-adjust:100%; scroll-behavior:smooth; overflow-x:hidden; width:100%; overscroll-behavior-x:none; }
 @media (prefers-reduced-motion: reduce){ html{ scroll-behavior:auto; } }
 
 /* Sur les grands écrans, le contenu s'élargit et s'agrandit légèrement
@@ -71,6 +90,7 @@ body{
   line-height:1.6;
   -webkit-font-smoothing:antialiased;
   overflow-x:hidden;
+  overscroll-behavior-x:none;
 }
 
 img{ max-width:100%; display:block; }
@@ -317,6 +337,7 @@ section{ padding:88px 0; position:relative; scroll-margin-top:84px; }
   padding:min(5vh,32px) 16px; padding-bottom:max(16px, env(safe-area-inset-bottom));
   background:rgba(var(--pine-dark-rgb),.6); backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px);
   opacity:0; visibility:hidden; transition:opacity .3s ease, visibility .3s;
+  overscroll-behavior-x:none;
 }
 .modal-overlay.open{ opacity:1; visibility:visible; }
 
@@ -329,7 +350,7 @@ section{ padding:88px 0; position:relative; scroll-margin-top:84px; }
 }
 .modal-overlay.open .modal{ transform:translateY(0) scale(1); opacity:1; }
 
-.modal-scroll{ max-height:min(86vh,780px); overflow-y:auto; -webkit-overflow-scrolling:touch; }
+.modal-scroll{ max-height:min(86vh,780px); overflow-y:auto; -webkit-overflow-scrolling:touch; touch-action:pan-y; overscroll-behavior-x:none; }
 
 .modal-media{ position:relative; height:260px; overflow:hidden; background:var(--pine-dark); }
 .modal-media img{ width:100%; height:100%; object-fit:cover; transition:opacity .28s ease; }
@@ -420,12 +441,33 @@ section{ padding:88px 0; position:relative; scroll-margin-top:84px; }
 .contact-list li:hover{ transform:translateX(4px); }
 .contact-list svg{ width:22px; height:22px; flex:none; color:var(--gold-light); margin-top:2px; }
 .contact-list .placeholder{ opacity:.65; font-style:italic; }
+.contact-list a{ text-decoration:none; }
+.contact-list a:hover, .contact-list a:focus-visible{ text-decoration:underline; }
 .contact-card{
   background:rgba(var(--cream-rgb),.08); border:1px solid var(--line-dark); border-radius:var(--radius); padding:28px;
   backdrop-filter:blur(4px); transition:transform .3s cubic-bezier(.2,.8,.2,1), background .3s ease;
 }
 .contact-card:hover{ transform:translateY(-4px); background:rgba(var(--cream-rgb),.12); }
 .contact-card p{ color:rgba(var(--cream-rgb),.85); }
+
+/* Formulaire de contact */
+.contact-form{ display:flex; flex-direction:column; gap:14px; margin-top:18px; }
+.form-row{ display:flex; flex-direction:column; gap:6px; }
+.form-row label{ font-size:.82rem; font-weight:600; color:rgba(var(--cream-rgb),.85); }
+.form-row input, .form-row textarea{
+  font-family:var(--font-body); font-size:.95rem; color:var(--ink);
+  background:var(--cream); border:1px solid transparent; border-radius:10px;
+  padding:11px 14px; resize:vertical; min-height:44px;
+}
+.form-row textarea{ min-height:110px; }
+.form-row input:focus-visible, .form-row textarea:focus-visible{ outline:3px solid var(--gold); outline-offset:1px; }
+.contact-form .btn-primary{ align-self:flex-start; }
+.contact-form .btn-primary:disabled{ opacity:.55; cursor:not-allowed; transform:none; box-shadow:none; }
+.form-status{ margin:0; font-size:.88rem; font-weight:600; min-height:1.2em; color:rgba(var(--cream-rgb),.85); }
+.form-status.is-success{ color:#bff0c9; }
+.form-status.is-error{ color:#ffd0c2; }
+.form-fallback{ margin:14px 0 0; font-size:.85rem; color:rgba(var(--cream-rgb),.75); }
+.form-fallback a{ font-weight:600; text-decoration:underline; }
 
 /* =====================================================================
    9. PIED DE PAGE
@@ -493,9 +535,7 @@ a:focus-visible, button:focus-visible{ outline:3px solid var(--gold); outline-of
     </a>
 
     <ul class="nav-links" id="navLinks">
-      <li><a href="#presentation">Présentation</a></li>
-      <li><a href="#pourquoi">Pourquoi</a></li>
-      <li><a href="#cours">Cours &amp; tarifs</a></li>
+      <!-- Liens du menu générés automatiquement depuis CONTENT.nav -->
       <li><a href="#contact" class="nav-cta-mobile">Me contacter</a></li>
     </ul>
 
@@ -513,7 +553,7 @@ a:focus-visible, button:focus-visible{ outline:3px solid var(--gold); outline-of
      HÉROS
      ============================================================ -->
 <section class="hero" id="accueil">
-  <div class="hero-bg" aria-hidden="true"></div>
+  <div class="hero-bg" id="heroBg" aria-hidden="true"></div>
   <div class="hero-inner">
     <span class="hero-badge hero-fx">🐾 <span id="heroBadgeText">Éducation canine positive</span></span>
     <h1 id="heroTitle" class="hero-fx">Une éducation canine <em>sur-mesure</em>, pas à pas.</h1>
@@ -546,8 +586,14 @@ a:focus-visible, button:focus-visible{ outline:3px solid var(--gold); outline-of
   <div class="container about">
     <div class="reveal">
       <div class="photo-frame">
-        <!-- Pour changer la photo : remplace le fichier images/portrait-morgane.jpg -->
-        <img src="images/portrait-morgane.jpg" alt="Morgane, éducatrice canine, avec un de ses chiens">
+        <!-- Photo définie dans content.json → images.portrait.
+             La version .webp est déduite automatiquement du même nom de
+             fichier (ex. portrait-morgane.jpg → portrait-morgane.webp).
+             Fournis les deux formats si tu changes cette photo. -->
+        <picture>
+          <source id="portraitWebp" type="image/webp" srcset="images/portrait-morgane.webp">
+          <img id="portraitImg" src="images/portrait-morgane.jpg" alt="Morgane, éducatrice canine, avec un de ses chiens" loading="lazy" decoding="async">
+        </picture>
       </div>
     </div>
 
@@ -572,11 +618,11 @@ a:focus-visible, button:focus-visible{ outline:3px solid var(--gold); outline-of
      ============================================================ -->
 <section class="why" id="pourquoi">
   <div class="container why-inner reveal">
-    <span class="eyebrow">Pourquoi suivre des cours ?</span>
-    <h2>L'éducation canine, ça sert à quoi ?</h2>
-    <p>Mon rôle est de vous accompagner dans l'éducation de votre chien et de favoriser une relation harmonieuse entre vous. L'objectif est d'aider votre chien à devenir un « bon citoyen », agréable à vivre pour son entourage — je vous fournis les outils nécessaires pour l'éduquer de manière optimale.</p>
-    <p>L'un des objectifs essentiels est aussi de garantir le bien-être de votre chien, afin qu'il se sente à l'aise et serein en toutes circonstances. Suivre des cours vous permet de mieux comprendre votre chien, d'anticiper ses réactions et d'analyser certains comportements.</p>
-    <blockquote>Il n'existe pas une méthode unique en matière d'éducation canine. Je m'adapte à la psychologie du maître et au caractère de chaque chien, pour une approche personnalisée et efficace.</blockquote>
+    <span class="eyebrow" id="whyEyebrow"></span>
+    <h2 id="whyTitle"></h2>
+    <p id="whyText1"></p>
+    <p id="whyText2"></p>
+    <blockquote id="whyQuote"></blockquote>
   </div>
   <div class="paw-divider reveal-stagger" id="pawDivider" aria-hidden="true"></div>
 </section>
@@ -599,12 +645,12 @@ a:focus-visible, button:focus-visible{ outline:3px solid var(--gold); outline-of
      CONTACT
      ============================================================ -->
 <section class="contact" id="contact">
-  <div class="contact-bg" aria-hidden="true"></div>
+  <div class="contact-bg" id="contactBg" aria-hidden="true"></div>
   <div class="dog-runner" id="dogRunnerContact" style="top:16px; color:var(--gold-light);" aria-hidden="true"></div>
   <div class="container contact-inner">
     <div class="reveal">
       <span class="eyebrow" style="color:var(--gold-light);">Contact</span>
-      <h2>Prêt·e à démarrer avec votre chien ?</h2>
+      <h2>Prêt à démarrer avec votre chien ?</h2>
       <p style="color:rgba(var(--cream-rgb),.85); max-width:44ch;">Le premier échange permet de faire connaissance et de définir ensemble les objectifs les plus adaptés à votre chien.</p>
       <ul class="contact-list">
         <li>
@@ -613,7 +659,8 @@ a:focus-visible, button:focus-visible{ outline:3px solid var(--gold); outline-of
         </li>
         <li>
           <svg viewBox="0 0 24 24" fill="none"><path d="M6 3h4l2 5-2.5 1.5a11 11 0 0 0 5 5L16 12l5 2v4c0 1-1 2-2 2C11 20 4 13 4 5c0-1 1-2 2-2Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>
-          <span id="contactPhone">07 82 25 26 88</span>
+          <!-- Le href tel: est dérivé automatiquement de content.json → contact.telephone -->
+          <a id="contactPhone" href="tel:">07 82 25 26 88</a>
         </li>
         <li>
           <svg viewBox="0 0 24 24" fill="none"><path d="M12 21s7-6.5 7-12a7 7 0 1 0-14 0c0 5.5 7 12 7 12Z" stroke="currentColor" stroke-width="1.6"/><circle cx="12" cy="9" r="2.4" stroke="currentColor" stroke-width="1.6"/></svg>
@@ -625,7 +672,32 @@ a:focus-visible, button:focus-visible{ outline:3px solid var(--gold); outline-of
     <div class="contact-card reveal">
       <h3 style="color:var(--cream);">Un projet pour votre chien ?</h3>
       <p>Décrivez votre situation (âge, race, comportements observés) et je reviens vers vous pour convenir d'un premier échange.</p>
-      <a class="btn btn-primary" id="mailtoBtn" href="mailto:Morgane@momoxdogs.fr">Écrire un message</a>
+
+      <!-- Formulaire de contact : envoyé via un service tiers gratuit
+           (Formspree ou Web3Forms), configuré dans content.json →
+           contact.formEndpoint (et contact.formAccessKey pour Web3Forms).
+           Voir le commentaire détaillé dans le <script> en bas de page. -->
+      <form class="contact-form" id="contactForm" novalidate>
+        <div class="form-row">
+          <label for="cfName">Nom</label>
+          <input type="text" id="cfName" name="name" autocomplete="name" required>
+        </div>
+        <div class="form-row">
+          <label for="cfEmail">Email</label>
+          <input type="email" id="cfEmail" name="email" autocomplete="email" required>
+        </div>
+        <div class="form-row">
+          <label for="cfPhone">Téléphone (optionnel)</label>
+          <input type="tel" id="cfPhone" name="phone" autocomplete="tel">
+        </div>
+        <div class="form-row">
+          <label for="cfMessage">Message</label>
+          <textarea id="cfMessage" name="message" rows="4" required></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary" id="cfSubmit">Envoyer le message</button>
+        <p class="form-status" id="cfStatus" role="status" aria-live="polite"></p>
+      </form>
+      <p class="form-fallback">ou écrivez directement à <a id="mailtoBtn" href="mailto:Morgane@momoxdogs.fr">Morgane@momoxdogs.fr</a></p>
     </div>
   </div>
 </section>
@@ -640,7 +712,10 @@ a:focus-visible, button:focus-visible{ outline:3px solid var(--gold); outline-of
     </button>
     <div class="modal-scroll">
       <div class="modal-media">
-        <img id="modalImg" src="" alt="">
+        <picture>
+          <source id="modalImgWebp" type="image/webp" srcset="">
+          <img id="modalImg" src="" alt="" loading="lazy" decoding="async">
+        </picture>
         <div class="modal-media-caption">
           <span class="card-cat" id="modalCat"></span>
           <h3 id="modalTitleText"></h3>
@@ -672,106 +747,200 @@ a:focus-visible, button:focus-visible{ outline:3px solid var(--gold); outline-of
 
 <footer>
   <div class="container footer-inner">
-    <span>© <span id="year"></span> Momox Dogs — Morgane, éducatrice canine (BPE)</span>
-    <span>Site conçu avec 🐾 pour les chiens et leurs humains</span>
+    <span>© <span id="year"></span> <span id="footerCopyright"></span></span>
+    <span id="footerTagline"></span>
   </div>
 </footer>
 
 <script>
 /* =====================================================================================
-   ZONE À MODIFIER — TOUT LE CONTENU DU SITE EST ICI.
-   Pour changer un texte, un prix ou un titre : modifie simplement le texte entre
-   guillemets " " ci-dessous, puis enregistre le fichier. Ne touche pas au reste du code.
+   TOUT LE CONTENU DU SITE (textes, prix, cours, présentation, contact...) se trouve
+   maintenant dans le fichier "content.json", à côté de ce fichier index.html.
+   Pour changer un texte, un prix, réordonner les cours ou le menu : ouvre content.json
+   et modifie/déplace les valeurs, puis enregistre. Ne touche pas au code ci-dessous.
 
-   PHOTOS : chaque service a une ligne "image" qui pointe vers un fichier du dossier
-   /images. Pour changer une photo, remplace le fichier du même nom dans /images
-   (garde exactement le même nom) — ou change le texte entre guillemets vers un
-   nouveau nom de fichier que tu auras ajouté dans /images.
+   IMPORTANT : ce chargement se fait via fetch(), qui nécessite que le site soit
+   servi par un serveur web (http:// ou https://) — ce sera le cas une fois le site
+   en ligne. Si tu ouvres index.html directement depuis le disque (file://), la
+   plupart des navigateurs bloqueront la lecture de content.json. Pour tester en
+   local, lance un petit serveur (ex. dans le dossier du site : `python3 -m http.server`
+   puis ouvre http://localhost:8000).
    ===================================================================================== */
-const CONTENT = {
+async function initSite() {
 
-  // --- Étiquettes affichées sous "Présentation" (les 4 services phares) ---
-  tags: [
-    "Éducation canine",
-    "Balades canines",
-    "Pet sitting",
-    "Désensibilisation aux manipulations"
-  ],
+let CONTENT;
+try {
+  const res = await fetch('content.json');
+  if (!res.ok) throw new Error('HTTP ' + res.status);
+  CONTENT = await res.json();
+} catch (err) {
+  console.error('Impossible de charger content.json :', err);
+  document.body.innerHTML =
+    '<div style="max-width:640px;margin:80px auto;padding:24px;font-family:sans-serif;line-height:1.5;">' +
+    '<h1 style="font-size:1.3rem;">Contenu introuvable</h1>' +
+    '<p>Le fichier <code>content.json</code> n\'a pas pu être chargé. Vérifie qu\'il est bien ' +
+    'présent à côté de <code>index.html</code>, et que le site est consulté via un serveur web ' +
+    '(http/https) plutôt qu\'ouvert directement depuis le disque.</p></div>';
+  return;
+}
 
-  // --- Coordonnées (section Contact) ---
-  contact: {
-    email: "Morgane@momoxdogs.fr",
-    telephone: "07 82 25 26 88",
-    zone: "Intervention dans le 95, le 92 et le 78"
-  },
+// --- Thème de couleurs (CONTENT.theme) : appliqué sur les variables CSS ---
+// Pour changer les couleurs du site, modifie les codes hexadécimaux dans
+// content.json → "theme". Pas besoin de toucher au CSS.
+if (CONTENT.theme) {
+  const hexToRgb = (hex) => {
+    const m = hex.replace('#', '').match(/.{1,2}/g);
+    return m.map(h => parseInt(h, 16)).join(',');
+  };
+  const root = document.documentElement.style;
+  const t = CONTENT.theme;
+  const cssVarMap = {
+    ink: '--ink', paper: '--paper', paperSoft: '--paper-soft',
+    pineDark: '--pine-dark', pine: '--pine', olive: '--olive',
+    gold: '--gold', goldLight: '--gold-light', cream: '--cream'
+  };
+  Object.entries(cssVarMap).forEach(([key, cssVar]) => {
+    if (t[key]) root.setProperty(cssVar, t[key]);
+  });
+  // Triplets RGB recalculés automatiquement à partir des couleurs ci-dessus
+  // (utilisés pour les dégradés et transparences du site).
+  if (t.ink) root.setProperty('--ink-rgb', hexToRgb(t.ink));
+  if (t.pineDark) root.setProperty('--pine-dark-rgb', hexToRgb(t.pineDark));
+  if (t.cream) root.setProperty('--cream-rgb', hexToRgb(t.cream));
+  if (t.paper) root.setProperty('--paper-rgb', hexToRgb(t.paper));
+}
 
-  // --- Les cours et services, avec leur description, leur tarif et leur photo ---
-  // Pour ajouter un nouveau cours : copie un bloc { ... } complet et modifie son contenu.
-  // Pour changer un prix : modifie uniquement la ligne "prix".
-  services: [
-    {
-      categorie: "Éducation",
-      titre: "Cours individuel",
-      image: "images/service-individuel.jpg",
-      description: "Lors de ces séances d'une heure, nous ferons le point sur votre quotidien avec votre chien, en identifiant les difficultés rencontrées et en définissant vos objectifs.\nJe prendrai le temps de vous expliquer le fonctionnement et les besoins spécifiques de votre chien, afin de vous fournir les clés pour réagir de manière appropriée face à ses comportements.\n\nNous aborderons les sujets qui vous intéressent, que ce soit l'éducation, la gestion d'un comportement problématique ou les aspects à améliorer.\nVous pourrez également poser toutes les questions que vous souhaitez.\n\nLes séances se dérouleront en extérieur, dans un lieu adapté et convenu en fonction de vos préférences et de celles de votre chien.",
-      prix: "50 €",
-      unite: "/ heure"
-    },
-    {
-      categorie: "Éducation",
-      titre: "Cours collectif",
-      image: "images/service-collectif.jpg",
-      description: "Le travail en groupe constitue un outil précieux pour développer la sociabilité de votre chien, que ce soit avec ses congénères ou avec des humains. C'est également une excellente occasion de renforcer la relation et la complicité avec votre chien, grâce à des exercices variés et des activités nouvelles.\nEn outre, cela permet de lutter contre cette tentation souvent très forte chez les chiens de courir vers leurs congénères pour jouer, et de les encourager à rester calmement près de vous.\n\nÀ mon sens, les ateliers collectifs représentent une étape clé dans l'apprentissage, une mise à l'épreuve des acquis, permettant de confronter le chien à des situations plus complexes et proches du quotidien, tout en bénéficiant du soutien d'un accompagnement professionnel.\n\nChaque séance offre un enrichissement particulier, tant pour le chien que pour le maître. Ce qui peut constituer un nouvel apprentissage pour certains chiens peut aussi être l'occasion de réviser des bases essentielles pour d'autres. Il est important de garder à l'esprit que le chien, tout comme l'humain, est influencé par son environnement. Sa capacité à se concentrer sur vous, à écouter et à assimiler de nouvelles informations sera impactée par des facteurs extérieurs tels que :\nDes humains qu'il ne connaît pas, qui portent des friandises,\nLa présence d'autres chiens,\nDe nouvelles odeurs,\nUn lieu inconnu.\nCes éléments représentent des défis stimulants, parfaits pour tester et renforcer les apprentissages déjà réalisés. En participant à un atelier collectif, il est essentiel de faire preuve de patience et d'accepter ces difficultés. Je serai toujours présent pour vous guider tout au long du processus.\n\nIl est également important d'être tolérant et compréhensif envers les autres participants : chaque chien a ses propres problématiques et chaque maître son propre parcours. Si vous êtes présents, c'est que vous êtes investis et impliqués, quel que soit votre niveau d'expérience.",
-      prix: "30 €",
-      unite: "/ heure"
-    },
-    {
-      categorie: "Éducation",
-      titre: "Cours chiot",
-      image: "images/service-chiot.jpg",
-      description: "L'éducation canine doit commencer dès le plus jeune âge, à l'instar de l'éducation des enfants. Il est essentiel de débuter l'éducation de votre chiot dès ses premières semaines, afin qu'il intègre ces principes et les conserve tout au long de sa vie, devenant ainsi un chien adulte plus équilibré et facile à vivre. Les bases de cette éducation consisteront principalement à lui indiquer clairement ce que vous attendez de lui, ainsi que les comportements à éviter.\nL'objectif est que votre chiot, puis votre chien adulte, adopte une conduite appropriée, en vous donnant toutes les chances de réussir. Un chiot bien éduqué connaît ses limites, gagne en assurance, développe une relation de confiance avec vous et s'intègre harmonieusement dans son environnement social.\n\nUn des avantages de ces cours est que votre chiot sera également amené à rencontrer d'autres chiens, favorisant ainsi sa socialisation. Tout comme pour les cours individuels, ces sessions se dérouleront en extérieur, dans un lieu convenu par toutes les parties.\nCela permettra à votre compagnon de se familiariser avec des chiens de différentes races, tailles et morphologies, l'aidant à développer des comportements appropriés tant avec les humains qu'avec ses congénères.\nDe plus, ces cours vous permettront de mieux comprendre le langage canin, essentiel pour interpréter les signes de communication de votre chiot, qui diffèrent de ceux des humains. Vous apprendrez ainsi à mieux comprendre votre chien et à vous faire comprendre de manière plus efficace.\n\nEn tant que propriétaire, vous êtes le principal responsable de l'éducation de votre chiot. Cela renforcera la complicité entre vous et offrira à votre compagnon une excellente intégration au sein de votre foyer. Toutefois, éduquer un chiot peut s'avérer complexe. Si vous choisissez d'éduquer votre chien vous-même, il est crucial de vous renseigner sur les bonnes pratiques en la matière.\n\nL'objectif de ces cours est de permettre à votre chiot de découvrir de nouvelles expériences dans un environnement sécurisé et de les aborder de manière positive, afin qu'il puisse apprendre et évoluer, tout comme vous.",
-      prix: "50 €",
-      unite: "/ heure"
-    },
-    {
-      categorie: "Bien-être",
-      titre: "Manipulations & désensibilisation",
-      image: "images/service-manipulation.jpg",
-      description: "Lorsqu'un chien présente une sensibilité particulière aux manipulations, qu'il s'agisse du nettoyage des oreilles, des yeux, du brossage ou même des caresses, il peut adopter des comportements gênants tels que la morsure, l'agitation ou la tentative de fuite. Dans ce contexte, l'objectif de nos séances sera de travailler l'interaction entre l'humain et le chien, en l'aidant à comprendre que ces manipulations ne constituent pas une contrainte, mais plutôt une opportunité d'obtenir des récompenses positives, telles que des friandises ou des moments de jeu.\nCe processus doit être mené dans une approche exclusivement positive.\nL'objectif étant que le chien accepte de se laisser manipuler en toute sérénité. Lorsqu'il est en confiance, il devient plus calme et coopératif, facilitant ainsi le travail de manipulation. Ces séances visent à dédramatiser le contact et les manipulations, en les rendant aussi agréables ou, du moins, supportables que possible.\nLa désensibilisation d'un chien, quel que soit l'aspect, est un processus long et exige une grande patience et un investissement constant. L'objectif final est que votre chien puisse se rendre chez le vétérinaire sans stress, en acceptant les manipulations nécessaires sans danger, ni pour lui, ni pour le professionnel.\nPour débuter, il est recommandé de mener ces séances dans un environnement calme et rassurant pour le chien. C'est pourquoi nous commencerons ces exercices à domicile, en adaptant l'approche à la problématique spécifique de votre chien.",
-      prix: "40 €",
-      unite: "/ heure"
-    },
-    {
-      categorie: "Diagnostic",
-      titre: "Bilan comportemental à domicile",
-      image: "images/service-bilan.jpg",
-      description: "Les comportements indésirables tels que l'agitation, les aboiements excessifs, les destructions, l'agressivité, la peur ou la malpropreté peuvent résulter de causes diverses et variées. Selon l'animal, son passé, son environnement et d'autres facteurs, la manière d'aborder la situation variera nécessairement. Il n'existe pas de solution universelle ou de méthode miracle dans le domaine de l'éducation canine.\nChaque cas de rééducation comportementale est unique. C'est pourquoi un entretien détaillé avec vous est essentiel.\n\nL'entretien :\nCet entretien, d'une durée d'environ 1 heure à 1h30, se déroule sous forme d'un échange de questions et réponses. L'objectif est de cerner l'origine des problèmes rencontrés, tout en observant attentivement l'environnement dans lequel votre chien évolue, ainsi que la façon dont vous communiquez avec lui.\nMon but principal est d'identifier la/les cause(s) sous-jacente(s) des comportements indésirables et de déterminer la meilleure approche pour y remédier.\nÀ l'issue de cette première phase d'observation et d'analyse, je proposerai la mise en place de protocoles comportementaux adaptés. Ce sont des méthodes spécifiques, visant à instaurer des comportements précis et efficaces pour résoudre les problèmes rencontrés, et ainsi restaurer une relation harmonieuse entre vous et votre animal.",
-      prix: "80 €",
-      unite: "/ séance"
-    },
-    {
-      categorie: "Balade",
-      titre: "Balades canines",
-      image: "images/service-balades.jpg",
-      description: "Je propose également un service de balades à domicile pour vos chiens. Chaque promenade dure au minimum une heure, et elle peut être l'occasion de travailler des points spécifiques que vous souhaitez améliorer, tels que le rappel ou la marche en laisse. Alternativement, nous pourrons simplement profiter d'une sortie agréable, en forêt, dans les champs ou dans un parc, pour passer un moment de qualité avec votre loulou.",
-      prix: "10 €",
-      unite: "/ heure"
-    },
-    {
-      categorie: "Garde",
-      titre: "Pet sitting",
-      image: "images/service-petsitting.jpg",
-      description: "Ce service est destiné à vos animaux de compagnie, qu'il s'agisse de chiens, de chats ou d'autres animaux. Bien que je ne sois pas en mesure d'accueillir des animaux à mon domicile, je me déplace directement chez vous pour assurer les soins quotidiens de vos compagnons.\nPour les chiens, ce service inclut plusieurs promenades par jour, ainsi que l'alimentation et des moments de qualité en leur compagnie. Pour les chats, je me charge de l'entretien de la litière, des soins nécessaires et leur apporte les caresses quotidiennes dont ils ont besoin.",
-      prix: "15 € chien · 10 € chat",
-      unite: "/ nuitée"
-    }
-  ]
-};
+// --- Images optimisées (.webp) --------------------------------------------
+// Pour chaque image .jpg/.png définie dans content.json, on déduit le nom du
+// fichier .webp correspondant (même nom, extension différente) et on l'utilise
+// en priorité (via <picture>/<source> ou image-set()), avec la version
+// .jpg/.png d'origine en repli pour les navigateurs qui ne supportent pas le
+// webp. IMPORTANT : si tu changes une photo, fournis les DEUX formats
+// (.jpg et .webp) au même nom de base dans /images. Un script de conversion
+// (cwebp) est fourni séparément pour générer les .webp en une commande.
+function toWebp(path) {
+  if (!path) return path;
+  return path.replace(/\.(jpe?g|png)$/i, '.webp');
+}
+// Applique une image de fond CSS en priorisant le .webp via image-set(),
+// avec repli automatique sur l'url() classique si image-set() n'est pas
+// supporté par le navigateur (l'affectation d'une valeur CSS invalide est
+// simplement ignorée, ce qui conserve la valeur précédente).
+function setBgImage(el, path) {
+  if (!el || !path) return;
+  const webp = toWebp(path);
+  el.style.backgroundImage = `url('${path}')`;
+  el.style.backgroundImage = `-webkit-image-set(url('${webp}') 1x type('image/webp'), url('${path}') 1x type('image/jpeg'))`;
+  el.style.backgroundImage = `image-set(url('${webp}') type('image/webp'), url('${path}') type('image/jpeg'))`;
+}
+
+// --- Images principales (CONTENT.images) : photo héros, fond contact, portrait ---
+// Pour changer une image, modifie le chemin dans content.json → "images",
+// ou remplace directement le fichier du même nom dans le dossier /images.
+if (CONTENT.images) {
+  const heroBg = document.getElementById('heroBg');
+  const contactBg = document.getElementById('contactBg');
+  const portraitImg = document.getElementById('portraitImg');
+  const portraitWebp = document.getElementById('portraitWebp');
+  if (heroBg && CONTENT.images.hero) setBgImage(heroBg, CONTENT.images.hero);
+  if (contactBg && CONTENT.images.contact) setBgImage(contactBg, CONTENT.images.contact);
+  if (portraitImg && CONTENT.images.portrait) {
+    portraitImg.src = CONTENT.images.portrait;
+    if (portraitWebp) portraitWebp.srcset = toWebp(CONTENT.images.portrait);
+  }
+}
+
+// --- SEO : Open Graph, Twitter Card et données structurées (CONTENT.seo) ---
+// Toutes les valeurs viennent de content.json → "seo" ; rien n'est codé en
+// dur ici. Modifie ce bloc dans content.json pour changer le titre, la
+// description ou l'image partagés sur les réseaux sociaux.
+if (CONTENT.seo) {
+  const seo = CONTENT.seo;
+  const setMetaContent = (id, value) => {
+    const el = document.getElementById(id);
+    if (el && value) el.setAttribute('content', value);
+  };
+  const toAbsoluteUrl = (path) => {
+    if (!path) return '';
+    if (/^https?:\/\//i.test(path)) return path;
+    const base = (seo.siteUrl || '').replace(/\/$/, '');
+    return base ? `${base}/${path.replace(/^\//, '')}` : path;
+  };
+
+  if (seo.siteTitle) document.title = seo.siteTitle;
+  if (seo.description) document.getElementById('metaDescription').setAttribute('content', seo.description);
+
+  const shareImageUrl = toAbsoluteUrl(seo.shareImage || (CONTENT.images && CONTENT.images.hero));
+  setMetaContent('ogTitle', seo.siteTitle);
+  setMetaContent('ogDescription', seo.description);
+  setMetaContent('ogType', seo.ogType || 'website');
+  setMetaContent('ogImage', shareImageUrl);
+  setMetaContent('ogUrl', seo.siteUrl);
+  setMetaContent('twitterTitle', seo.siteTitle);
+  setMetaContent('twitterDescription', seo.description);
+  setMetaContent('twitterImage', shareImageUrl);
+  const canonical = document.getElementById('canonicalLink');
+  if (canonical && seo.siteUrl) canonical.setAttribute('href', seo.siteUrl);
+
+  // Données structurées schema.org — générées dynamiquement depuis CONTENT
+  // (services, contact) pour rester synchronisées avec le reste du site.
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'ProfessionalService',
+    name: seo.siteTitle || (CONTENT.footer && CONTENT.footer.copyright),
+    description: seo.description,
+    telephone: CONTENT.contact && CONTENT.contact.telephone,
+    email: CONTENT.contact && CONTENT.contact.email,
+    areaServed: CONTENT.contact && CONTENT.contact.zone,
+    url: seo.siteUrl || undefined,
+    image: shareImageUrl || undefined,
+    hasOfferCatalog: CONTENT.services ? {
+      '@type': 'OfferCatalog',
+      name: 'Cours et services',
+      itemListElement: CONTENT.services.map(s => ({
+        '@type': 'Offer',
+        itemOffered: { '@type': 'Service', name: s.titre, description: s.categorie },
+        // Le prix est repris tel quel (ex. "50 €", "15 € chien · 10 € chat") :
+        // le format n'est pas toujours numérique pur, donc pas de priceCurrency strict ici.
+        price: s.prix
+      }))
+    } : undefined
+  };
+  // Supprime les clés vides/undefined pour un JSON-LD propre
+  Object.keys(jsonLd).forEach(k => { if (jsonLd[k] === undefined || jsonLd[k] === '') delete jsonLd[k]; });
+  document.getElementById('jsonLdSchema').textContent = JSON.stringify(jsonLd, null, 2);
+}
 
 /* =====================================================================================
    À partir d'ici : le code qui affiche automatiquement le contenu ci-dessus.
    Il n'y a normalement rien à modifier en dessous de cette ligne.
    ===================================================================================== */
+
+// Menu de navigation — liens et ordre viennent de CONTENT.nav
+document.getElementById('navLinks').insertAdjacentHTML('afterbegin',
+  CONTENT.nav.map(item => `<li><a href="#${item.id}">${item.label}</a></li>`).join('')
+);
+
+// Héros
+document.getElementById('heroBadgeText').textContent = CONTENT.hero.badge;
+document.getElementById('heroTitle').innerHTML = CONTENT.hero.titre;
+document.getElementById('heroLead').textContent = CONTENT.hero.texte;
+
+// Présentation
+document.getElementById('presTitle').textContent = CONTENT.presentation.titre;
+document.getElementById('presBio1').textContent = CONTENT.presentation.texte1;
+document.getElementById('presBio2').textContent = CONTENT.presentation.texte2;
+
+// Pourquoi suivre des cours
+document.getElementById('whyEyebrow').textContent = CONTENT.pourquoi.eyebrow;
+document.getElementById('whyTitle').textContent = CONTENT.pourquoi.titre;
+document.getElementById('whyText1').textContent = CONTENT.pourquoi.texte1;
+document.getElementById('whyText2').textContent = CONTENT.pourquoi.texte2;
+document.getElementById('whyQuote').textContent = CONTENT.pourquoi.citation;
+
+// Pied de page
+document.getElementById('footerCopyright').textContent = CONTENT.footer.copyright;
+document.getElementById('footerTagline').textContent = CONTENT.footer.tagline;
 
 // Étiquettes de services
 document.getElementById('servicesTags').innerHTML =
@@ -784,7 +953,10 @@ const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').match
 
 document.getElementById('cardsGrid').innerHTML = CONTENT.services.map((s, i) => `
   <article class="card" data-index="${i}" tabindex="0" role="button" aria-label="Voir le détail : ${s.titre}">
-    <div class="card-img-clip"><div class="card-img-parallax"><img class="card-img" src="${s.image}" alt="${s.titre}" loading="lazy" onerror="this.classList.add('img-error')"></div></div>
+    <div class="card-img-clip"><div class="card-img-parallax"><picture>
+      <source type="image/webp" srcset="${toWebp(s.image)}">
+      <img class="card-img" src="${s.image}" alt="${s.titre}" loading="lazy" decoding="async" onerror="this.classList.add('img-error')">
+    </picture></div></div>
     <div class="card-body">
       <span class="card-cat">${pawSvg} ${s.categorie}</span>
       <h3>${s.titre}</h3>
@@ -800,9 +972,75 @@ document.getElementById('cardsGrid').innerHTML = CONTENT.services.map((s, i) => 
 // Coordonnées
 document.getElementById('contactEmail').textContent = CONTENT.contact.email;
 document.getElementById('contactEmail').classList.toggle('placeholder', CONTENT.contact.email.includes('a-completer'));
-document.getElementById('contactPhone').textContent = CONTENT.contact.telephone;
+// Téléphone : l'affichage garde le format saisi dans content.json (ex. "07 82 25 26 88"),
+// seul le lien tel: est recalculé automatiquement en nettoyant espaces/tirets
+// et en remplaçant le 0 initial par l'indicatif français +33.
+const contactPhoneEl = document.getElementById('contactPhone');
+contactPhoneEl.textContent = CONTENT.contact.telephone;
+const cleanedPhone = (CONTENT.contact.telephone || '').replace(/[\s.-]/g, '');
+contactPhoneEl.href = 'tel:' + (cleanedPhone.startsWith('0') ? '+33' + cleanedPhone.slice(1) : cleanedPhone);
 document.getElementById('contactZone').textContent = CONTENT.contact.zone;
 document.getElementById('mailtoBtn').href = 'mailto:' + CONTENT.contact.email;
+document.getElementById('mailtoBtn').textContent = CONTENT.contact.email;
+
+// Formulaire de contact --------------------------------------------------
+// Le formulaire poste vers un service tiers gratuit (le site étant 100%
+// statique, sans backend) configuré dans content.json → contact.formEndpoint
+// (+ contact.formAccessKey si besoin). Deux options possibles :
+//
+//  • Formspree (https://formspree.io) : crée un compte gratuit, crée un
+//    formulaire, récupère son URL de type "https://formspree.io/f/xxxxxxx"
+//    et colle-la dans content.json → contact.formEndpoint.
+//    (contact.formAccessKey peut rester vide.)
+//
+//  • Web3Forms (https://web3forms.com) : crée un compte gratuit, récupère
+//    ta clé d'accès ("access key"), mets "https://api.web3forms.com/submit"
+//    dans contact.formEndpoint et ta clé dans contact.formAccessKey.
+//
+// Tant que contact.formEndpoint est vide, le formulaire reste désactivé et
+// seul le lien mailto: de secours (sous le formulaire) fonctionne.
+(function setupContactForm() {
+  const form = document.getElementById('contactForm');
+  const status = document.getElementById('cfStatus');
+  const submitBtn = document.getElementById('cfSubmit');
+  const endpoint = (CONTENT.contact.formEndpoint || '').trim();
+  const accessKey = (CONTENT.contact.formAccessKey || '').trim();
+
+  if (!endpoint) {
+    status.textContent = "Le formulaire n'est pas encore configuré — merci d'utiliser l'email ci-dessous.";
+    status.classList.add('is-error');
+    submitBtn.disabled = true;
+    return;
+  }
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    submitBtn.disabled = true;
+    status.classList.remove('is-success', 'is-error');
+    status.textContent = 'Envoi en cours…';
+
+    const formData = new FormData(form);
+    if (accessKey) formData.append('access_key', accessKey);
+
+    try {
+      const res = await fetch(endpoint, {
+        method: 'POST',
+        body: formData,
+        headers: { 'Accept': 'application/json' }
+      });
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      status.textContent = 'Merci, votre message a bien été envoyé !';
+      status.classList.add('is-success');
+      form.reset();
+    } catch (err) {
+      console.error('Erreur lors de l\'envoi du formulaire :', err);
+      status.textContent = "Une erreur est survenue lors de l'envoi. Merci de réessayer, ou d'écrire directement par email.";
+      status.classList.add('is-error');
+    } finally {
+      submitBtn.disabled = false;
+    }
+  });
+})();
 
 // Année du pied de page
 document.getElementById('year').textContent = new Date().getFullYear();
@@ -940,6 +1178,7 @@ document.querySelectorAll('.btn').forEach(btn => {
   const modal = document.getElementById('modal');
   const scrollBox = modal.querySelector('.modal-scroll');
   const imgEl = document.getElementById('modalImg');
+  const imgWebpEl = document.getElementById('modalImgWebp');
   const catEl = document.getElementById('modalCat');
   const titleEl = document.getElementById('modalTitleText');
   const counterEl = document.getElementById('modalCounter');
@@ -962,6 +1201,7 @@ document.querySelectorAll('.btn').forEach(btn => {
     const s = services[index];
     imgEl.src = s.image;
     imgEl.alt = s.titre;
+    if (imgWebpEl) imgWebpEl.srcset = toWebp(s.image);
     catEl.innerHTML = pawSvg + ' ' + s.categorie;
     titleEl.textContent = s.titre;
     counterEl.textContent = `Cours ${index + 1} / ${services.length}`;
@@ -1072,6 +1312,10 @@ document.querySelectorAll('.btn').forEach(btn => {
     touchX = null;
   }, { passive: true });
 })();
+
+} // fin de initSite()
+
+initSite();
 </script>
 </body>
 </html>
