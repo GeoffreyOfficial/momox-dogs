@@ -586,14 +586,8 @@ a:focus-visible, button:focus-visible{ outline:3px solid var(--gold); outline-of
   <div class="container about">
     <div class="reveal">
       <div class="photo-frame">
-        <!-- Photo définie dans content.json → images.portrait.
-             La version .webp est déduite automatiquement du même nom de
-             fichier (ex. portrait-morgane.jpg → portrait-morgane.webp).
-             Fournis les deux formats si tu changes cette photo. -->
-        <picture>
-          <source id="portraitWebp" type="image/webp" srcset="images/portrait-morgane.webp">
-          <img id="portraitImg" src="images/portrait-morgane.jpg" alt="Morgane, éducatrice canine, avec un de ses chiens" loading="lazy" decoding="async">
-        </picture>
+        <!-- Photo définie dans content.json → images.portrait. -->
+        <img id="portraitImg" src="images/portrait-morgane.jpg" alt="Morgane, éducatrice canine, avec un de ses chiens" loading="lazy" decoding="async">
       </div>
     </div>
 
@@ -712,10 +706,7 @@ a:focus-visible, button:focus-visible{ outline:3px solid var(--gold); outline-of
     </button>
     <div class="modal-scroll">
       <div class="modal-media">
-        <picture>
-          <source id="modalImgWebp" type="image/webp" srcset="">
-          <img id="modalImg" src="" alt="" loading="lazy" decoding="async">
-        </picture>
+        <img id="modalImg" src="" alt="" loading="lazy" decoding="async">
         <div class="modal-media-caption">
           <span class="card-cat" id="modalCat"></span>
           <h3 id="modalTitleText"></h3>
@@ -810,28 +801,10 @@ if (CONTENT.theme) {
   if (t.paper) root.setProperty('--paper-rgb', hexToRgb(t.paper));
 }
 
-// --- Images optimisées (.webp) --------------------------------------------
-// Pour chaque image .jpg/.png définie dans content.json, on déduit le nom du
-// fichier .webp correspondant (même nom, extension différente) et on l'utilise
-// en priorité (via <picture>/<source> ou image-set()), avec la version
-// .jpg/.png d'origine en repli pour les navigateurs qui ne supportent pas le
-// webp. IMPORTANT : si tu changes une photo, fournis les DEUX formats
-// (.jpg et .webp) au même nom de base dans /images. Un script de conversion
-// (cwebp) est fourni séparément pour générer les .webp en une commande.
-function toWebp(path) {
-  if (!path) return path;
-  return path.replace(/\.(jpe?g|png)$/i, '.webp');
-}
-// Applique une image de fond CSS en priorisant le .webp via image-set(),
-// avec repli automatique sur l'url() classique si image-set() n'est pas
-// supporté par le navigateur (l'affectation d'une valeur CSS invalide est
-// simplement ignorée, ce qui conserve la valeur précédente).
+// Applique une image de fond CSS classique (url()).
 function setBgImage(el, path) {
   if (!el || !path) return;
-  const webp = toWebp(path);
   el.style.backgroundImage = `url('${path}')`;
-  el.style.backgroundImage = `-webkit-image-set(url('${webp}') 1x type('image/webp'), url('${path}') 1x type('image/jpeg'))`;
-  el.style.backgroundImage = `image-set(url('${webp}') type('image/webp'), url('${path}') type('image/jpeg'))`;
 }
 
 // --- Images principales (CONTENT.images) : photo héros, fond contact, portrait ---
@@ -841,12 +814,10 @@ if (CONTENT.images) {
   const heroBg = document.getElementById('heroBg');
   const contactBg = document.getElementById('contactBg');
   const portraitImg = document.getElementById('portraitImg');
-  const portraitWebp = document.getElementById('portraitWebp');
   if (heroBg && CONTENT.images.hero) setBgImage(heroBg, CONTENT.images.hero);
   if (contactBg && CONTENT.images.contact) setBgImage(contactBg, CONTENT.images.contact);
   if (portraitImg && CONTENT.images.portrait) {
     portraitImg.src = CONTENT.images.portrait;
-    if (portraitWebp) portraitWebp.srcset = toWebp(CONTENT.images.portrait);
   }
 }
 
@@ -953,10 +924,9 @@ const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').match
 
 document.getElementById('cardsGrid').innerHTML = CONTENT.services.map((s, i) => `
   <article class="card" data-index="${i}" tabindex="0" role="button" aria-label="Voir le détail : ${s.titre}">
-    <div class="card-img-clip"><div class="card-img-parallax"><picture>
-      <source type="image/webp" srcset="${toWebp(s.image)}">
+    <div class="card-img-clip"><div class="card-img-parallax">
       <img class="card-img" src="${s.image}" alt="${s.titre}" loading="lazy" decoding="async" onerror="this.classList.add('img-error')">
-    </picture></div></div>
+    </div></div>
     <div class="card-body">
       <span class="card-cat">${pawSvg} ${s.categorie}</span>
       <h3>${s.titre}</h3>
@@ -1178,7 +1148,6 @@ document.querySelectorAll('.btn').forEach(btn => {
   const modal = document.getElementById('modal');
   const scrollBox = modal.querySelector('.modal-scroll');
   const imgEl = document.getElementById('modalImg');
-  const imgWebpEl = document.getElementById('modalImgWebp');
   const catEl = document.getElementById('modalCat');
   const titleEl = document.getElementById('modalTitleText');
   const counterEl = document.getElementById('modalCounter');
@@ -1201,7 +1170,6 @@ document.querySelectorAll('.btn').forEach(btn => {
     const s = services[index];
     imgEl.src = s.image;
     imgEl.alt = s.titre;
-    if (imgWebpEl) imgWebpEl.srcset = toWebp(s.image);
     catEl.innerHTML = pawSvg + ' ' + s.categorie;
     titleEl.textContent = s.titre;
     counterEl.textContent = `Cours ${index + 1} / ${services.length}`;
