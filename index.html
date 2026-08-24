@@ -182,13 +182,27 @@ section{ padding:88px 0; position:relative; scroll-margin-top:84px; }
 .hamburger span, .hamburger span::before, .hamburger span::after{
   display:block; width:22px; height:2px; background:var(--ink); border-radius:2px;
 }
-.hamburger span{ position:relative; transition:background .15s; }
-.hamburger span::before,.hamburger span::after{ content:""; position:absolute; left:0; transition:transform .2s ease, top .2s ease; }
-.hamburger span::before{ top:-7px; }
-.hamburger span::after{ top:7px; }
-.hamburger[aria-expanded="true"] span{ background:transparent; }
-.hamburger[aria-expanded="true"] span::before{ top:0; transform:rotate(45deg); }
-.hamburger[aria-expanded="true"] span::after{ top:0; transform:rotate(-45deg); }
+/* Morph hamburger → croix : les 3 barres partagent le même centre (top:0
+   sur les pseudo-éléments) et c'est translateY + rotate qui les positionne.
+   Important : on n'anime jamais opacity/transform sur .hamburger span
+   lui-même, car ses pseudo-éléments ::before/::after sont rendus à
+   l'intérieur de sa propre boîte — les cacher/transformer aurait aussi
+   caché les deux autres barres. Seule la barre du milieu (span) devient
+   transparente via background-color ; les deux autres pivotent en croix
+   via transform (fluide, sans à-coup). */
+.hamburger span{ position:relative; transition:background-color .2s ease; }
+.hamburger span::before,.hamburger span::after{
+  content:""; position:absolute; top:0; left:0;
+  transition:transform .3s cubic-bezier(.4,0,.2,1);
+}
+.hamburger span::before{ transform:translateY(-7px); }
+.hamburger span::after{ transform:translateY(7px); }
+.hamburger[aria-expanded="true"] span{ background-color:transparent; }
+.hamburger[aria-expanded="true"] span::before{ transform:translateY(0) rotate(45deg); }
+.hamburger[aria-expanded="true"] span::after{ transform:translateY(0) rotate(-45deg); }
+@media (prefers-reduced-motion: reduce){
+  .hamburger span, .hamburger span::before, .hamburger span::after{ transition:none; }
+}
 
 @media (max-width:860px){
   .desktop-cta{ display:none; }
@@ -367,9 +381,11 @@ section{ padding:88px 0; position:relative; scroll-margin-top:84px; }
 
 .services-tags{ display:flex; flex-wrap:wrap; gap:10px; margin-top:22px; }
 .services-tags span{
+  display:inline-flex; align-items:center; gap:7px;
   font-size:.82rem; font-weight:600; padding:8px 14px; border-radius:999px;
   background:linear-gradient(135deg,var(--gold-light) 0%,var(--pine) 100%); color:#3d2c0f;
 }
+.services-tags svg{ width:15px; height:15px; flex:none; }
 
 /* =====================================================================
    5. POURQUOI L'ÉDUCATION CANINE
@@ -563,8 +579,12 @@ section{ padding:88px 0; position:relative; scroll-margin-top:84px; }
 /* À partir d'un écran moyen/large, la fiche passe en 2 colonnes : la photo
    occupe toute la hauteur à gauche (fixe, pas de scroll) et seul le texte,
    à droite, défile si besoin. Ça exploite la largeur de l'écran et
-   supprime le long scroll vertical qu'on avait en une seule colonne. */
-@media (min-width:860px){
+   supprime le long scroll vertical qu'on avait en une seule colonne.
+   Seuil à 900px (plutôt que 860px) : entre 860 et 900px de large — la
+   tranche des tablettes en portrait — la colonne de texte du mode 2
+   colonnes devenait trop étroite pour bien respirer ; on reste donc en
+   1 colonne (image en haut, scroll) un peu plus longtemps. */
+@media (min-width:900px){
   .modal{ max-width:980px; }
   .modal-scroll{
     display:grid; grid-template-columns:38% 1fr; align-items:stretch;
@@ -603,6 +623,33 @@ section{ padding:88px 0; position:relative; scroll-margin-top:84px; }
 }
 
 /* =====================================================================
+   7bis. GALERIE — chiens accompagnés
+   Section entièrement masquée (attribut [hidden] posé par défaut dans le
+   HTML) tant que content.json → galerie contient moins de 5 photos ; le
+   JS ne retire cet attribut que si la condition est remplie, donc aucun
+   espace vide n'est généré quand la galerie est vide ou incomplète.
+   ===================================================================== */
+.gallery{ background:var(--paper-soft); }
+.gallery-head{ max-width:640px; margin-bottom:36px; }
+.gallery-grid{
+  display:grid; grid-template-columns:repeat(auto-fill, minmax(190px,1fr)); gap:16px;
+}
+.gallery-item{
+  position:relative; aspect-ratio:1/1; border-radius:14px; overflow:hidden;
+  background:linear-gradient(155deg,var(--gold-light) 0%, var(--pine) 60%, var(--pine-dark) 100%);
+  box-shadow:0 10px 22px rgba(var(--ink-rgb),.14);
+}
+.gallery-item img{
+  width:100%; height:100%; object-fit:cover; transition:transform .5s cubic-bezier(.2,.8,.2,1);
+}
+/* Photo introuvable (ex. mauvais chemin dans content.json → galerie) : on
+   masque l'icône d'image cassée du navigateur et on laisse voir le dégradé
+   de fond de la tuile, comme pour les cartes de cours (.card-img.img-error). */
+.gallery-item img.img-error{ display:none; }
+.gallery-item:hover img{ transform:scale(1.08); }
+@media (prefers-reduced-motion: reduce){ .gallery-item img{ transition:none; } }
+
+/* =====================================================================
    8. CONTACT
    ===================================================================== */
 .contact{ position:relative; color:var(--cream); overflow:hidden; }
@@ -639,6 +686,47 @@ section{ padding:88px 0; position:relative; scroll-margin-top:84px; }
 .contact-cta-value.placeholder{ opacity:.65; font-style:italic; }
 .contact-cta-arrow{ margin-left:auto; flex:none; width:18px; height:18px; opacity:.6; transition:transform .25s cubic-bezier(.34,1.56,.64,1), opacity .25s ease; }
 .contact-cta:hover .contact-cta-arrow{ transform:translateX(5px); opacity:1; }
+
+/* Bouton "copier" — reste cliquable indépendamment du lien mailto:/tel:
+   qui l'englobe (voir JS : preventDefault + stopPropagation au clic). */
+.contact-cta-copy{
+  position:relative; z-index:2; flex:none; width:34px; height:34px; border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+  background:rgba(var(--cream-rgb),.1); border:1px solid var(--line-dark); color:var(--cream);
+  cursor:pointer; padding:0; transition:background .2s ease, border-color .2s ease, transform .2s ease;
+}
+.contact-cta-copy:hover, .contact-cta-copy:focus-visible{ background:rgba(var(--cream-rgb),.2); border-color:rgba(var(--gold-light-rgb,221,208,176),.55); }
+.contact-cta-copy:active{ transform:scale(.92); }
+.contact-cta-copy svg{ width:16px; height:16px; position:absolute; transition:opacity .2s ease, transform .2s ease; }
+.contact-cta-copy .icon-check{ opacity:0; transform:scale(.6); color:#8fd19e; }
+.contact-cta-copy .icon-clip{ opacity:1; transform:scale(1); }
+.contact-cta-copy.copied .icon-clip{ opacity:0; transform:scale(.6); }
+.contact-cta-copy.copied .icon-check{ opacity:1; transform:scale(1); }
+/* Texte réservé aux lecteurs d'écran (le retour visuel passe par le
+   changement d'icône ci-dessus) : pas de bulle flottante, pour éviter
+   qu'elle soit rognée par le overflow:hidden de la carte parente. */
+.contact-cta-copy-msg{
+  position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden;
+  clip:rect(0,0,0,0); white-space:nowrap; border:0;
+}
+@media (prefers-reduced-motion: reduce){
+  .contact-cta-copy, .contact-cta-copy svg{ transition:none; }
+}
+
+/* Écrans très étroits (< 360px) : on resserre la carte et on retire la
+   flèche décorative (redondante avec le fait que toute la carte soit
+   cliquable) pour laisser la place au bouton copier sans superposition
+   ni texte tronqué. */
+@media (max-width:359px){
+  .contact-cta{ padding:14px; gap:10px; }
+  .contact-cta-icon{ width:38px; height:38px; }
+  .contact-cta-icon svg{ width:18px; height:18px; }
+  .contact-cta-label{ font-size:.68rem; }
+  .contact-cta-value{ font-size:.98rem; }
+  .contact-cta-copy{ width:30px; height:30px; }
+  .contact-cta-copy svg{ width:14px; height:14px; }
+  .contact-cta-arrow{ display:none; }
+}
 /* Reflet lumineux au survol, en écho aux autres composants du site */
 .contact-cta::after{
   content:""; position:absolute; top:0; left:-60%; width:35%; height:100%; z-index:0;
@@ -743,11 +831,19 @@ footer{ background:linear-gradient(135deg,var(--pine-dark) 0%,#5f4626 100%); col
 .reveal{ opacity:0; transform:translateY(26px); transition:opacity .7s cubic-bezier(.2,.8,.2,1), transform .7s cubic-bezier(.2,.8,.2,1); }
 .reveal.in{ opacity:1; transform:none; }
 .reveal-stagger.in > *{ opacity:1; transform:none; }
-.reveal-stagger > *{ opacity:0; transform:translateY(24px) scale(.97); transition:opacity .55s cubic-bezier(.34,1.4,.4,1), transform .55s cubic-bezier(.34,1.4,.4,1); }
-.reveal-stagger > *:nth-child(1){ transition-delay:.02s; } .reveal-stagger > *:nth-child(2){ transition-delay:.08s; }
-.reveal-stagger > *:nth-child(3){ transition-delay:.14s; } .reveal-stagger > *:nth-child(4){ transition-delay:.2s; }
-.reveal-stagger > *:nth-child(5){ transition-delay:.26s; } .reveal-stagger > *:nth-child(6){ transition-delay:.32s; }
-.reveal-stagger > *:nth-child(7){ transition-delay:.38s; }
+/* Délai en cascade calculé à partir de --i (index de l'élément, posé en style
+   inline par le JS qui génère chaque groupe : pawDivider, cartes de cours,
+   galerie, cartes de contact). Remplace l'ancienne liste figée de règles
+   :nth-child(1..7) qui ne couvrait que 7 éléments : au-delà (ex. une galerie
+   de 8 photos ou plus), les éléments supplémentaires apparaissaient sans
+   délai, hors de la vague. Ici, --i:0 par défaut si absent, et le délai est
+   plafonné à .6s pour ne pas faire attendre trop longtemps sur un grand
+   nombre d'éléments. */
+.reveal-stagger > *{
+  opacity:0; transform:translateY(24px) scale(.97);
+  transition:opacity .55s cubic-bezier(.34,1.4,.4,1), transform .55s cubic-bezier(.34,1.4,.4,1);
+  transition-delay:min(calc(var(--i,0) * .06s + .02s), .6s);
+}
 @media (prefers-reduced-motion: reduce){
   .reveal, .reveal-stagger > *{ opacity:1; transform:none; transition:none; }
 }
@@ -912,6 +1008,27 @@ a:focus-visible, button:focus-visible{ outline:3px solid var(--gold); outline-of
 </section>
 
 <!-- ============================================================
+     GALERIE — chiens accompagnés
+     Alimentée par content.json → "galerie" (tableau d'objets
+     { "src": "images/galerie/xxx.jpg", "alt": "..." }), images stockées
+     dans le dossier images/galerie/ (séparé de images/ pour ne pas mêler
+     les visuels du site et les photos de chiens).
+     La section reste masquée ([hidden] ci-dessous) tant que ce tableau
+     contient moins de 5 photos ; le JS retire [hidden] seulement si la
+     condition est remplie, donc rien ne s'affiche ni ne réserve d'espace
+     tant qu'il n'y a pas au moins 5 photos dans le JSON.
+     ============================================================ -->
+<section class="gallery" id="galerie" hidden>
+  <div class="container">
+    <div class="gallery-head reveal">
+      <span class="eyebrow">Galerie</span>
+      <h2>Les chiens que j'accompagne.</h2>
+    </div>
+    <div class="gallery-grid reveal-stagger" id="galleryGrid"><!-- généré automatiquement depuis CONTENT.galerie --></div>
+  </div>
+</section>
+
+<!-- ============================================================
      CONTACT
      ============================================================ -->
 <section class="contact" id="contact">
@@ -926,7 +1043,7 @@ a:focus-visible, button:focus-visible{ outline:3px solid var(--gold); outline-of
       <!-- Deux grandes cartes cliquables (mailto: / tel:), calculées
            automatiquement depuis content.json → contact.email / .telephone. -->
       <div class="contact-cta-group reveal-stagger">
-        <a class="contact-cta" id="contactEmailLink" href="mailto:">
+        <a class="contact-cta" id="contactEmailLink" href="mailto:" style="--i:0">
           <span class="contact-cta-icon">
             <svg viewBox="0 0 24 24" fill="none"><path d="M4 5h16v14H4z" stroke="currentColor" stroke-width="1.6"/><path d="M4 6l8 7 8-7" stroke="currentColor" stroke-width="1.6"/></svg>
           </span>
@@ -934,9 +1051,14 @@ a:focus-visible, button:focus-visible{ outline:3px solid var(--gold); outline-of
             <span class="contact-cta-label">Écrire un email</span>
             <span class="contact-cta-value" id="contactEmail">Morgane@momoxdogs.fr</span>
           </span>
+          <button type="button" class="contact-cta-copy" id="contactEmailCopy" data-copy-target="contactEmail" aria-label="Copier l'adresse email">
+            <svg class="icon-clip" viewBox="0 0 24 24" fill="none"><path d="M9 4h6a1 1 0 0 1 1 1v2H8V5a1 1 0 0 1 1-1Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><rect x="6" y="7" width="12" height="14" rx="2" stroke="currentColor" stroke-width="1.7"/></svg>
+            <svg class="icon-check" viewBox="0 0 24 24" fill="none"><path d="M5 12.5l4.5 4.5L19 7" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <span class="contact-cta-copy-msg" aria-live="polite"></span>
+          </button>
           <svg class="contact-cta-arrow" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
         </a>
-        <a class="contact-cta" id="contactPhoneLink" href="tel:">
+        <a class="contact-cta" id="contactPhoneLink" href="tel:" style="--i:1">
           <span class="contact-cta-icon">
             <svg viewBox="0 0 24 24" fill="none"><path d="M6 3h4l2 5-2.5 1.5a11 11 0 0 0 5 5L16 12l5 2v4c0 1-1 2-2 2C11 20 4 13 4 5c0-1 1-2 2-2Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>
           </span>
@@ -944,6 +1066,11 @@ a:focus-visible, button:focus-visible{ outline:3px solid var(--gold); outline-of
             <span class="contact-cta-label">Appeler</span>
             <span class="contact-cta-value" id="contactPhone">07 82 25 26 88</span>
           </span>
+          <button type="button" class="contact-cta-copy" id="contactPhoneCopy" data-copy-target="contactPhone" aria-label="Copier le numéro de téléphone">
+            <svg class="icon-clip" viewBox="0 0 24 24" fill="none"><path d="M9 4h6a1 1 0 0 1 1 1v2H8V5a1 1 0 0 1 1-1Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><rect x="6" y="7" width="12" height="14" rx="2" stroke="currentColor" stroke-width="1.7"/></svg>
+            <svg class="icon-check" viewBox="0 0 24 24" fill="none"><path d="M5 12.5l4.5 4.5L19 7" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <span class="contact-cta-copy-msg" aria-live="polite"></span>
+          </button>
           <svg class="contact-cta-arrow" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
         </a>
       </div>
@@ -1179,9 +1306,16 @@ if (CONTENT.seo) {
    Il n'y a normalement rien à modifier en dessous de cette ligne.
    ===================================================================================== */
 
-// Menu de navigation — liens et ordre viennent de CONTENT.nav
+// Menu de navigation — liens et ordre viennent de CONTENT.nav.
+// Le lien "Galerie" n'est ajouté que si la section correspondante sera
+// effectivement affichée (au moins 5 photos dans CONTENT.galerie), pour
+// ne jamais pointer vers une section masquée.
+const galerieOk = Array.isArray(CONTENT.galerie) && CONTENT.galerie.length >= 5;
+const navItems = galerieOk
+  ? [...CONTENT.nav, { id: 'galerie', label: 'Galerie' }]
+  : CONTENT.nav;
 document.getElementById('navLinks').insertAdjacentHTML('afterbegin',
-  CONTENT.nav.map(item => `<li><a href="#${item.id}">${item.label}</a></li>`).join('')
+  navItems.map(item => `<li><a href="#${item.id}">${item.label}</a></li>`).join('')
 );
 
 // Héros
@@ -1205,9 +1339,18 @@ document.getElementById('whyQuote').textContent = CONTENT.pourquoi.citation;
 document.getElementById('footerCopyright').textContent = CONTENT.footer.copyright;
 document.getElementById('footerTagline').textContent = CONTENT.footer.tagline;
 
-// Étiquettes de services
+// Étiquettes de services — une petite icône adaptée à chaque étiquette.
+// La correspondance se fait par texte exact ; une étiquette inconnue (si
+// la liste évolue dans content.json) retombe sur l'icône patte générique.
+const tagIconFallback = '<svg viewBox="0 0 40 40" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><circle cx="14" cy="14" r="4"/><circle cx="24" cy="12" r="4.2"/><circle cx="30" cy="19" r="3.6"/><path d="M20 22c-5 0-9 3.6-9 8 0 1.8 1.5 3 3.4 2.4 1.3-.4 3.3-1.1 5.6-1.1s4.3.7 5.6 1.1c1.9.6 3.4-.6 3.4-2.4 0-4.4-4-8-9-8Z"/></svg>';
+const tagIcons = {
+  'Éducation canine': '<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 4 2 8.5 12 13l10-4.5L12 4Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M6 10.5V15c0 1.7 2.7 3 6 3s6-1.3 6-3v-4.5" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>',
+  'Balades canines': '<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="9" cy="7" r="1.6" fill="currentColor"/><circle cx="14.2" cy="5.6" r="1.7" fill="currentColor"/><circle cx="18" cy="8.8" r="1.5" fill="currentColor"/><path d="M13.5 10.8c-2.6 0-4.6 1.9-4.6 4.3 0 1 .8 1.6 1.8 1.3.9-.3 1.7-.6 2.8-.6s1.9.3 2.8.6c1 .3 1.8-.3 1.8-1.3 0-2.4-2-4.3-4.6-4.3Z" fill="currentColor"/></svg>',
+  'Pet sitting': '<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M4 11 12 4l8 7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M6 9.5V19a1 1 0 0 0 1 1h3v-4.5h4V20h3a1 1 0 0 0 1-1V9.5" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>',
+  'Désensibilisation aux manipulations': '<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M7 12.5V6a1.5 1.5 0 0 1 3 0v5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><path d="M10 11V4.5a1.5 1.5 0 0 1 3 0V11" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><path d="M13 11V6a1.5 1.5 0 0 1 3 0v7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><path d="M16 13v-2a1.5 1.5 0 0 1 3 0v5c0 3.3-2.5 6-6 6h-1c-2 0-3.3-.7-4.5-2.2L4.8 16a1.3 1.3 0 0 1 1.9-1.7L8 15.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>'
+};
 document.getElementById('servicesTags').innerHTML =
-  CONTENT.tags.map(t => `<span>${t}</span>`).join('');
+  CONTENT.tags.map(t => `<span>${tagIcons[t] || tagIconFallback}${t}</span>`).join('');
 
 // Cartes de cours/tarifs — aperçu court, la fiche complète s'ouvre en modale
 const pawSvg = '<svg viewBox="0 0 40 40" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><circle cx="14" cy="14" r="4"/><circle cx="24" cy="12" r="4.2"/><circle cx="30" cy="19" r="3.6"/><path d="M20 22c-5 0-9 3.6-9 8 0 1.8 1.5 3 3.4 2.4 1.3-.4 3.3-1.1 5.6-1.1s4.3.7 5.6 1.1c1.9.6 3.4-.6 3.4-2.4 0-4.4-4-8-9-8Z"/></svg>';
@@ -1215,7 +1358,7 @@ const dogRunSvg = '<svg viewBox="0 0 140 70" fill="none" xmlns="http://www.w3.or
 const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 document.getElementById('cardsGrid').innerHTML = CONTENT.services.map((s, i) => `
-  <article class="card" data-index="${i}" tabindex="0" role="button" aria-label="Voir le détail : ${s.titre}">
+  <article class="card" data-index="${i}" style="--i:${i}" tabindex="0" role="button" aria-label="Voir le détail : ${s.titre}">
     <div class="card-img-clip"><div class="card-img-parallax">
       <img class="card-img" src="${s.image}" alt="${s.titre}" loading="lazy" decoding="async" onerror="this.classList.add('img-error')">
     </div></div>
@@ -1253,6 +1396,30 @@ window.addEventListener('resize', () => {
   cardFitResizeTimer = window.setTimeout(fitCardPreviews, 150);
 });
 
+// Galerie — n'est peuplée et affichée que si content.json → galerie
+// contient au moins 5 photos (voir `galerieOk` plus haut, déjà calculé
+// pour le menu). Sinon la section reste [hidden] et ne prend aucune place.
+if (galerieOk) {
+  document.getElementById('galleryGrid').innerHTML = CONTENT.galerie.map((photo, i) => `
+    <figure class="gallery-item" style="--i:${i}">
+      <img src="${photo.src}" alt="${photo.alt || ''}" loading="lazy" decoding="async" onerror="this.classList.add('img-error')">
+    </figure>
+  `).join('');
+  document.getElementById('galerie').hidden = false;
+
+  // La section galerie est masquée ([hidden]) au chargement de la page, donc
+  // si on arrive directement sur une URL #galerie (lien partagé, favori,
+  // retour du navigateur), le défilement automatique du navigateur vers
+  // l'ancre échoue : la section n'existe pas encore visuellement à ce
+  // moment-là. On corrige en scrollant nous-mêmes vers la section une fois
+  // qu'elle est révélée, si c'est bien elle que l'URL visait.
+  if (location.hash === '#galerie') {
+    requestAnimationFrame(() => {
+      document.getElementById('galerie').scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'start' });
+    });
+  }
+}
+
 // Coordonnées — email et téléphone sont maintenant deux grandes cartes
 // cliquables (mailto: / tel:), calculées automatiquement depuis content.json.
 document.getElementById('contactEmail').textContent = CONTENT.contact.email;
@@ -1265,6 +1432,35 @@ document.getElementById('contactPhone').textContent = CONTENT.contact.telephone;
 const cleanedPhone = (CONTENT.contact.telephone || '').replace(/[\s.-]/g, '');
 document.getElementById('contactPhoneLink').href = 'tel:' + (cleanedPhone.startsWith('0') ? '+33' + cleanedPhone.slice(1) : cleanedPhone);
 document.getElementById('contactZone').textContent = CONTENT.contact.zone;
+
+// Boutons "copier" sur les cartes email/téléphone : copie la valeur dans
+// le presse-papier sans déclencher le lien mailto:/tel: qui englobe le
+// bouton (preventDefault + stopPropagation), puis affiche une confirmation
+// visuelle brève (icône presse-papier → coche) et l'annonce aux lecteurs
+// d'écran via une zone aria-live.
+document.querySelectorAll('.contact-cta-copy').forEach(btn => {
+  let resetTimer;
+  const liveMsg = btn.querySelector('.contact-cta-copy-msg');
+  btn.addEventListener('click', async (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const targetEl = document.getElementById(btn.dataset.copyTarget);
+    const value = targetEl ? targetEl.textContent.trim() : '';
+    if (!value) return;
+    try {
+      await navigator.clipboard.writeText(value);
+    } catch (err) {
+      return; // Presse-papier indisponible (permissions, contexte non sécurisé) : on n'affiche pas de fausse confirmation.
+    }
+    btn.classList.add('copied');
+    if (liveMsg) liveMsg.textContent = 'Copié !';
+    clearTimeout(resetTimer);
+    resetTimer = window.setTimeout(() => {
+      btn.classList.remove('copied');
+      if (liveMsg) liveMsg.textContent = '';
+    }, 1800);
+  });
+});
 
 // Carte : centrée sur la ville de Morgane (content.json → contact.ville),
 // via l'embed public Google Maps (aucune clé API requise).
@@ -1323,7 +1519,7 @@ document.addEventListener('click', (e) => {
 // Diviseur "empreintes" entre les sections Pourquoi et Cours
 const pawDivider = document.getElementById('pawDivider');
 if (pawDivider) {
-  pawDivider.innerHTML = Array.from({ length: 5 }).map(() => `<span>${pawSvg}</span>`).join('');
+  pawDivider.innerHTML = Array.from({ length: 5 }).map((_, i) => `<span style="--i:${i}">${pawSvg}</span>`).join('');
 }
 
 // Chiens qui traversent en course les transitions entre sections (une fois chacun),
