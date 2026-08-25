@@ -1,0 +1,149 @@
+{
+  "tags": [
+    "Éducation canine",
+    "Balades canines",
+    "Pet sitting",
+    "Désensibilisation aux manipulations"
+  ],
+  "services": [
+    {
+      "categorie": "Éducation",
+      "titre": "Cours individuel",
+      "image": "images/service-individuel.jpg",
+      "description": "Lors de ces séances d'une heure, nous ferons le point sur votre quotidien avec votre chien, en identifiant les difficultés rencontrées et en définissant vos objectifs.\nJe prendrai le temps de vous expliquer le fonctionnement et les besoins spécifiques de votre chien, afin de vous fournir les clés pour réagir de manière appropriée face à ses comportements.\n\nNous aborderons les sujets qui vous intéressent, que ce soit l'éducation, la gestion d'un comportement problématique ou les aspects à améliorer.\nVous pourrez également poser toutes les questions que vous souhaitez.\n\nLes séances se dérouleront en extérieur, dans un lieu adapté et convenu en fonction de vos préférences et de celles de votre chien.",
+      "prix": "50 €",
+      "unite": "/ heure",
+      "visible": true
+    },
+    {
+      "categorie": "Éducation",
+      "titre": "Cours collectif",
+      "image": "images/service-collectif.jpg",
+      "description": "Le travail en groupe constitue un outil précieux pour développer la sociabilité de votre chien, que ce soit avec ses congénères ou avec des humains. C'est également une excellente occasion de renforcer la relation et la complicité avec votre chien, grâce à des exercices variés et des activités nouvelles.\nEn outre, cela permet de lutter contre cette tentation souvent très forte chez les chiens de courir vers leurs congénères pour jouer, et de les encourager à rester calmement près de vous.\n\nÀ mon sens, les ateliers collectifs représentent une étape clé dans l'apprentissage, une mise à l'épreuve des acquis, permettant de confronter le chien à des situations plus complexes et proches du quotidien, tout en bénéficiant du soutien d'un accompagnement professionnel.\n\nChaque séance offre un enrichissement particulier, tant pour le chien que pour le maître. Ce qui peut constituer un nouvel apprentissage pour certains chiens peut aussi être l'occasion de réviser des bases essentielles pour d'autres. Il est important de garder à l'esprit que le chien, tout comme l'humain, est influencé par son environnement. Sa capacité à se concentrer sur vous, à écouter et à assimiler de nouvelles informations sera impactée par des facteurs extérieurs tels que :\nDes humains qu'il ne connaît pas, qui portent des friandises,\nLa présence d'autres chiens,\nDe nouvelles odeurs,\nUn lieu inconnu.\nCes éléments représentent des défis stimulants, parfaits pour tester et renforcer les apprentissages déjà réalisés. En participant à un atelier collectif, il est essentiel de faire preuve de patience et d'accepter ces difficultés. Je serai toujours présent pour vous guider tout au long du processus.\n\nIl est également important d'être tolérant et compréhensif envers les autres participants : chaque chien a ses propres problématiques et chaque maître son propre parcours. Si vous êtes présents, c'est que vous êtes investis et impliqués, quel que soit votre niveau d'expérience.",
+      "prix": "30 €",
+      "unite": "/ heure",
+      "visible": true
+    },
+    {
+      "categorie": "Éducation",
+      "titre": "Cours chiot",
+      "image": "images/service-chiot.jpg",
+      "description": "L'éducation canine doit commencer dès le plus jeune âge, à l'instar de l'éducation des enfants. Il est essentiel de débuter l'éducation de votre chiot dès ses premières semaines, afin qu'il intègre ces principes et les conserve tout au long de sa vie, devenant ainsi un chien adulte plus équilibré et facile à vivre. Les bases de cette éducation consisteront principalement à lui indiquer clairement ce que vous attendez de lui, ainsi que les comportements à éviter.\nL'objectif est que votre chiot, puis votre chien adulte, adopte une conduite appropriée, en vous donnant toutes les chances de réussir. Un chiot bien éduqué connaît ses limites, gagne en assurance, développe une relation de confiance avec vous et s'intègre harmonieusement dans son environnement social.\n\nUn des avantages de ces cours est que votre chiot sera également amené à rencontrer d'autres chiens, favorisant ainsi sa socialisation. Tout comme pour les cours individuels, ces sessions se dérouleront en extérieur, dans un lieu convenu par toutes les parties.\nCela permettra à votre compagnon de se familiariser avec des chiens de différentes races, tailles et morphologies, l'aidant à développer des comportements appropriés tant avec les humains qu'avec ses congénères.\nDe plus, ces cours vous permettront de mieux comprendre le langage canin, essentiel pour interpréter les signes de communication de votre chiot, qui diffèrent de ceux des humains. Vous apprendrez ainsi à mieux comprendre votre chien et à vous faire comprendre de manière plus efficace.\n\nEn tant que propriétaire, vous êtes le principal responsable de l'éducation de votre chiot. Cela renforcera la complicité entre vous et offrira à votre compagnon une excellente intégration au sein de votre foyer. Toutefois, éduquer un chiot peut s'avérer complexe. Si vous choisissez d'éduquer votre chien vous-même, il est crucial de vous renseigner sur les bonnes pratiques en la matière.\n\nL'objectif de ces cours est de permettre à votre chiot de découvrir de nouvelles expériences dans un environnement sécurisé et de les aborder de manière positive, afin qu'il puisse apprendre et évoluer, tout comme vous.",
+      "prix": "50 €",
+      "unite": "/ heure",
+      "visible": true
+    },
+    {
+      "categorie": "Bien-être",
+      "titre": "Manipulations & désensibilisation",
+      "image": "images/service-manipulation.jpg",
+      "description": "Lorsqu'un chien présente une sensibilité particulière aux manipulations, qu'il s'agisse du nettoyage des oreilles, des yeux, du brossage ou même des caresses, il peut adopter des comportements gênants tels que la morsure, l'agitation ou la tentative de fuite. Dans ce contexte, l'objectif de nos séances sera de travailler l'interaction entre l'humain et le chien, en l'aidant à comprendre que ces manipulations ne constituent pas une contrainte, mais plutôt une opportunité d'obtenir des récompenses positives, telles que des friandises ou des moments de jeu.\nCe processus doit être mené dans une approche exclusivement positive.\nL'objectif étant que le chien accepte de se laisser manipuler en toute sérénité. Lorsqu'il est en confiance, il devient plus calme et coopératif, facilitant ainsi le travail de manipulation. Ces séances visent à dédramatiser le contact et les manipulations, en les rendant aussi agréables ou, du moins, supportables que possible.\nLa désensibilisation d'un chien, quel que soit l'aspect, est un processus long et exige une grande patience et un investissement constant. L'objectif final est que votre chien puisse se rendre chez le vétérinaire sans stress, en acceptant les manipulations nécessaires sans danger, ni pour lui, ni pour le professionnel.\nPour débuter, il est recommandé de mener ces séances dans un environnement calme et rassurant pour le chien. C'est pourquoi nous commencerons ces exercices à domicile, en adaptant l'approche à la problématique spécifique de votre chien.",
+      "prix": "40 €",
+      "unite": "/ heure",
+      "visible": true
+    },
+    {
+      "categorie": "Diagnostic",
+      "titre": "Bilan comportemental à domicile",
+      "image": "images/service-bilan.jpg",
+      "description": "Les comportements indésirables tels que l'agitation, les aboiements excessifs, les destructions, l'agressivité, la peur ou la malpropreté peuvent résulter de causes diverses et variées. Selon l'animal, son passé, son environnement et d'autres facteurs, la manière d'aborder la situation variera nécessairement. Il n'existe pas de solution universelle ou de méthode miracle dans le domaine de l'éducation canine.\nChaque cas de rééducation comportementale est unique. C'est pourquoi un entretien détaillé avec vous est essentiel.\n\nL'entretien :\nCet entretien, d'une durée d'environ 1 heure à 1h30, se déroule sous forme d'un échange de questions et réponses. L'objectif est de cerner l'origine des problèmes rencontrés, tout en observant attentivement l'environnement dans lequel votre chien évolue, ainsi que la façon dont vous communiquez avec lui.\nMon but principal est d'identifier la/les cause(s) sous-jacente(s) des comportements indésirables et de déterminer la meilleure approche pour y remédier.\nÀ l'issue de cette première phase d'observation et d'analyse, je proposerai la mise en place de protocoles comportementaux adaptés. Ce sont des méthodes spécifiques, visant à instaurer des comportements précis et efficaces pour résoudre les problèmes rencontrés, et ainsi restaurer une relation harmonieuse entre vous et votre animal.",
+      "prix": "80 €",
+      "unite": "/ séance",
+      "visible": true
+    },
+    {
+      "categorie": "Balade",
+      "titre": "Balades canines",
+      "image": "images/service-balades.jpg",
+      "description": "Je propose également un service de balades à domicile pour vos chiens. Chaque promenade dure au minimum une heure, et elle peut être l'occasion de travailler des points spécifiques que vous souhaitez améliorer, tels que le rappel ou la marche en laisse. Alternativement, nous pourrons simplement profiter d'une sortie agréable, en forêt, dans les champs ou dans un parc, pour passer un moment de qualité avec votre loulou.",
+      "prix": "10 €",
+      "unite": "/ heure",
+      "visible": true
+    },
+    {
+      "categorie": "Garde",
+      "titre": "Pet sitting",
+      "image": "images/service-petsitting.jpg",
+      "description": "Ce service est destiné à vos animaux de compagnie, qu'il s'agisse de chiens, de chats ou d'autres animaux. Bien que je ne sois pas en mesure d'accueillir des animaux à mon domicile, je me déplace directement chez vous pour assurer les soins quotidiens de vos compagnons.\nPour les chiens, ce service inclut plusieurs promenades par jour, ainsi que l'alimentation et des moments de qualité en leur compagnie. Pour les chats, je me charge de l'entretien de la litière, des soins nécessaires et leur apporte les caresses quotidiennes dont ils ont besoin.",
+      "prix": "15 € · 10 €",
+      "unite": "chien / chat · nuitée",
+      "visible": true
+    }
+  ],
+  "galerie": [],
+  "visibility": {
+    "presentation": true,
+    "pourquoi": true,
+    "tags": true,
+    "galerie": true,
+    "map": true,
+    "facebook": true,
+    "instagram": true
+  },
+  "nav": [
+    {
+      "id": "presentation",
+      "label": "Présentation"
+    },
+    {
+      "id": "pourquoi",
+      "label": "Pourquoi"
+    },
+    {
+      "id": "cours",
+      "label": "Cours & tarifs"
+    }
+  ],
+  "contact": {
+    "email": "Morgane@momoxdogs.fr",
+    "telephone": "07 82 25 26 88",
+    "zone": "Je me déplace chez vous, à Taverny (95) et dans les communes alentours.",
+    "ville": "Taverny, France",
+    "facebook": "https://www.facebook.com/profile.php?id=61564959076095",
+    "instagram": "https://www.instagram.com/momoxdogs95"
+  },
+  "hero": {
+    "badge": "Éducation canine positive",
+    "titre": "Une éducation canine <em>sur-mesure</em>, pas à pas.",
+    "texte": "Balades, désensibilisation, obéissance : j'accompagne chaque binôme humain-chien vers une relation plus sereine — quel que soit l'âge, la race ou le tempérament de votre chien."
+  },
+  "presentation": {
+    "titre": "Bonjour, je suis Morgane.",
+    "texte1": "J'ai suivi une formation au lycée des Combrailles, en Auvergne, qui m'a permis d'obtenir le Brevet Professionnel d'Éducateur Canin (BPE).",
+    "texte2": "Je travaille avec tous les chiens, quels que soient leur âge, leur race ou leur tempérament : tous sont les bienvenus. Ma méthode repose sur la recherche de l'équilibre optimal, autant pour votre chien que pour vous, en m'adaptant à ses besoins spécifiques et à vos attentes."
+  },
+  "pourquoi": {
+    "eyebrow": "Pourquoi suivre des cours ?",
+    "titre": "L'éducation canine, ça sert à quoi ?",
+    "texte1": "Mon rôle est de vous accompagner dans l'éducation de votre chien et de favoriser une relation harmonieuse entre vous. L'objectif est d'aider votre chien à devenir un « bon citoyen », agréable à vivre pour son entourage — je vous fournis les outils nécessaires pour l'éduquer de manière optimale.",
+    "texte2": "L'un des objectifs essentiels est aussi de garantir le bien-être de votre chien, afin qu'il se sente à l'aise et serein en toutes circonstances. Suivre des cours vous permet de mieux comprendre votre chien, d'anticiper ses réactions et d'analyser certains comportements.",
+    "citation": "Il n'existe pas une méthode unique en matière d'éducation canine. Je m'adapte à la psychologie du maître et au caractère de chaque chien, pour une approche personnalisée et efficace."
+  },
+  "footer": {
+    "copyright": "Momox Dogs — Morgane, éducatrice canine (BPE)",
+    "tagline": "Site conçu avec 🐾 pour les chiens et leurs humains"
+  },
+  "seo": {
+    "siteTitle": "Momox Dogs — Morgane, éducatrice canine (BPE)",
+    "description": "Momox Dogs — Morgane, éducatrice canine (BPE) : cours individuels et collectifs, cours chiot, désensibilisation, bilans comportementaux, balades et pet sitting. Basée à Taverny (95), intervention aux alentours.",
+    "siteUrl": "https://momox-dogs.fr",
+    "ogType": "website",
+    "shareImage": "images/portrait-morgane.jpg"
+  },
+  "images": {
+    "hero": "images/hero-chien.jpg",
+    "contact": "images/contact-bg.jpg",
+    "portrait": "images/portrait-morgane.jpg"
+  },
+  "theme": {
+    "ink": "#3c2a22",
+    "paper": "#fbf1e7",
+    "paperSoft": "#f3e0cd",
+    "pineDark": "#9c5a3c",
+    "pine": "#c17b52",
+    "olive": "#8a5f45",
+    "gold": "#c17a4a",
+    "goldLight": "#e8b98f",
+    "cream": "#fff6ec"
+  }
+}
