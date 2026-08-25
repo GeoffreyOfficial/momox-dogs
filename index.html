@@ -473,14 +473,8 @@ body.modal-open .hero-actions .btn-primary::before{ animation-play-state:paused;
 /* Léger enfoncement tactile : priorité sur la transition d'entrée/survol
    grâce à la spécificité plus élevée de :active, pour un retour immédiat au tap. */
 .card:active{ transform:scale(.98) translateY(-2px); transition:transform .12s ease; }
-/* Bascule 3D à l'entrée : la carte part légèrement couchée (rotateX) et se
-   redresse en s'installant à l'écran ; hérite de la transition de
-   .reveal-stagger > * (voir section 10) qui la ramène à transform:none. */
-.cards.reveal-stagger > .card{
-  transform:perspective(900px) rotateX(-22deg) translateY(26px);
-  transform-origin:50% 100%;
-}
-/* Reflet lumineux qui balaie la carte une fois qu'elle s'est redressée */
+/* Reflet lumineux qui balaie la carte une fois qu'elle s'est installée
+   (hérite de l'effet d'apparition standard de .reveal-stagger > *, section 10) */
 .card::after{
   content:""; position:absolute; inset:0; z-index:3; pointer-events:none;
   background:linear-gradient(115deg, transparent 30%, rgba(255,255,255,.55) 50%, transparent 70%);
