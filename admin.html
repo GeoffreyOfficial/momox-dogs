@@ -899,7 +899,7 @@ input.invalid:focus, textarea.invalid:focus{ box-shadow:0 0 0 3px rgba(180,83,65
       <svg class="panel-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M6 9l6 6 6-6"/></svg>
     </div>
     <div class="panel-body">
-      <div class="field"><label>Badge (petit texte au-dessus du titre)</label><input type="text" data-bind="hero.badge"></div>
+      <div class="field"><label>Badge (petit texte au-dessus du titre)</label><input type="text" data-bind="hero.badge"><div class="desc">Laisser vide pour ne pas afficher de badge.</div></div>
       <div class="field">
         <label>Titre principal *</label>
         <input type="text" data-bind="hero.titre">
@@ -918,7 +918,7 @@ input.invalid:focus, textarea.invalid:focus{ box-shadow:0 0 0 3px rgba(180,83,65
     <div class="panel-body">
       <div class="field"><label>Titre *</label><input type="text" data-bind="presentation.titre"></div>
       <div class="field"><label>Premier paragraphe *</label><textarea data-bind="presentation.texte1"></textarea></div>
-      <div class="field"><label>Second paragraphe *</label><textarea data-bind="presentation.texte2"></textarea></div>
+      <div class="field"><label>Second paragraphe</label><textarea data-bind="presentation.texte2"></textarea><div class="desc">Laisser vide pour ne pas afficher ce paragraphe.</div></div>
     </div>
   </section>
 
@@ -930,12 +930,12 @@ input.invalid:focus, textarea.invalid:focus{ box-shadow:0 0 0 3px rgba(180,83,65
     </div>
     <div class="panel-body">
       <div class="grid-2">
-        <div class="field"><label>Eyebrow (petit texte au-dessus du titre)</label><input type="text" data-bind="pourquoi.eyebrow"></div>
+        <div class="field"><label>Eyebrow (petit texte au-dessus du titre)</label><input type="text" data-bind="pourquoi.eyebrow"><div class="desc">Laisser vide pour ne pas afficher cet eyebrow.</div></div>
         <div class="field"><label>Titre *</label><input type="text" data-bind="pourquoi.titre"></div>
       </div>
       <div class="field"><label>Premier paragraphe *</label><textarea data-bind="pourquoi.texte1"></textarea></div>
-      <div class="field"><label>Second paragraphe *</label><textarea data-bind="pourquoi.texte2"></textarea></div>
-      <div class="field"><label>Citation mise en avant *</label><textarea data-bind="pourquoi.citation"></textarea></div>
+      <div class="field"><label>Second paragraphe</label><textarea data-bind="pourquoi.texte2"></textarea><div class="desc">Laisser vide pour ne pas afficher ce paragraphe.</div></div>
+      <div class="field"><label>Citation mise en avant</label><textarea data-bind="pourquoi.citation"></textarea><div class="desc">Laisser vide pour ne pas afficher de citation.</div></div>
     </div>
   </section>
 
@@ -1048,7 +1048,7 @@ input.invalid:focus, textarea.invalid:focus{ box-shadow:0 0 0 3px rgba(180,83,65
     </div>
     <div class="panel-body">
       <div class="field"><label>Copyright *</label><input type="text" data-bind="footer.copyright"></div>
-      <div class="field"><label>Phrase de fin</label><input type="text" data-bind="footer.tagline"></div>
+      <div class="field"><label>Phrase de fin</label><input type="text" data-bind="footer.tagline"><div class="desc">Laisser vide pour ne pas afficher de phrase de fin.</div></div>
     </div>
   </section>
 
@@ -2531,11 +2531,11 @@ const FIELD_RULES = {
   'hero.texte':          { required:true },
   'presentation.titre':  { required:true },
   'presentation.texte1': { required:true },
-  'presentation.texte2': { required:true },
+  'presentation.texte2': { required:false },
   'pourquoi.titre':      { required:true },
   'pourquoi.texte1':     { required:true },
-  'pourquoi.texte2':     { required:true },
-  'pourquoi.citation':   { required:true },
+  'pourquoi.texte2':     { required:false },
+  'pourquoi.citation':   { required:false },
   'footer.copyright':    { required:true },
   'seo.siteTitle':       { required:true },
   'seo.description':     { required:true },
@@ -2616,7 +2616,7 @@ $('#newTagInput').addEventListener('input', function(){
 });
 
 /* --------------------------- Cours & tarifs --------------------------- */
-const SERVICE_REQUIRED = { categorie:true, titre:true, prix:true, unite:false, description:true };
+const SERVICE_REQUIRED = { categorie:true, titre:true, prix:false, unite:false, description:true };
 const SERVICE_FIELD_LABELS = { categorie:'Catégorie', titre:'Titre', prix:'Prix', unite:'Unité', description:'Description' };
 
 /* Déplie/replie une fiche de prestation dans l'admin (indépendant des
@@ -2712,7 +2712,7 @@ function renderServices(){
           <div class="field"><label>Nom du fichier image</label><div data-img-field></div><div class="desc">Le fichier doit se trouver dans le dossier <code>images/</code> du site.</div></div>
         </div>
         <div class="grid-2">
-          <div class="field"><label>Prix *</label><input type="text" data-f="prix" placeholder="ex. 50 €"></div>
+          <div class="field"><label>Prix</label><input type="text" data-f="prix" placeholder="ex. 50 €"><div class="desc">Laisser vide pour n'afficher aucun bloc prix sur cette prestation.</div></div>
           <div class="field"><label>Unité</label><input type="text" data-f="unite" placeholder="ex. / heure"></div>
         </div>
         <div class="field"><label>Description *</label><textarea class="tall" data-f="description"></textarea><div class="desc">Les sauts de ligne, apostrophes et caractères spéciaux (é, «, —…) sont conservés tels quels.</div></div>
