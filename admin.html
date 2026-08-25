@@ -51,6 +51,10 @@
 
 *,*::before,*::after{ box-sizing:border-box; }
 html{ -webkit-text-size-adjust:100%; scroll-behavior:smooth; }
+@media (prefers-reduced-motion: reduce){
+  html{ scroll-behavior:auto; }
+  *,*::before,*::after{ animation-duration:.001ms !important; animation-iteration-count:1 !important; transition-duration:.001ms !important; }
+}
 body{
   margin:0;
   font-family:var(--font-body);
@@ -59,7 +63,29 @@ body{
   line-height:1.55;
   -webkit-font-smoothing:antialiased;
   padding-bottom:190px; /* repli initial — recalculé précisément en JS via syncActionbarSpacing() dès que la barre est mesurable, pour s'adapter au nombre de lignes réellement affichées */
+  position:relative;
 }
+/* Fond décoratif discret — deux halos très doux qui dérivent lentement,
+   purement esthétiques (aucune interaction, aria-hidden via -webkit). */
+body::before, body::after{
+  content:""; position:fixed; z-index:0; pointer-events:none; border-radius:50%;
+  filter:blur(60px); opacity:.35; will-change:transform;
+}
+body::before{
+  width:46vw; height:46vw; max-width:560px; max-height:560px;
+  top:-14vw; right:-12vw;
+  background:radial-gradient(circle, rgba(var(--pine-dark-rgb),.35), transparent 70%);
+  animation:driftA 26s ease-in-out infinite;
+}
+body::after{
+  width:38vw; height:38vw; max-width:460px; max-height:460px;
+  bottom:-10vw; left:-10vw;
+  background:radial-gradient(circle, rgba(171,143,102,.3), transparent 70%);
+  animation:driftB 32s ease-in-out infinite;
+}
+@keyframes driftA{ 0%,100%{ transform:translate(0,0) scale(1); } 50%{ transform:translate(-3vw,3vw) scale(1.08); } }
+@keyframes driftB{ 0%,100%{ transform:translate(0,0) scale(1); } 50%{ transform:translate(3vw,-2vw) scale(1.1); } }
+.admin-header, main#appMain, .actionbar, #emptyState{ position:relative; z-index:1; }
 img{ max-width:100%; display:block; }
 a{ color:inherit; }
 h1,h2,h3{ font-family:var(--font-display); margin:0 0 .3em; font-weight:600; line-height:1.15; }
@@ -82,8 +108,11 @@ p{ margin:0 0 1em; }
 }
 .btn:hover{ transform:translateY(-2px); }
 .btn:active{ transform:scale(.97); }
-.btn-primary{ background:linear-gradient(135deg,var(--gold-light) 0%,var(--gold) 100%); color:#3d2c0f; }
-.btn-primary:hover{ box-shadow:0 10px 22px rgba(193,147,44,.45); }
+.btn-primary{
+  background:linear-gradient(135deg,var(--gold-light) 0%,var(--gold) 100%); background-size:160% 160%; background-position:0% 50%;
+  color:#3d2c0f; transition:transform .18s cubic-bezier(.34,1.56,.64,1), box-shadow .18s ease, background-position .4s ease;
+}
+.btn-primary:hover{ box-shadow:0 10px 22px rgba(193,147,44,.45); background-position:100% 50%; }
 .btn-outline{ background:transparent; border-color:var(--line); color:var(--ink); }
 .btn-outline:hover{ border-color:var(--gold); color:var(--gold); }
 .btn-danger{ background:transparent; border-color:var(--danger-light); color:var(--danger); }
@@ -99,20 +128,35 @@ p{ margin:0 0 1em; }
   position:sticky; top:0; z-index:50;
   background:rgba(var(--paper-rgb),.97); backdrop-filter:blur(8px);
   border-bottom:1px solid var(--line);
+  transform:translateY(-100%);
+  animation:headerSlideIn .5s cubic-bezier(.2,.8,.2,1) .05s forwards;
+  transition:box-shadow .25s ease, border-color .25s ease;
 }
+.admin-header.is-scrolled{ box-shadow:0 8px 24px rgba(var(--ink-rgb),.08); }
+@keyframes headerSlideIn{ to{ transform:translateY(0); } }
 .admin-header .row{ display:flex; align-items:center; gap:14px; padding:14px 0; flex-wrap:wrap; }
 .admin-brand{ display:flex; align-items:center; gap:10px; margin-right:auto; }
-.admin-brand-mark{ width:34px; height:34px; border-radius:50%; background:var(--gold-light); flex:none; display:flex; align-items:center; justify-content:center; font-family:var(--font-display); font-weight:700; color:#5a4726; }
+.admin-brand-mark{
+  width:34px; height:34px; border-radius:50%; background:var(--gold-light); flex:none;
+  display:flex; align-items:center; justify-content:center; font-family:var(--font-display); font-weight:700; color:#5a4726;
+  animation:brandPop .6s cubic-bezier(.34,1.56,.64,1) .15s both;
+  transition:transform .25s cubic-bezier(.34,1.56,.64,1), box-shadow .25s ease;
+}
+.admin-brand:hover .admin-brand-mark{ transform:rotate(-8deg) scale(1.08); box-shadow:0 6px 16px rgba(171,143,102,.4); }
+@keyframes brandPop{ from{ transform:scale(.3) rotate(-20deg); opacity:0; } to{ transform:scale(1) rotate(0); opacity:1; } }
 .admin-brand-title{ font-family:var(--font-display); font-weight:600; font-size:1.15rem; line-height:1.1; }
 .admin-brand-sub{ font-size:.72rem; color:var(--olive); text-transform:uppercase; letter-spacing:.08em; }
 .status-pill{
   font-size:.76rem; font-weight:600; padding:6px 12px; border-radius:999px;
   background:var(--paper-soft); color:var(--olive); border:1px solid var(--line);
   display:flex; align-items:center; gap:6px;
+  transition:background .3s ease, color .3s ease, border-color .3s ease, transform .3s cubic-bezier(.34,1.56,.64,1);
 }
-.status-pill.dirty{ background:#fdf1de; color:#8a5a1c; border-color:#eccd9a; }
-.status-pill.dirty::before{ content:"●"; color:#c98a2c; }
+.status-pill.dirty{ background:#fdf1de; color:#8a5a1c; border-color:#eccd9a; animation:pillBump .35s cubic-bezier(.34,1.56,.64,1); }
+.status-pill.dirty::before{ content:"●"; color:#c98a2c; animation:pulseDot 1.8s ease-in-out infinite; }
 .status-pill.saved::before{ content:"✓"; }
+@keyframes pillBump{ 0%{ transform:scale(1); } 40%{ transform:scale(1.08); } 100%{ transform:scale(1); } }
+@keyframes pulseDot{ 0%,100%{ opacity:1; } 50%{ opacity:.35; } }
 
 /* ---------------------------------------------------------------------
    Mise en page générale
@@ -124,17 +168,79 @@ p{ margin:0 0 1em; }
 .panel{
   background:#fff; border:1px solid var(--line); border-radius:var(--radius);
   margin-bottom:20px; overflow:hidden;
+  transition:box-shadow .25s ease, border-color .25s ease, transform .25s ease;
+  opacity:0; transform:translateY(16px);
 }
+main#appMain.is-ready .panel{ animation:panelIn .55s cubic-bezier(.2,.8,.2,1) both; }
+main#appMain.is-ready .panel:nth-of-type(1){ animation-delay:.02s; }
+main#appMain.is-ready .panel:nth-of-type(2){ animation-delay:.06s; }
+main#appMain.is-ready .panel:nth-of-type(3){ animation-delay:.10s; }
+main#appMain.is-ready .panel:nth-of-type(4){ animation-delay:.14s; }
+main#appMain.is-ready .panel:nth-of-type(5){ animation-delay:.18s; }
+main#appMain.is-ready .panel:nth-of-type(6){ animation-delay:.22s; }
+main#appMain.is-ready .panel:nth-of-type(7){ animation-delay:.26s; }
+main#appMain.is-ready .panel:nth-of-type(8){ animation-delay:.30s; }
+main#appMain.is-ready .panel:nth-of-type(9){ animation-delay:.34s; }
+main#appMain.is-ready .panel:nth-of-type(10){ animation-delay:.38s; }
+main#appMain.is-ready .panel:nth-of-type(11){ animation-delay:.42s; }
+main#appMain.is-ready .panel:nth-of-type(12){ animation-delay:.46s; }
+@keyframes panelIn{ from{ opacity:0; transform:translateY(16px); } to{ opacity:1; transform:translateY(0); } }
+.panel:hover{ border-color:rgba(var(--pine-dark-rgb),.35); }
+.panel.open{ box-shadow:0 4px 22px rgba(var(--ink-rgb),.06); }
 .panel-head{
   display:flex; align-items:center; justify-content:space-between; gap:10px;
   padding:18px 22px; cursor:pointer; user-select:none; background:var(--paper-soft);
+  transition:background .2s ease;
 }
+.panel-head:hover{ background:var(--gold-light); }
 .panel-head h2{ font-size:1.05rem; margin:0; }
 .panel-head .hint{ font-size:.8rem; color:var(--olive); font-weight:400; font-family:var(--font-body); display:block; margin-top:2px; }
-.panel-chevron{ transition:transform .2s ease; flex:none; color:var(--olive); }
+.panel-chevron{ transition:transform .3s cubic-bezier(.4,0,.2,1); flex:none; color:var(--olive); }
 .panel.open .panel-chevron{ transform:rotate(180deg); }
-.panel-body{ padding:22px; display:none; }
-.panel.open .panel-body{ display:block; }
+.panel-body{
+  padding:22px; display:none; overflow:hidden; max-height:0; opacity:0;
+  transition:max-height .4s cubic-bezier(.4,0,.2,1), opacity .3s ease .05s;
+}
+
+/* ---------------------------------------------------------------------
+   Interrupteurs (switches) — utilisés pour la visibilité de blocs entiers
+   (panneau « Visibilité du site ») et pour masquer un cours en particulier
+   dans la liste des prestations.
+   --------------------------------------------------------------------- */
+.switch{ position:relative; display:inline-flex; align-items:center; flex:none; cursor:pointer; }
+.switch input{ position:absolute; inset:0; opacity:0; margin:0; cursor:pointer; }
+.switch-track{
+  width:46px; height:27px; border-radius:999px; flex:none;
+  background:rgba(var(--ink-rgb),.16); border:1px solid var(--line);
+  transition:background .22s ease, border-color .22s ease; position:relative;
+}
+.switch-thumb{
+  position:absolute; top:2px; left:2px; width:21px; height:21px; border-radius:50%;
+  background:var(--cream); box-shadow:0 1px 3px rgba(var(--ink-rgb),.35);
+  transition:transform .22s cubic-bezier(.34,1.56,.64,1);
+}
+.switch input:checked ~ .switch-track{ background:linear-gradient(135deg,var(--gold-light) 0%,var(--gold) 100%); border-color:transparent; }
+.switch input:checked ~ .switch-track .switch-thumb{ transform:translateX(19px); }
+.switch input:focus-visible ~ .switch-track{ outline:2px solid var(--gold); outline-offset:2px; }
+.switch input:disabled ~ .switch-track{ opacity:.5; cursor:not-allowed; }
+
+.visibility-grid{ display:grid; gap:10px; }
+.visibility-row{
+  display:flex; align-items:center; justify-content:space-between; gap:16px;
+  padding:13px 16px; border:1px solid var(--line); border-radius:14px;
+  background:var(--cream); transition:opacity .22s ease, border-color .22s ease, background .22s ease;
+}
+.visibility-row-text{ display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+.visibility-row-text strong{ font-size:.93rem; font-weight:600; }
+.visibility-row-text .desc{ font-size:.78rem; color:var(--olive); margin:2px 0 0; flex-basis:100%; }
+.visibility-off-pill{
+  font-size:.66rem; font-weight:700; text-transform:uppercase; letter-spacing:.06em;
+  color:var(--danger); background:var(--danger-light); padding:2px 8px; border-radius:999px;
+  display:none;
+}
+.visibility-row.is-off{ background:transparent; border-style:dashed; border-color:rgba(var(--ink-rgb),.22); }
+.visibility-row.is-off .visibility-off-pill{ display:inline-block; }
+.visibility-row.is-off .visibility-row-text strong{ color:var(--olive); }
 
 .field{ margin-bottom:16px; }
 .field:last-child{ margin-bottom:0; }
@@ -186,10 +292,29 @@ input.invalid:focus, textarea.invalid:focus{ box-shadow:0 0 0 3px rgba(180,83,65
 .service-card{
   border:1px solid var(--line); border-radius:14px; padding:18px; margin-bottom:16px;
   background:#fffdf9; position:relative;
+  transition:border-color .2s ease, box-shadow .2s ease, transform .2s ease;
 }
+.service-card:hover{ border-color:rgba(var(--pine-dark-rgb),.3); box-shadow:0 6px 20px rgba(var(--ink-rgb),.06); transform:translateY(-1px); }
 .service-card-top{ display:flex; align-items:flex-start; justify-content:space-between; gap:12px; margin-bottom:14px; }
-.service-card-title{ font-family:var(--font-display); font-size:1.05rem; font-weight:600; }
+.service-card:not(.open) .service-card-top{ margin-bottom:0; }
+.service-card-title{ font-family:var(--font-display); font-size:1.05rem; font-weight:600; cursor:pointer; }
 .service-card-title .cat{ font-family:var(--font-body); font-size:.72rem; text-transform:uppercase; letter-spacing:.08em; color:var(--gold); display:block; font-weight:700; margin-bottom:2px; }
+.service-card-subtitle{ display:block; font-family:var(--font-body); font-weight:400; font-size:.8rem; color:var(--olive); margin-top:2px; }
+.service-chevron{ transition:transform .3s cubic-bezier(.4,0,.2,1); flex:none; color:var(--olive); }
+.service-card.open .service-chevron{ transform:rotate(180deg); }
+.service-card-body{
+  padding-top:14px; display:none; overflow:hidden; max-height:0; opacity:0;
+  transition:max-height .35s cubic-bezier(.4,0,.2,1), opacity .28s ease .04s;
+}
+.service-card.is-hidden{ opacity:.55; border-style:dashed; }
+.service-hidden-badge{
+  font-family:var(--font-body); font-size:.66rem; font-weight:700; text-transform:uppercase; letter-spacing:.06em;
+  color:var(--danger); background:var(--danger-light); padding:2px 8px; border-radius:999px; margin-left:8px;
+  vertical-align:middle; display:none;
+}
+.service-card.is-hidden .service-hidden-badge{ display:inline-block; }
+.service-visibility-toggle{ display:flex; align-items:center; gap:8px; margin-right:4px; }
+.service-visibility-toggle span{ font-size:.72rem; font-weight:600; color:var(--olive); white-space:nowrap; }
 .service-actions{ display:flex; gap:6px; flex:none; }
 .service-img-preview{
   width:100%; height:120px; object-fit:cover; border-radius:10px; background:var(--paper-soft);
@@ -207,10 +332,11 @@ input.invalid:focus, textarea.invalid:focus{ box-shadow:0 0 0 3px rgba(180,83,65
   position:fixed; left:0; right:0; bottom:0; z-index:60;
   background:rgba(var(--paper-rgb),.98); backdrop-filter:blur(8px);
   border-top:1px solid var(--line);
-  padding:12px 0; padding-bottom:calc(12px + env(safe-area-inset-bottom));
+  padding:10px 0; padding-bottom:calc(10px + env(safe-area-inset-bottom));
 }
-.actionbar .row{ display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
-.actionbar .spacer{ flex:1; }
+.actionbar .container{ display:flex; flex-direction:column; gap:8px; }
+.actionbar-row-top{ display:flex; gap:8px; align-items:center; }
+.actionbar-download{ width:100%; }
 .file-input-label{ display:inline-flex; }
 .file-input-label input[type=file]{ display:none; }
 
@@ -259,19 +385,164 @@ input.invalid:focus, textarea.invalid:focus{ box-shadow:0 0 0 3px rgba(180,83,65
 .empty-state h2{ color:var(--ink); }
 .empty-state .btn{ margin-top:16px; }
 
+/* ---------------------------------------------------------------------
+   Robustesse — indicateurs de sauvegarde & récupération d'erreurs
+   --------------------------------------------------------------------- */
+.status-pill.warn{
+  background:var(--danger-light); color:var(--danger); border-color:#e7bdae;
+  cursor:help;
+}
+.status-pill.warn::before{ content:"⚠"; }
+
+.empty-state-error{
+  text-align:left; max-width:520px; margin:0 auto 24px;
+  background:var(--danger-light); border:1px solid #e7bdae; border-radius:var(--radius);
+  padding:18px 20px; color:#7a3626;
+}
+.empty-state-error strong{ display:block; margin-bottom:6px; font-family:var(--font-display); font-size:1.02rem; color:#6b2f21; }
+.empty-state-error p{ margin:0; font-size:.88rem; line-height:1.55; }
+
+.error-banner{
+  position:fixed; left:16px; right:16px; z-index:950;
+  bottom:calc(16px + env(safe-area-inset-bottom));
+  max-width:560px; margin:0 auto;
+  background:#3d2c22; color:#f6e6dc;
+  border-radius:var(--radius); padding:14px 16px;
+  display:flex; align-items:flex-start; gap:12px;
+  box-shadow:0 20px 50px rgba(0,0,0,.35);
+  transform:translateY(140%); opacity:0;
+  transition:transform .38s cubic-bezier(.34,1.56,.64,1), opacity .3s ease;
+}
+.error-banner.show{ transform:translateY(0); opacity:1; }
+.error-banner-icon{ font-size:1.2rem; line-height:1; flex:none; margin-top:1px; }
+.error-banner-text{ flex:1; font-size:.85rem; line-height:1.5; }
+.error-banner-close{
+  flex:none; background:none; border:none; color:#f6e6dc; opacity:.75;
+  font-size:1rem; cursor:pointer; padding:2px 4px; line-height:1;
+}
+.error-banner-close:hover{ opacity:1; }
+
 .loading-overlay{
   position:fixed; inset:0; background:var(--paper); z-index:300;
   display:flex; align-items:center; justify-content:center; flex-direction:column; gap:14px;
+  transition:opacity .35s ease;
 }
+.loading-overlay.is-hiding{ opacity:0; }
 .spinner{
   width:34px; height:34px; border-radius:50%; border:3px solid var(--line); border-top-color:var(--gold);
   animation:spin .8s linear infinite;
 }
 @keyframes spin{ to{ transform:rotate(360deg); } }
+.tag-chip{ transition:transform .18s cubic-bezier(.34,1.56,.64,1), box-shadow .18s ease; }
+.tag-chip:hover{ transform:translateY(-1px); box-shadow:0 4px 12px rgba(var(--ink-rgb),.08); }
 
-.color-row{ display:flex; align-items:center; gap:10px; }
-.color-row input[type=color]{ width:44px; height:44px; padding:0; border:1.5px solid var(--line); border-radius:10px; background:none; cursor:pointer; }
-.color-row input[type=text]{ flex:1; }
+.color-row{ display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+.color-row input[type=color]{
+  width:44px; height:44px; padding:0; border:1.5px solid var(--line); border-radius:10px; background:none; cursor:pointer;
+  transition:transform .18s cubic-bezier(.34,1.56,.64,1), box-shadow .18s ease;
+}
+.color-row input[type=color]:hover{ transform:scale(1.06); box-shadow:0 4px 14px rgba(var(--ink-rgb),.14); }
+.color-row input[type=text]{ flex:1; min-width:120px; }
+.color-row .field-error{ width:100%; margin-top:8px; }
+
+/* ---------------------------------------------------------------------
+   Thème / couleurs — panneau repensé : intro, aperçu ciblé, préréglages,
+   champs groupés par usage.
+   --------------------------------------------------------------------- */
+.theme-intro{ margin-bottom:18px; }
+.theme-intro .desc{ margin:0; }
+
+/* Préréglages de palette */
+.theme-presets{ display:flex; flex-wrap:wrap; gap:10px; margin-bottom:22px; }
+.theme-preset{
+  display:flex; align-items:center; gap:9px; padding:8px 14px 8px 10px;
+  border:1.5px solid var(--line); border-radius:999px; background:#fffdf9; cursor:pointer;
+  font-family:var(--font-body); font-size:.8rem; font-weight:600; color:var(--ink);
+  transition:border-color .18s ease, transform .18s cubic-bezier(.34,1.56,.64,1), box-shadow .18s ease;
+}
+.theme-preset:hover{ border-color:var(--gold); transform:translateY(-1px); box-shadow:0 6px 16px rgba(var(--ink-rgb),.08); }
+.theme-preset:active{ transform:scale(.97); }
+.theme-preset.is-current{ border-color:var(--gold); background:var(--paper-soft); }
+.theme-preset-dots{ display:flex; }
+.theme-preset-dots span{
+  width:16px; height:16px; border-radius:50%; border:2px solid #fffdf9; margin-left:-7px; flex:none;
+}
+.theme-preset-dots span:first-child{ margin-left:0; }
+
+/* Aperçu ciblé — mini maquette du site qui suit les vraies variables CSS */
+.theme-preview-card{
+  border:1px solid var(--line); border-radius:14px; overflow:hidden; margin-bottom:22px;
+  box-shadow:0 10px 30px rgba(var(--ink-rgb),.08);
+}
+.tp-dots{ display:flex; gap:6px; padding:9px 12px; background:#e9e3d3; }
+.tp-dots span{ width:9px; height:9px; border-radius:50%; background:#c9bfa4; }
+.tp-header{
+  display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap;
+  padding:12px 18px; background:var(--paper); border-bottom:1px solid var(--line); transition:background .25s ease;
+}
+.tp-brand{ font-family:var(--font-display); font-weight:700; font-size:1rem; color:var(--ink); transition:color .25s ease; }
+.tp-brand em{ font-style:normal; color:var(--gold); transition:color .25s ease; }
+.tp-nav{ font-size:.72rem; color:var(--olive); letter-spacing:.03em; transition:color .25s ease; }
+.tp-hero{
+  padding:26px 20px; background:var(--pine-dark); transition:background .25s ease; position:relative;
+}
+.tp-eyebrow{
+  font-size:.66rem; font-weight:700; letter-spacing:.1em; text-transform:uppercase;
+  color:var(--gold-light); margin-bottom:6px; transition:color .25s ease;
+}
+.tp-title{
+  font-family:var(--font-display); font-size:1.15rem; font-weight:600; color:var(--cream);
+  margin-bottom:14px; max-width:280px; transition:color .25s ease;
+}
+.tp-title em{ font-style:italic; color:var(--gold); transition:color .25s ease; }
+.tp-btn{
+  display:inline-flex; align-items:center; font-family:var(--font-body); font-weight:600; font-size:.8rem;
+  padding:9px 16px; border-radius:999px; border:none; cursor:default;
+  background:linear-gradient(135deg,var(--gold-light) 0%,var(--gold) 100%); color:#3d2c0f;
+  transition:background .25s ease;
+}
+.tp-section{ padding:18px; background:var(--paper); display:flex; transition:background .25s ease; }
+.tp-card{
+  background:var(--paper-soft); border-radius:10px; padding:14px; max-width:230px;
+  transition:background .25s ease;
+}
+.tp-card-title{ font-family:var(--font-display); font-weight:600; font-size:.9rem; color:var(--ink); margin-bottom:4px; transition:color .25s ease; }
+.tp-card-text{ font-size:.76rem; color:var(--olive); line-height:1.5; margin-bottom:10px; transition:color .25s ease; }
+.tp-pill{
+  display:inline-block; font-size:.68rem; font-weight:700; letter-spacing:.04em; text-transform:uppercase;
+  padding:4px 10px; border-radius:999px; background:rgba(var(--pine-dark-rgb),.14); color:var(--pine);
+  transition:color .25s ease, box-shadow .25s ease;
+}
+/* Surbrillance ciblée : un halo doux apparaît autour de la zone de
+   l'aperçu correspondant au champ actuellement survolé / en édition */
+[data-role]{ position:relative; }
+[data-role].tp-focus{ animation:tpPulse 1.1s ease-in-out infinite; }
+[data-role].tp-focus::after{
+  content:""; position:absolute; inset:-4px; border-radius:8px;
+  outline:2.5px dashed var(--gold); outline-offset:2px; pointer-events:none;
+}
+@keyframes tpPulse{ 0%,100%{ filter:brightness(1); } 50%{ filter:brightness(1.12); } }
+.theme-preview-hint{ font-size:.76rem; color:var(--olive); text-align:center; padding:8px 12px; background:var(--paper-soft); }
+
+/* Groupes de champs de couleur */
+.theme-group{ margin-bottom:22px; }
+.theme-group:last-of-type{ margin-bottom:0; }
+.theme-group-head{ margin-bottom:12px; }
+.theme-group-title{
+  font-family:var(--font-display); font-size:.98rem; font-weight:600; color:var(--ink); margin-bottom:2px;
+}
+.theme-group-desc{ font-size:.78rem; color:var(--olive); }
+.theme-field-card{
+  border:1px solid var(--line); border-radius:12px; padding:14px; margin-bottom:12px;
+  background:#fffdf9; transition:border-color .2s ease, box-shadow .2s ease, background .2s ease;
+}
+.theme-field-card:last-child{ margin-bottom:0; }
+.theme-field-card:hover, .theme-field-card.is-active{
+  border-color:var(--gold); box-shadow:0 6px 18px rgba(var(--ink-rgb),.07); background:#fff;
+}
+.theme-field-card label{ display:block; font-size:.85rem; font-weight:600; color:var(--ink); margin-bottom:2px; }
+.theme-usage{ font-size:.76rem; color:var(--olive); margin-bottom:10px; line-height:1.45; }
+.theme-usage strong{ color:var(--ink); font-weight:600; }
 
 /* ---------------------------------------------------------------------
    Aperçu du site (iframe plein écran)
@@ -296,6 +567,181 @@ input.invalid:focus, textarea.invalid:focus{ box-shadow:0 0 0 3px rgba(180,83,65
 #previewIframe{ border:none; background:#fff; width:100%; height:100%; border-radius:10px; box-shadow:0 14px 44px rgba(0,0,0,.4); }
 .preview-frame-wrap.mobile{ align-items:center; }
 .preview-frame-wrap.mobile #previewIframe{ width:min(390px, calc(100vw - 40px)); min-width:0; height:820px; border-radius:28px; }
+
+/* ---------------------------------------------------------------------
+   Guide complet — fiche explicative pas à pas (bouton « Guide complet »
+   dans l'en-tête). Même famille visuelle que l'aperçu du site, en plein
+   écran, avec un sommaire cliquable et des étapes numérotées.
+   --------------------------------------------------------------------- */
+.guide-overlay{
+  position:fixed; inset:0; z-index:600; background:var(--paper);
+  display:flex; flex-direction:column;
+}
+.guide-topbar{
+  display:flex; align-items:flex-start; justify-content:space-between; gap:14px;
+  padding:18px 22px; padding-top:calc(18px + env(safe-area-inset-top));
+  background:linear-gradient(135deg,var(--gold-light) 0%,var(--paper-soft) 65%);
+  border-bottom:1px solid var(--line); flex-wrap:wrap;
+}
+.guide-topbar-left{ display:flex; flex-direction:column; gap:4px; min-width:0; }
+.guide-topbar-left strong{ font-family:var(--font-display); font-size:1.25rem; line-height:1.2; }
+.guide-topbar-left .desc{ margin:0; max-width:580px; }
+.guide-body{ flex:1; overflow-y:auto; -webkit-overflow-scrolling:touch; }
+.guide-inner{ max-width:820px; margin:0 auto; padding:28px 20px 90px; }
+
+.guide-toc{
+  display:flex; flex-wrap:wrap; gap:8px; margin-bottom:34px;
+  padding:14px; border:1px solid var(--line); border-radius:var(--radius); background:var(--cream);
+}
+.guide-toc-label{ width:100%; font-size:.72rem; font-weight:700; text-transform:uppercase; letter-spacing:.08em; color:var(--olive); margin-bottom:2px; }
+.guide-toc a{
+  font-size:.82rem; font-weight:600; color:var(--olive); text-decoration:none;
+  padding:7px 13px; border-radius:999px; background:var(--paper-soft); border:1px solid var(--line);
+  transition:background .18s ease, color .18s ease, border-color .18s ease, transform .18s ease;
+}
+.guide-toc a:hover{ background:var(--gold-light); color:var(--ink); border-color:var(--gold); transform:translateY(-1px); }
+
+.guide-step{ display:flex; gap:18px; margin-bottom:40px; scroll-margin-top:18px; }
+.guide-step-num{
+  flex:none; width:42px; height:42px; border-radius:50%;
+  background:linear-gradient(135deg,var(--gold-light) 0%,var(--gold) 100%);
+  color:#3d2c0f; font-family:var(--font-display); font-weight:700; font-size:1.15rem;
+  display:flex; align-items:center; justify-content:center;
+  box-shadow:0 6px 16px rgba(171,143,102,.35);
+}
+.guide-step-body{ min-width:0; flex:1; }
+.guide-step h3{ margin:2px 0 12px; font-size:1.18rem; display:flex; align-items:center; gap:9px; flex-wrap:wrap; }
+.guide-step p{ font-size:.95rem; }
+.guide-step ol, .guide-step ul{ margin:0 0 14px; padding-left:22px; font-size:.95rem; }
+.guide-step li{ margin-bottom:9px; }
+.guide-step li::marker{ color:var(--gold); font-weight:700; }
+.guide-step code{ background:var(--paper-soft); border:1px solid var(--line); border-radius:6px; padding:1px 7px; font-size:.86em; }
+
+.guide-callout{
+  display:flex; gap:12px; padding:14px 16px; border-radius:14px; margin:14px 0;
+  border:1px solid var(--line); background:var(--cream); font-size:.88rem;
+}
+.guide-callout-icon{ flex:none; font-size:1.25rem; line-height:1.3; }
+.guide-callout-title{ font-weight:700; display:block; margin-bottom:2px; }
+.guide-callout-ovh{ border-color:#9dc0ef; background:#eaf2fd; }
+.guide-callout-tip{ border-color:var(--gold); background:var(--gold-light); }
+.guide-callout-warn{ border-color:var(--danger); background:var(--danger-light); }
+
+.guide-checklist{
+  border:2px dashed var(--gold); border-radius:var(--radius); padding:22px 24px; background:var(--cream);
+  margin-top:8px;
+}
+.guide-checklist h3{ margin-top:0; }
+.guide-checklist label{ display:flex; align-items:flex-start; gap:10px; font-size:.92rem; margin-bottom:11px; cursor:pointer; }
+.guide-checklist input{ margin-top:3px; flex:none; width:16px; height:16px; accent-color:var(--gold); }
+.guide-checklist label:last-child{ margin-bottom:0; }
+
+.guide-callout-info{ border-color:#9dc0ef; background:#eaf2fd; }
+.guide-json{
+  background:var(--paper-soft); border:1px solid var(--line); border-radius:10px;
+  padding:12px 14px; font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  font-size:.8rem; line-height:1.6; overflow-x:auto; white-space:pre; margin:8px 0 16px; color:var(--ink);
+}
+.guide-panel-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:14px; margin:8px 0 22px; }
+.guide-panel-card{ border:1px solid var(--line); border-radius:12px; padding:14px 16px; background:#fff; min-width:0; }
+.guide-panel-card h4{
+  margin:0 0 6px; font-family:var(--font-display); font-size:1rem; font-weight:600;
+  display:flex; align-items:center; gap:7px; flex-wrap:wrap;
+}
+.guide-panel-card .guide-path{
+  display:inline-block; font-size:.72rem; font-weight:700; letter-spacing:.03em;
+  color:var(--olive); background:var(--paper-soft); border:1px solid var(--line);
+  border-radius:6px; padding:2px 7px; margin:0 0 8px; word-break:break-all;
+}
+.guide-panel-card p{ margin:0 0 8px; font-size:.88rem; line-height:1.55; }
+.guide-panel-card p:last-child{ margin-bottom:0; }
+.guide-site-list{ list-style:none; margin:10px 0 22px; padding:0; display:flex; flex-direction:column; gap:8px; }
+.guide-site-list li{
+  border:1px solid var(--line); border-radius:10px; padding:10px 14px; font-size:.88rem;
+  display:flex; flex-wrap:wrap; gap:4px 10px; align-items:baseline; background:#fff;
+}
+.guide-site-list .guide-path{
+  font-size:.72rem; font-weight:700; letter-spacing:.03em; color:var(--olive);
+  background:var(--paper-soft); border:1px solid var(--line); border-radius:6px; padding:2px 7px;
+}
+.guide-fix{ margin-bottom:14px; padding-bottom:14px; border-bottom:1px dashed var(--line); }
+.guide-fix:last-child{ margin-bottom:0; padding-bottom:0; border-bottom:none; }
+.guide-fix .guide-fix-title{ display:block; font-weight:700; margin-bottom:3px; }
+.guide-fix p{ margin:0 0 4px; font-size:.9rem; line-height:1.55; }
+@media (max-width:640px){
+  .guide-panel-grid{ grid-template-columns:1fr; }
+  .guide-json{ font-size:.74rem; }
+}
+
+@media (max-width:640px){
+  .guide-topbar{ flex-direction:column; }
+  .guide-step{ gap:12px; }
+  .guide-step-num{ width:34px; height:34px; font-size:1rem; }
+}
+
+/* ---------------------------------------------------------------------
+   Confirmation personnalisée — remplace window.confirm()
+   --------------------------------------------------------------------- */
+.confirm-overlay{
+  position:fixed; inset:0; z-index:900;
+  display:flex; align-items:flex-end; justify-content:center;
+  padding:16px; padding-bottom:calc(16px + env(safe-area-inset-bottom));
+  background:rgba(43,38,32,0);
+  backdrop-filter:blur(0px); -webkit-backdrop-filter:blur(0px);
+  transition:background .3s ease, backdrop-filter .3s ease;
+}
+.confirm-overlay.show{
+  background:rgba(43,38,32,.55);
+  backdrop-filter:blur(5px); -webkit-backdrop-filter:blur(5px);
+}
+@media(min-width:560px){
+  .confirm-overlay{ align-items:center; }
+}
+.confirm-modal{
+  width:100%; max-width:400px;
+  background:var(--paper);
+  border:1px solid var(--line);
+  border-radius:calc(var(--radius) + 6px);
+  padding:32px 26px 24px;
+  text-align:center;
+  box-shadow:0 30px 80px rgba(var(--ink-rgb),.4), 0 2px 0 rgba(255,255,255,.5) inset;
+  transform:translateY(60px) scale(.85); opacity:0;
+  transition:transform .42s cubic-bezier(.34,1.56,.64,1), opacity .26s ease;
+}
+.confirm-overlay.show .confirm-modal{
+  transform:translateY(0) scale(1); opacity:1;
+}
+.confirm-modal.is-shake{ animation:confirmShake .45s ease; }
+@keyframes confirmShake{
+  0%,100%{ transform:translateX(0) scale(1); }
+  20%{ transform:translateX(-9px) scale(1); }
+  40%{ transform:translateX(8px) scale(1); }
+  60%{ transform:translateX(-5px) scale(1); }
+  80%{ transform:translateX(3px) scale(1); }
+}
+.confirm-icon{
+  width:60px; height:60px; margin:0 auto 16px;
+  border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+  font-size:1.6rem; line-height:1;
+  background:rgba(var(--pine-dark-rgb),.16); color:var(--gold);
+  animation:confirmIconPop .5s cubic-bezier(.34,1.56,.64,1) .08s both;
+}
+.confirm-modal.is-danger .confirm-icon{ background:var(--danger-light); color:var(--danger); }
+@keyframes confirmIconPop{
+  from{ transform:scale(.2) rotate(-24deg); opacity:0; }
+  to{ transform:scale(1) rotate(0); opacity:1; }
+}
+.confirm-title{
+  font-family:var(--font-display); font-weight:700; font-size:1.26rem;
+  margin:0 0 10px; color:var(--ink); letter-spacing:-.01em;
+}
+.confirm-message{
+  font-size:.94rem; line-height:1.6; color:var(--olive);
+  margin:0 0 26px; white-space:pre-line;
+}
+.confirm-actions{ display:flex; gap:10px; }
+.confirm-actions .btn{ flex:1; min-width:0; }
 </style>
 </head>
 <body>
@@ -317,6 +763,8 @@ input.invalid:focus, textarea.invalid:focus{ box-shadow:0 0 0 3px rgba(180,83,65
       </div>
     </div>
     <button class="btn btn-outline btn-sm" id="previewBtn" type="button" style="display:none;">👁 Aperçu du site</button>
+    <button class="btn btn-outline btn-sm" id="guideBtn" type="button">📘 Guide complet</button>
+    <div id="autosaveWarn" class="status-pill warn" style="display:none;" title="La sauvegarde automatique locale ne fonctionne pas sur cet appareil (navigation privée ?). Télécharge ton fichier content.json régulièrement pour ne rien perdre.">Sauvegarde locale indisponible</div>
     <div id="statusPill" class="status-pill saved">À jour</div>
   </div>
 </header>
@@ -327,6 +775,18 @@ input.invalid:focus, textarea.invalid:focus{ box-shadow:0 0 0 3px rgba(180,83,65
     <p>Modifie les textes, les prix, l'ordre des cours ou les informations de contact ci-dessous, puis clique sur « Télécharger content.json » en bas de page. Remplace ensuite ce fichier sur le serveur du site (à côté d'index.html) pour publier les changements.</p>
     <p class="desc">Les champs marqués d'un <strong>*</strong> sont obligatoires. Pour les images, indique uniquement le nom du fichier (ex. <code>chien.jpg</code>) : le dossier est ajouté automatiquement.</p>
   </div>
+
+  <!-- ============================= VISIBILITÉ ============================= -->
+  <section class="panel open" data-panel>
+    <div class="panel-head" data-toggle>
+      <div><h2>👁 Visibilité du site</h2><span class="hint">Masque temporairement des blocs entiers — rien n'est supprimé, tout reste réactivable en un clic</span></div>
+      <svg class="panel-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M6 9l6 6 6-6"/></svg>
+    </div>
+    <div class="panel-body">
+      <div class="desc" style="margin-bottom:14px;">Désactive un interrupteur pour cacher l'élément correspondant sur le site — son contenu (texte, lien, ville…) reste intact ailleurs sur cette page, prêt à être réaffiché.</div>
+      <div class="visibility-grid" id="visibilityGrid"><!-- généré automatiquement --></div>
+    </div>
+  </section>
 
   <!-- ============================= CONTACT ============================= -->
   <section class="panel open" data-panel>
@@ -466,7 +926,34 @@ input.invalid:focus, textarea.invalid:focus{ box-shadow:0 0 0 3px rgba(180,83,65
       <svg class="panel-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M6 9l6 6 6-6"/></svg>
     </div>
     <div class="panel-body">
-      <div id="themeBody" class="grid-2"></div>
+      <div class="theme-intro">
+        <p class="desc">9 couleurs suffisent à habiller tout le site. Survole ou modifie un champ ci-dessous : la zone concernée s'illumine dans l'aperçu pour que tu voies immédiatement où elle s'applique.</p>
+      </div>
+
+      <div id="themePresets" class="theme-presets"></div>
+
+      <div class="theme-preview-card" id="themePreviewCard">
+        <div class="tp-dots"><span></span><span></span><span></span></div>
+        <div class="tp-header" data-role="paper">
+          <div class="tp-brand" data-role="ink">Momox <em data-role="gold">Dogs</em></div>
+          <div class="tp-nav" data-role="olive">Présentation · Pourquoi · Cours</div>
+        </div>
+        <div class="tp-hero" data-role="pineDark">
+          <div class="tp-eyebrow" data-role="goldLight">ÉDUCATION CANINE</div>
+          <div class="tp-title" data-role="cream">Une éducation <em data-role="gold">sur-mesure</em>, pas à pas.</div>
+          <span class="tp-btn" data-role="gold">Prendre rendez-vous</span>
+        </div>
+        <div class="tp-section" data-role="paper">
+          <div class="tp-card" data-role="paperSoft">
+            <div class="tp-card-title" data-role="ink">Cours individuel</div>
+            <div class="tp-card-text" data-role="olive">Un exemple de paragraphe pour visualiser le texte courant.</div>
+            <span class="tp-pill" data-role="pine">Accent</span>
+          </div>
+        </div>
+      </div>
+      <div class="theme-preview-hint">Ceci est une maquette miniature — utilise « Aperçu du site » en haut de page pour voir le rendu réel et complet.</div>
+
+      <div id="themeBody" style="margin-top:22px;"></div>
       <button class="btn btn-outline btn-sm" id="resetThemeBtn" type="button" style="margin-top:8px;">Réinitialiser aux couleurs d'origine</button>
     </div>
   </section>
@@ -500,8 +987,12 @@ input.invalid:focus, textarea.invalid:focus{ box-shadow:0 0 0 3px rgba(180,83,65
 </main>
 
 <div id="emptyState" class="empty-state" style="display:none;">
-  <h2>Impossible de charger content.json automatiquement</h2>
-  <p>Si tu ouvres cette page directement depuis ton ordinateur (sans serveur web), le navigateur bloque le chargement automatique du fichier.<br>Choisis-le manuellement ci-dessous :</p>
+  <div id="emptyStateError" class="empty-state-error" style="display:none;">
+    <strong>Ce fichier n'a pas pu être utilisé</strong>
+    <p id="emptyStateErrorText"></p>
+  </div>
+  <h2 id="emptyStateTitle">Impossible de charger content.json automatiquement</h2>
+  <p id="emptyStateText">Si tu ouvres cette page directement depuis ton ordinateur (sans serveur web), le navigateur bloque le chargement automatique du fichier.<br>Choisis-le manuellement ci-dessous :</p>
   <label class="btn btn-primary file-input-label">
     Choisir content.json
     <input type="file" id="manualFileInput" accept="application/json,.json">
@@ -509,20 +1000,23 @@ input.invalid:focus, textarea.invalid:focus{ box-shadow:0 0 0 3px rgba(180,83,65
 </div>
 
 <div class="actionbar" id="actionbar" style="display:none;">
-  <div class="container row">
-    <button class="btn btn-icon btn-outline" id="undoBtn" type="button" title="Rien à annuler" disabled>
-      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 14 4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/></svg>
-    </button>
-    <button class="btn btn-icon btn-outline" id="redoBtn" type="button" title="Rien à rétablir" disabled>
-      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 14l5-5-5-5"/><path d="M20 9H9.5a5.5 5.5 0 0 0 0 11H13"/></svg>
-    </button>
-    <label class="btn btn-outline btn-sm file-input-label">
-      Charger un fichier
-      <input type="file" id="reloadFileInput" accept="application/json,.json">
-    </label>
-    <button class="btn btn-outline btn-sm" id="copyJsonBtn" type="button">Copier le JSON</button>
-    <div class="spacer"></div>
-    <button class="btn btn-primary" id="downloadBtn" type="button">⬇ Télécharger content.json</button>
+  <div class="container">
+    <div class="actionbar-row-top">
+      <button class="btn btn-icon btn-outline" id="undoBtn" type="button" title="Rien à annuler" disabled>
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 14 4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/></svg>
+      </button>
+      <button class="btn btn-icon btn-outline" id="redoBtn" type="button" title="Rien à rétablir" disabled>
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 14l5-5-5-5"/><path d="M20 9H9.5a5.5 5.5 0 0 0 0 11H13"/></svg>
+      </button>
+      <label class="btn btn-icon btn-outline file-input-label" title="Charger un fichier">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4"/><path d="M6 10l6-6 6 6"/><path d="M4 20h16"/></svg>
+        <input type="file" id="reloadFileInput" accept="application/json,.json">
+      </label>
+      <button class="btn btn-icon btn-outline" id="copyJsonBtn" type="button" title="Copier le JSON">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>
+      </button>
+    </div>
+    <button class="btn btn-primary actionbar-download" id="downloadBtn" type="button">⬇ Télécharger content.json</button>
   </div>
 </div>
 
@@ -544,6 +1038,425 @@ input.invalid:focus, textarea.invalid:focus{ box-shadow:0 0 0 3px rgba(180,83,65
   </div>
 </div>
 
+<!-- ============================= GUIDE COMPLET ============================= -->
+<div id="guideOverlay" class="guide-overlay" style="display:none;" role="dialog" aria-modal="true" aria-labelledby="guideTitle">
+  <div class="guide-topbar">
+    <div class="guide-topbar-left">
+      <strong id="guideTitle">📘 Comment mettre à jour le site</strong>
+      <span class="desc">Le guide complet : comprendre l'admin et ses panneaux, modifier un texte, changer une photo, publier sur OVH, et corriger les problèmes courants.</span>
+    </div>
+    <button class="btn btn-sm btn-primary" id="guideCloseBtn" type="button">✕ Fermer</button>
+  </div>
+  <div class="guide-body">
+    <div class="guide-inner">
+
+      <div class="guide-toc">
+        <span class="guide-toc-label">Aller directement à…</span>
+        <a href="#guide-vue">1. Comment ça marche</a>
+        <a href="#guide-panneaux">2. L'admin en détail : les panneaux</a>
+        <a href="#guide-site">3. La structure du site</a>
+        <a href="#guide-textes">4. Modifier un texte / un prix</a>
+        <a href="#guide-photos">5. Changer ou ajouter une photo</a>
+        <a href="#guide-publier">6. Publier sur OVH</a>
+        <a href="#guide-verifier">7. Vérifier que c'est en ligne</a>
+        <a href="#guide-astuces">8. Problèmes potentiels &amp; comment les corriger</a>
+        <a href="#guide-checklist">✅ Aide-mémoire</a>
+      </div>
+
+      <!-- 1. VUE D'ENSEMBLE -->
+      <div class="guide-step" id="guide-vue">
+        <div class="guide-step-num">1</div>
+        <div class="guide-step-body">
+          <h3>🧩 Comment le site est construit</h3>
+          <p>Le site tient en trois éléments, tous placés dans le même dossier sur l'hébergement OVH :</p>
+          <ul>
+            <li><code>index.html</code> — le site lui-même. On n'y touche jamais directement.</li>
+            <li><code>content.json</code> — <strong>tous les textes, prix, cours et coordonnées</strong> du site. C'est ce fichier que cette page (<code>admin.html</code>) permet de modifier facilement, sans écrire une ligne de code.</li>
+            <li>le dossier <code>images/</code> — toutes les photos du site (et <code>images/galerie/</code> pour les photos des chiens accompagnés).</li>
+          </ul>
+          <p>Le principe est donc toujours le même en trois temps : <strong>1)</strong> je modifie dans cette page admin, <strong>2)</strong> je télécharge le fichier <code>content.json</code> mis à jour, <strong>3)</strong> je le dépose sur l'hébergement OVH à la place de l'ancien. Le site est alors à jour pour tout le monde.</p>
+          <div class="guide-callout guide-callout-tip">
+            <span class="guide-callout-icon">💡</span>
+            <div><span class="guide-callout-title">Rien n'est jamais perdu</span>Cette page garde automatiquement un brouillon de tes modifications dans le navigateur, même si tu fermes l'onglet par accident. Le bouton ↶ (annuler) en bas permet aussi de revenir en arrière à tout moment.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2. LES PANNEAUX DE L'ADMIN -->
+      <div class="guide-step" id="guide-panneaux">
+        <div class="guide-step-num">2</div>
+        <div class="guide-step-body">
+          <h3>🗂️ L'admin en détail : les panneaux</h3>
+          <p>La page <code>admin.html</code> est composée de <strong>13 panneaux</strong> (les blocs qu'on ouvre/ferme en cliquant sur leur titre), plus trois outils globaux en haut et en bas de page. Chaque panneau modifie une partie précise du fichier <code>content.json</code> — jamais <code>index.html</code> directement. Voici, panneau par panneau, ce qu'il contrôle et à quoi ça correspond dans le fichier.</p>
+
+          <div class="guide-callout guide-callout-info">
+            <span class="guide-callout-icon">🔤</span>
+            <div><span class="guide-callout-title">Pour lire les extraits ci-dessous</span>Certains encadrés grisés montrent à quoi ressemble le fichier <code>content.json</code> « vu de l'intérieur » — c'est juste à titre d'exemple, il n'y a jamais besoin d'y toucher soi-même. Deux mots reviennent souvent : <code>true</code> veut dire <strong>« activé / affiché sur le site »</strong>, et <code>false</code> veut dire <strong>« désactivé / caché »</strong>. Un clic sur un interrupteur dans l'admin bascule automatiquement entre les deux — pas besoin de taper ces mots.</div>
+          </div>
+
+          <div class="guide-panel-grid">
+
+            <div class="guide-panel-card">
+              <h4>👁 Visibilité du site</h4>
+              <span class="guide-path">visibility.*</span>
+              <p>7 interrupteurs qui cachent ou montrent des blocs entiers du site (Présentation, Pourquoi, Étiquettes, Galerie, Carte, Facebook, Instagram) sans jamais supprimer leur contenu.</p>
+              <div class="guide-json">"visibility": {
+  "pourquoi": true,   ← affichée sur le site
+  "galerie": false    ← cachée du site
+}</div>
+              <p>Exemple : <strong>éteindre</strong> l'interrupteur « Pourquoi » fait passer sa valeur à <code>false</code> et la section disparaît du site. La <strong>rallumer</strong> repasse la valeur à <code>true</code> et la section réapparaît, exactement comme avant — son texte n'a jamais bougé du panneau « Pourquoi » entre-temps.</p>
+            </div>
+
+            <div class="guide-panel-card">
+              <h4>Coordonnées de contact</h4>
+              <span class="guide-path">contact.*</span>
+              <p>Email, téléphone, ville, zone d'intervention, liens Facebook et Instagram.</p>
+              <div class="guide-json">"contact": {
+  "email": "Morgane@momoxdogs.fr",
+  "telephone": "07 82 25 26 88",
+  "ville": "Taverny, France"
+}</div>
+              <p>Ce sont ces champs qui alimentent les boutons « Appeler » / « Écrire » et la zone de texte affichés dans la section Contact du site.</p>
+            </div>
+
+            <div class="guide-panel-card">
+              <h4>Page d'accueil</h4>
+              <span class="guide-path">hero.*</span>
+              <p>Le badge, le grand titre et le texte d'introduction tout en haut du site (première chose vue par un visiteur).</p>
+              <div class="guide-json">"hero": {
+  "titre": "Une éducation canine &lt;em&gt;sur-mesure&lt;/em&gt;, pas à pas."
+}</div>
+              <p>La balise <code>&lt;em&gt;...&lt;/em&gt;</code> autour d'un mot l'affiche en italique doré sur le site — c'est la seule mise en forme HTML autorisée dans ce champ.</p>
+            </div>
+
+            <div class="guide-panel-card">
+              <h4>Présentation</h4>
+              <span class="guide-path">presentation.*</span>
+              <p>Le titre et les deux paragraphes de la section « Bonjour, je suis Morgane ».</p>
+              <div class="guide-json">"presentation": {
+  "titre": "Bonjour, je suis Morgane."
+}</div>
+            </div>
+
+            <div class="guide-panel-card">
+              <h4>Section « Pourquoi »</h4>
+              <span class="guide-path">pourquoi.*</span>
+              <p>Eyebrow, titre, deux paragraphes et la citation mise en avant de la section « Pourquoi suivre des cours ? ».</p>
+              <div class="guide-json">"pourquoi": {
+  "citation": "Il n'existe pas une méthode unique…"
+}</div>
+              <p>Ce panneau reste rempli même si la section est masquée depuis « 👁 Visibilité du site » — pratique pour préparer un texte avant de le publier.</p>
+            </div>
+
+            <div class="guide-panel-card">
+              <h4>Étiquettes</h4>
+              <span class="guide-path">tags (liste)</span>
+              <p>Les petits mots-clés affichés sous la présentation (ex. « Éducation canine »). On en ajoute ou on en retire un par un.</p>
+              <div class="guide-json">"tags": [
+  "Éducation canine",
+  "Balades canines"
+]</div>
+              <p>Cliquer sur « Ajouter » insère une nouvelle entrée à la fin de cette liste ; la croix sur une étiquette la retire.</p>
+            </div>
+
+            <div class="guide-panel-card">
+              <h4>Cours &amp; tarifs</h4>
+              <span class="guide-path">services (liste d'objets)</span>
+              <p>Le panneau le plus riche : chaque carte est une prestation, avec sa catégorie, son titre, son image, sa description, son prix et sa visibilité propre.</p>
+              <div class="guide-json">{
+  "categorie": "Éducation",
+  "titre": "Cours individuel",
+  "image": "images/service-individuel.jpg",
+  "description": "…",
+  "prix": "50 €",
+  "unite": "/ heure",
+  "visible": true
+}</div>
+              <p>Les flèches ↑ / ↓ changent l'ordre d'affichage sur le site. <code>"visible": true</code> = la prestation apparaît sur le site ; <code>"visible": false</code> = elle est cachée (masquée) sans être supprimée. L'interrupteur « visible » de <em>chaque carte</em> est différent de celui du panneau « Visibilité du site » : celui-ci masque une prestation précise, l'autre masque des sections entières.</p>
+            </div>
+
+            <div class="guide-panel-card">
+              <h4>Images principales</h4>
+              <span class="guide-path">images.hero / images.contact / images.portrait</span>
+              <p>Les trois grandes photos du site : image d'accueil, fond de la section contact, portrait de Morgane.</p>
+              <div class="guide-json">"images": {
+  "hero": "images/hero-chien.jpg",
+  "portrait": "images/portrait-morgane.jpg"
+}</div>
+              <p>Seul le nom du fichier est demandé dans l'admin (ex. <code>hero-chien.jpg</code>) — le dossier n'est pas à taper, il est ajouté automatiquement devant. Mais le <strong>fichier lui-même</strong> doit être envoyé sur OVH dans un dossier appelé <code>images</code>, situé juste à côté d'<code>index.html</code> à la racine du site.</p>
+            </div>
+
+            <div class="guide-panel-card">
+              <h4>Galerie photo</h4>
+              <span class="guide-path">galerie (liste d'objets)</span>
+              <p>Les photos de chiens accompagnés, chacune avec son nom de fichier et son texte alternatif (accessibilité + référencement).</p>
+              <div class="guide-json">"galerie": [
+  { "src": "images/galerie/chien1.jpg", "alt": "Chien en balade en forêt" }
+]</div>
+              <p>Comme pour les images principales, seul le nom du fichier (ex. <code>chien1.jpg</code>) est à taper dans l'admin. Mais le fichier envoyé sur OVH doit lui être placé dans <code>galerie</code>, un sous-dossier <em>à l'intérieur</em> du dossier <code>images</code> — pas directement dans <code>images</code>.</p>
+              <p>La section Galerie n'apparaît sur le site que si <strong>deux conditions</strong> sont réunies en même temps : au moins 5 photos ici, <em>et</em> l'interrupteur « galerie » réglé sur <code>true</code> (allumé) dans « 👁 Visibilité du site ».</p>
+            </div>
+
+            <div class="guide-panel-card">
+              <h4>Menu de navigation</h4>
+              <span class="guide-path">nav (liste d'objets)</span>
+              <p>Le texte des liens du menu, dans l'ordre où ils apparaissent en haut du site.</p>
+              <div class="guide-json">"nav": [
+  { "id": "presentation", "label": "Présentation" },
+  { "id": "cours", "label": "Cours & tarifs" }
+]</div>
+              <p><code>id</code> doit correspondre exactement à l'identifiant d'une section du site (voir la structure du site ci-dessous) — seul <code>label</code> (le texte visible) est à modifier ici. Le lien « Galerie » s'ajoute tout seul dès 5 photos.</p>
+            </div>
+
+            <div class="guide-panel-card">
+              <h4>Couleurs du site</h4>
+              <span class="guide-path">theme.*</span>
+              <p>9 couleurs (fond, texte, accents dorés…) qui habillent l'ensemble du site.</p>
+              <div class="guide-json">"theme": {
+  "gold": "#ab8f66",
+  "paper": "#fbf7ec"
+}</div>
+              <p>Le mini-aperçu du panneau s'illumine en survolant un champ, pour repérer où chaque couleur s'applique avant de valider.</p>
+            </div>
+
+            <div class="guide-panel-card">
+              <h4>Pied de page</h4>
+              <span class="guide-path">footer.*</span>
+              <p>Le copyright et la petite phrase tout en bas du site.</p>
+              <div class="guide-json">"footer": {
+  "copyright": "Momox Dogs — Morgane, éducatrice canine (BPE)"
+}</div>
+            </div>
+
+            <div class="guide-panel-card">
+              <h4>Référencement (SEO)</h4>
+              <span class="guide-path">seo.*</span>
+              <p>Le titre et la description utilisés par Google et par les réseaux sociaux quand le site est partagé.</p>
+              <div class="guide-json">"seo": {
+  "siteTitle": "Momox Dogs — Morgane, éducatrice canine (BPE)",
+  "siteUrl": "https://momox-dogs.fr"
+}</div>
+              <p>Ces champs ne changent rien à l'apparence du site lui-même, seulement à ce qui s'affiche dans les résultats de recherche et les aperçus de partage.</p>
+            </div>
+
+          </div>
+
+          <p><strong>Trois outils globaux ne sont pas des panneaux</strong> et ne modifient rien tant qu'on ne clique pas dessus :</p>
+          <ul>
+            <li><strong>« 👁 Aperçu du site »</strong> (en haut) : montre le rendu réel du site avec les modifications actuelles, sans rien publier.</li>
+            <li><strong>« 📘 Guide complet »</strong> (en haut) : ouvre cette aide.</li>
+            <li><strong>La barre du bas</strong> (↶ annuler, ↷ rétablir, charger un fichier, copier le JSON, <strong>⬇ Télécharger content.json</strong>) : le bouton de téléchargement est la seule action qui produit le fichier à envoyer sur OVH.</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- 3. STRUCTURE DU SITE -->
+      <div class="guide-step" id="guide-site">
+        <div class="guide-step-num">3</div>
+        <div class="guide-step-body">
+          <h3>🏗️ La structure du site</h3>
+          <p><code>index.html</code> affiche toujours les mêmes sections, dans le même ordre. Chacune est alimentée par une partie précise de <code>content.json</code> — c'est ce lien qui explique pourquoi modifier l'admin change le site sans jamais toucher à <code>index.html</code>.</p>
+          <ul class="guide-site-list">
+            <li><span class="guide-path">#accueil</span> En-tête + grand titre — alimenté par <code>hero.*</code></li>
+            <li><span class="guide-path">#presentation</span> « Bonjour, je suis Morgane » — alimenté par <code>presentation.*</code>, portrait par <code>images.portrait</code>, étiquettes par <code>tags</code></li>
+            <li><span class="guide-path">#pourquoi</span> Pourquoi suivre des cours — <code>pourquoi.*</code> · s'affiche seulement si <code>visibility.pourquoi</code> vaut <code>true</code></li>
+            <li><span class="guide-path">#cours</span> Grille des prestations — générée automatiquement depuis <code>services</code> (une carte par prestation dont <code>visible</code> vaut <code>true</code>)</li>
+            <li><span class="guide-path">#galerie</span> Galerie photo — générée depuis <code>galerie</code> · visible seulement si 5 photos ou plus <em>et</em> <code>visibility.galerie</code> à <code>true</code></li>
+            <li><span class="guide-path">#contact</span> Email, téléphone, zone, réseaux sociaux, carte — <code>contact.*</code> · réseaux et carte masquables un par un via <code>visibility.facebook</code>, <code>visibility.instagram</code>, <code>visibility.map</code> (chacun à <code>false</code> pour cacher)</li>
+            <li><span class="guide-path">pied de page</span> Copyright + phrase de fin — <code>footer.*</code></li>
+          </ul>
+          <p>Le <strong>menu de navigation</strong> en haut de page (<code>nav</code>) pointe vers ces sections par leur identifiant (<code>presentation</code>, <code>pourquoi</code>, <code>cours</code>, <code>contact</code>…) : c'est pourquoi seul le texte affiché (<code>label</code>) doit être modifié dans l'admin, jamais l'<code>id</code>.</p>
+          <p>Cliquer sur une carte de la section « Cours » ouvre une fiche détaillée (fenêtre modale) avec la description complète de la prestation — elle aussi générée automatiquement à partir de <code>services</code>, sans panneau dédié.</p>
+          <div class="guide-callout guide-callout-info">
+            <span class="guide-callout-icon">🗂️</span>
+            <div><span class="guide-callout-title">Trois fichiers, trois rôles</span><code>index.html</code> = la structure et le design du site (fixe) · <code>content.json</code> = tous les textes, prix et réglages (modifié via l'admin) · <code>admin.html</code> = cette page d'édition, qui ne fait qu'écrire un nouveau <code>content.json</code> à télécharger — elle n'a pas besoin d'être « publiée » elle-même sur OVH pour que le site fonctionne.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 4. MODIFIER UN TEXTE -->
+      <div class="guide-step" id="guide-textes">
+        <div class="guide-step-num">4</div>
+        <div class="guide-step-body">
+          <h3>✏️ Modifier un texte, un prix ou un cours</h3>
+          <ol>
+            <li>Ouvre cette page <code>admin.html</code> (garde-la en favori dans ton navigateur, tu y reviendras régulièrement).</li>
+            <li>Clique sur le panneau qui t'intéresse pour le déplier (ex. « Cours &amp; tarifs », « Coordonnées de contact »…) et modifie directement les champs. Chaque changement est enregistré tout seul au fur et à mesure.</li>
+            <li>Utilise le panneau <strong>« 👁 Visibilité du site »</strong> ou l'interrupteur sur chaque cours si tu veux cacher temporairement un élément sans le supprimer.</li>
+            <li>Clique sur <strong>« 👁 Aperçu du site »</strong> en haut pour vérifier le rendu avant de publier quoi que ce soit.</li>
+            <li>Une fois satisfaite, clique sur <strong>« ⬇ Télécharger content.json »</strong> tout en bas de la page. Le fichier part dans ton dossier <em>Téléchargements</em>.</li>
+          </ol>
+          <div class="guide-callout guide-callout-warn">
+            <span class="guide-callout-icon">⚠️</span>
+            <div><span class="guide-callout-title">Le nom du fichier compte</span>Ton navigateur peut renommer le fichier téléchargé en <code>content (1).json</code> s'il en existe déjà un dans le dossier <em>Téléchargements</em>. Avant de l'envoyer sur OVH, vérifie qu'il s'appelle bien exactement <code>content.json</code> (renomme-le si besoin).</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 5. PHOTOS -->
+      <div class="guide-step" id="guide-photos">
+        <div class="guide-step-num">5</div>
+        <div class="guide-step-body">
+          <h3>📷 Changer ou ajouter une photo</h3>
+          <p>Une photo se gère en deux temps : préparer le fichier, puis l'envoyer sur OVH au bon endroit.</p>
+          <ol>
+            <li><strong>Prépare le fichier</strong> sur ton ordinateur ou ton téléphone : renomme-le sans espaces ni accents ni majuscules — utilise des tirets. Ex. <code>photo-chien-1.jpg</code>, pas <code>Photo Chien (1).JPG</code>.</li>
+            <li>Format <code>.jpg</code> ou <code>.webp</code> de préférence, et une taille raisonnable (idéalement sous 1-2 Mo, ~1600 px de large) pour que le site reste rapide.</li>
+            <li>Dans l'admin, indique <strong>uniquement le nom du fichier</strong> dans le champ prévu (ex. dans une prestation, ou dans « Images principales ») — le dossier <code>images/</code> est ajouté automatiquement, pas besoin de le taper.</li>
+            <li>Envoie ensuite le fichier photo lui-même sur OVH, dans le dossier <code>images</code> du site (ou dans son sous-dossier <code>galerie</code> pour les photos de chiens) — voir l'étape 6 ci-dessous pour la manière de l'envoyer.</li>
+          </ol>
+          <div class="guide-callout guide-callout-warn">
+            <span class="guide-callout-icon">⚠️</span>
+            <div><span class="guide-callout-title">Le nom doit correspondre exactement</span>Sur l'hébergement OVH, majuscules et minuscules comptent : si l'admin indique <code>chien.jpg</code> mais que le fichier envoyé s'appelle <code>Chien.JPG</code>, la photo n'apparaîtra pas sur le site.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 6. PUBLIER SUR OVH -->
+      <div class="guide-step" id="guide-publier">
+        <div class="guide-step-num">6</div>
+        <div class="guide-step-body">
+          <h3>🚀 Publier les changements sur OVH</h3>
+          <div class="guide-callout guide-callout-ovh">
+            <span class="guide-callout-icon">🛠️</span>
+            <div><span class="guide-callout-title">Le site est hébergé chez OVH</span>Il faut se connecter à l'espace client OVH pour déposer les fichiers modifiés (<code>content.json</code> et/ou les photos). Deux façons de faire, du plus simple au plus complet :</div>
+          </div>
+
+          <p><strong>Option A — le gestionnaire de fichiers OVH (le plus simple, dans le navigateur)</strong></p>
+          <ol>
+            <li>Va sur <code>https://www.ovh.com/manager/</code> et connecte-toi avec l'identifiant du compte OVH.</li>
+            <li>Dans le menu de gauche, ouvre <strong>« Web Cloud »</strong> puis <strong>« Hébergements »</strong>, et sélectionne l'hébergement du site (ex. momox-dogs.fr).</li>
+            <li>Va dans l'onglet <strong>« FTP-SSH »</strong> : si un <strong>« Gestionnaire de fichiers »</strong> est proposé, ouvre-le directement depuis le navigateur — inutile d'installer quoi que ce soit.</li>
+            <li>Ouvre le dossier <code>www</code> (c'est la racine du site, là où se trouve <code>index.html</code>).</li>
+            <li>Pour <code>content.json</code> : sélectionne le fichier existant, supprime-le ou utilise « Envoyer un fichier » en choisissant le nouveau <code>content.json</code> téléchargé à l'étape 4 — il doit remplacer l'ancien, au même endroit.</li>
+            <li>Pour une photo : ouvre le dossier <code>images</code> (ou <code>images/galerie</code>) et envoie le fichier photo de la même façon.</li>
+          </ol>
+
+          <p><strong>Option B — un logiciel FTP comme FileZilla (si le gestionnaire web n'est pas disponible)</strong></p>
+          <ol>
+            <li>Dans le Manager OVH, onglet <strong>« FTP-SSH »</strong> de l'hébergement, récupère : le <em>serveur FTP</em>, l'<em>identifiant</em> et le <em>mot de passe</em> (ou crée un identifiant FTP dédié si besoin).</li>
+            <li>Installe et ouvre <strong>FileZilla</strong> (gratuit), renseigne ces trois informations dans « Connexion rapide » et connecte-toi.</li>
+            <li>À droite (le serveur OVH), va dans le dossier <code>www</code>.</li>
+            <li>À gauche (ton ordinateur), retrouve le fichier <code>content.json</code> téléchargé (ou la photo).</li>
+            <li>Glisse-dépose le fichier de gauche vers <code>www</code> à droite, et confirme le remplacement (« Overwrite ») quand FileZilla le demande.</li>
+          </ol>
+          <div class="guide-callout guide-callout-tip">
+            <span class="guide-callout-icon">💾</span>
+            <div><span class="guide-callout-title">Avant d'écraser un fichier</span>Télécharge une copie de l'ancien <code>content.json</code> depuis OVH sur ton ordinateur avant de le remplacer (renomme-la par exemple <code>content-avant-15-08.json</code>). Si quelque chose ne va pas, tu pourras toujours revenir en arrière.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 7. VÉRIFIER -->
+      <div class="guide-step" id="guide-verifier">
+        <div class="guide-step-num">7</div>
+        <div class="guide-step-body">
+          <h3>🔍 Vérifier que la mise à jour est bien en ligne</h3>
+          <ol>
+            <li>Ouvre le site dans le navigateur (l'adresse habituelle) et vérifie que le changement apparaît.</li>
+            <li>Si tu ne vois pas encore le changement, force le rafraîchissement de la page : <code>Ctrl</code> + <code>F5</code> sur ordinateur (ou <code>Cmd</code> + <code>Maj</code> + <code>R</code> sur Mac) — le navigateur garde parfois une ancienne version en mémoire.</li>
+            <li>Jette aussi un œil sur téléphone, en navigation privée si besoin, pour être sûre que tout le monde voit la nouvelle version.</li>
+          </ol>
+        </div>
+      </div>
+
+      <!-- 8. PROBLÈMES POTENTIELS -->
+      <div class="guide-step" id="guide-astuces">
+        <div class="guide-step-num">8</div>
+        <div class="guide-step-body">
+          <h3>🩹 Problèmes potentiels &amp; comment les corriger</h3>
+
+          <p><strong>Affichage général du site</strong></p>
+          <div class="guide-fix">
+            <span class="guide-fix-title">Le site n'affiche plus rien / semble cassé après une mise à jour</span>
+            <p><strong>Cause probable :</strong> le <code>content.json</code> envoyé sur OVH est incomplet, corrompu, ou n'est pas celui généré par l'admin (ex. modifié à la main).</p>
+            <p><strong>Solution :</strong> renvoie sur OVH la copie de sauvegarde de l'ancien <code>content.json</code> (voir l'astuce de l'étape 6) pour revenir à une version qui fonctionnait, puis recommence la modification depuis l'admin.</p>
+          </div>
+          <div class="guide-fix">
+            <span class="guide-fix-title">Une section a disparu du site alors que je n'y ai pas touché</span>
+            <p><strong>Cause probable :</strong> son interrupteur dans « 👁 Visibilité du site » a été désactivé par erreur, ou — pour la Galerie — le nombre de photos est repassé sous 5.</p>
+            <p><strong>Solution :</strong> ouvre le panneau « Visibilité du site » et réactive l'interrupteur concerné ; pour la Galerie, vérifie aussi le nombre de photos dans son panneau.</p>
+          </div>
+
+          <p><strong>Images</strong></p>
+          <div class="guide-fix">
+            <span class="guide-fix-title">Une photo n'apparaît pas sur le site</span>
+            <p><strong>Cause probable :</strong> le nom tapé dans l'admin ne correspond pas exactement (majuscules/minuscules comprises) au nom du fichier envoyé sur OVH, ou le fichier n'est pas dans le bon dossier.</p>
+            <p><strong>Solution :</strong> renomme le fichier ou corrige le champ pour qu'ils soient identiques au caractère près, et vérifie qu'il est bien dans <code>images/</code> (ou <code>images/galerie/</code> pour la galerie).</p>
+          </div>
+          <div class="guide-fix">
+            <span class="guide-fix-title">L'aperçu dans l'admin montre une image cassée</span>
+            <p><strong>Cause probable :</strong> le fichier indiqué n'existe pas encore à cet emplacement — normal si la photo n'a pas encore été envoyée sur OVH.</p>
+            <p><strong>Solution :</strong> aucune action dans l'admin ; l'image s'affichera dès que le fichier sera déposé au bon endroit sur OVH (voir l'étape 6).</p>
+          </div>
+
+          <p><strong>Le formulaire d'admin lui-même</strong></p>
+          <div class="guide-fix">
+            <span class="guide-fix-title">content.json refuse de se charger dans l'admin</span>
+            <p><strong>Cause probable :</strong> le fichier a été modifié à la main (hors admin) et contient une faute de syntaxe, ou ce n'est pas le bon fichier.</p>
+            <p><strong>Solution :</strong> un message d'erreur explique le problème rencontré ; charge plutôt une sauvegarde précédente qui fonctionnait, via le bouton de chargement de fichier.</p>
+          </div>
+          <div class="guide-fix">
+            <span class="guide-fix-title">Un champ reste bordé de rouge</span>
+            <p><strong>Cause probable :</strong> il est obligatoire et vide, ou mal formaté (ex. une adresse e-mail sans « @ », un lien sans <code>https://</code>).</p>
+            <p><strong>Solution :</strong> corrige le champ signalé avant de télécharger — le bouton de téléchargement reste utilisable, mais mieux vaut tout corriger d'abord.</p>
+          </div>
+          <div class="guide-fix">
+            <span class="guide-fix-title">Mes modifications d'hier ont disparu</span>
+            <p><strong>Cause probable :</strong> l'admin garde un brouillon automatique <em>dans le navigateur utilisé</em> — si un autre navigateur, un autre ordinateur, ou la navigation privée a été utilisé entre-temps, ce brouillon n'est pas partagé.</p>
+            <p><strong>Solution :</strong> travaille toujours depuis le même navigateur pour un brouillon en cours, et télécharge <code>content.json</code> dès qu'une série de modifications est terminée — c'est ce fichier, une fois publié sur OVH, qui devient la seule vraie source commune à tout le monde.</p>
+          </div>
+
+          <p><strong>Publication sur OVH</strong></p>
+          <div class="guide-fix">
+            <span class="guide-fix-title">J'ai bien envoyé le fichier mais rien ne change sur le site</span>
+            <p><strong>Cause probable :</strong> le fichier téléchargé s'appelait <code>content (1).json</code> (renommage automatique du navigateur) et n'a donc pas remplacé l'original sur OVH, ou le navigateur affiche une version en mémoire (cache).</p>
+            <p><strong>Solution :</strong> vérifie sur OVH que le fichier s'appelle exactement <code>content.json</code>, puis force le rafraîchissement de la page (<code>Ctrl</code>+<code>F5</code>, voir l'étape 7).</p>
+          </div>
+          <div class="guide-fix">
+            <span class="guide-fix-title">Un lien du menu de navigation ne mène nulle part</span>
+            <p><strong>Cause probable :</strong> le champ <code>id</code> d'une entrée du menu a été modifié — il doit toujours correspondre à l'identifiant d'une section réelle du site (voir « La structure du site »).</p>
+            <p><strong>Solution :</strong> dans le panneau « Menu de navigation », ne modifie que le texte affiché ; si l'ordre ou le contenu semble incohérent, recharge la dernière sauvegarde connue de <code>content.json</code>.</p>
+          </div>
+
+          <div class="guide-callout guide-callout-tip">
+            <span class="guide-callout-icon">💡</span>
+            <div><span class="guide-callout-title">Le réflexe qui évite la plupart des problèmes</span>Avant tout envoi sur OVH : utilise « 👁 Aperçu du site » pour voir le rendu réel, et garde toujours une copie de sauvegarde de l'ancien <code>content.json</code> avant de le remplacer.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CHECKLIST -->
+      <div id="guide-checklist" class="guide-checklist" style="scroll-margin-top:18px;">
+        <h3>✅ Aide-mémoire — les 4 étapes à chaque mise à jour</h3>
+        <label><input type="checkbox"><span>Je modifie mes textes / prix / photos dans cette page admin, panneau par panneau.</span></label>
+        <label><input type="checkbox"><span>Je vérifie avec « 👁 Aperçu du site », puis je clique sur « ⬇ Télécharger content.json ».</span></label>
+        <label><input type="checkbox"><span>Je me connecte au Manager OVH et j'envoie le fichier (et les photos éventuelles) dans le dossier <code>www</code> / <code>images</code>, à la place des anciens.</span></label>
+        <label><input type="checkbox"><span>Je recharge le site (Ctrl+F5) pour vérifier que tout est bien en ligne.</span></label>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<div id="confirmOverlay" class="confirm-overlay" style="display:none;">
+  <div class="confirm-modal" id="confirmModal" role="alertdialog" aria-modal="true" aria-labelledby="confirmTitle" aria-describedby="confirmMessage" tabindex="-1">
+    <div class="confirm-icon" id="confirmIcon">❓</div>
+    <h3 class="confirm-title" id="confirmTitle">Confirmer</h3>
+    <p class="confirm-message" id="confirmMessage"></p>
+    <div class="confirm-actions">
+      <button type="button" class="btn btn-outline" id="confirmCancelBtn">Annuler</button>
+      <button type="button" class="btn btn-primary" id="confirmOkBtn">Confirmer</button>
+    </div>
+  </div>
+</div>
+
+<div id="errorBanner" class="error-banner" style="display:none;" role="alert">
+  <span class="error-banner-icon">🛡️</span>
+  <span class="error-banner-text" id="errorBannerText"></span>
+  <button type="button" class="error-banner-close" id="errorBannerClose" aria-label="Fermer">✕</button>
+</div>
+
 <script>
 /* =====================================================================
    ÉTAT
@@ -555,6 +1468,85 @@ const DRAFT_KEY = 'momoxdogs_admin_draft_v1';
 const $ = (sel, root=document) => root.querySelector(sel);
 const $$ = (sel, root=document) => Array.from(root.querySelectorAll(sel));
 
+/* =====================================================================
+   CONFIRMATION PERSONNALISÉE — remplace window.confirm()
+   Usage : const ok = await customConfirm({ title, message, okText,
+           cancelText, danger, icon }); // ou juste une string comme message
+   ===================================================================== */
+function customConfirm(opts){
+  if (typeof opts === 'string') opts = { message: opts };
+  const {
+    title = 'Confirmer l\u2019action',
+    message = '',
+    okText = 'Confirmer',
+    cancelText = 'Annuler',
+    danger = false,
+    icon = null
+  } = opts;
+
+  const overlay  = $('#confirmOverlay');
+  const modal    = $('#confirmModal');
+  const iconEl   = $('#confirmIcon');
+  const titleEl  = $('#confirmTitle');
+  const msgEl    = $('#confirmMessage');
+  const okBtn    = $('#confirmOkBtn');
+  const cancelBtn= $('#confirmCancelBtn');
+
+  titleEl.textContent = title;
+  msgEl.textContent = message;
+  okBtn.textContent = okText;
+  cancelBtn.textContent = cancelText;
+  iconEl.textContent = icon || (danger ? '\u{1F5D1}\uFE0F' : '\u2753');
+  modal.classList.toggle('is-danger', !!danger);
+  okBtn.className = 'btn ' + (danger ? 'btn-danger' : 'btn-primary');
+
+  const previouslyFocused = document.activeElement;
+
+  return new Promise((resolve) => {
+    let settled = false;
+
+    function close(result){
+      if (settled) return;
+      settled = true;
+      overlay.classList.remove('show');
+      document.removeEventListener('keydown', onKeydown, true);
+      setTimeout(() => { overlay.style.display = 'none'; }, 260);
+      if (previouslyFocused && typeof previouslyFocused.focus === 'function') previouslyFocused.focus();
+      resolve(result);
+    }
+
+    function onKeydown(e){
+      if (e.key === 'Escape'){ e.preventDefault(); close(false); }
+      else if (e.key === 'Enter'){ e.preventDefault(); close(document.activeElement === okBtn); }
+      else if (e.key === 'Tab'){
+        e.preventDefault();
+        const focusables = [cancelBtn, okBtn];
+        const idx = focusables.indexOf(document.activeElement);
+        const next = e.shiftKey ? (idx <= 0 ? focusables.length - 1 : idx - 1) : (idx === focusables.length - 1 ? 0 : idx + 1);
+        focusables[next].focus();
+      }
+    }
+
+    okBtn.onclick = () => close(true);
+    cancelBtn.onclick = () => close(false);
+    overlay.onclick = (e) => { if (e.target === overlay) close(false); };
+
+    overlay.style.display = 'flex';
+    document.addEventListener('keydown', onKeydown, true);
+    requestAnimationFrame(() => {
+      overlay.classList.add('show');
+      cancelBtn.focus();
+    });
+  });
+}
+
+function hideLoadingOverlay(){
+  const overlay = $('#loadingOverlay');
+  if (!overlay || overlay.style.display === 'none') return;
+  overlay.classList.add('is-hiding');
+  setTimeout(() => { overlay.style.display = 'none'; }, 360);
+}
+
 function showToast(msg, isError=false){
   const t = $('#toast');
   t.textContent = msg;
@@ -562,6 +1554,49 @@ function showToast(msg, isError=false){
   clearTimeout(showToast._timer);
   showToast._timer = setTimeout(()=> t.classList.remove('show'), 2600);
 }
+
+/* =====================================================================
+   FILET DE SÉCURITÉ GLOBAL
+   Si une erreur JS imprévue survient malgré toutes les protections
+   ci-dessous, on ne veut jamais laisser la page se figer sans
+   explication. On affiche une bannière discrète mais claire, et on
+   tente aussitôt une sauvegarde d'urgence de CONTENT dans le brouillon
+   local, pour maximiser les chances de ne rien perdre.
+   ===================================================================== */
+function showErrorBanner(message){
+  const banner = $('#errorBanner');
+  $('#errorBannerText').textContent = message;
+  banner.style.display = 'flex';
+  requestAnimationFrame(() => banner.classList.add('show'));
+}
+function hideErrorBanner(){
+  const banner = $('#errorBanner');
+  banner.classList.remove('show');
+  setTimeout(() => { banner.style.display = 'none'; }, 300);
+}
+$('#errorBannerClose').addEventListener('click', hideErrorBanner);
+
+function emergencySave(){
+  if (!CONTENT) return false;
+  try { localStorage.setItem(DRAFT_KEY, JSON.stringify(CONTENT)); return true; }
+  catch(e){ return false; }
+}
+
+let lastGlobalErrorAt = 0;
+function handleUnexpectedError(err){
+  const now = Date.now();
+  if (now - lastGlobalErrorAt < 4000) return; // évite le spam si l'erreur se répète en boucle
+  lastGlobalErrorAt = now;
+  console.error('Erreur inattendue :', err);
+  const saved = emergencySave();
+  showErrorBanner(
+    saved
+      ? 'Une erreur inattendue est survenue. Tes modifications ont été sauvegardées localement par sécurité — recharge la page si l\u2019affichage semble bloqué.'
+      : 'Une erreur inattendue est survenue et la sauvegarde locale a échoué. Télécharge ton fichier maintenant si possible, avant de recharger la page.'
+  );
+}
+window.addEventListener('error', (e) => handleUnexpectedError(e.error || e.message));
+window.addEventListener('unhandledrejection', (e) => handleUnexpectedError(e.reason));
 
 /* =====================================================================
    VALIDATION DES FORMULAIRES
@@ -714,6 +1749,8 @@ function buildImageFilenameField(wrapEl, { prefix, getFull, setFull, onCommit, i
 function revealField(el){
   const panel = el.closest('[data-panel]');
   if (panel && !panel.classList.contains('open')) panel.classList.add('open');
+  const serviceCard = el.closest('.service-card');
+  if (serviceCard && !serviceCard.classList.contains('open')) setServiceCardOpen(serviceCard, true, false);
   if (typeof el.scrollIntoView === 'function') el.scrollIntoView({ behavior:'smooth', block:'center' });
   try { el.focus({ preventScroll:true }); } catch(e){ try { el.focus(); } catch(e2){} }
 }
@@ -748,9 +1785,23 @@ function setDirty(v){
   }
 }
 
+let autosaveFailed = false;
+function setAutosaveWarning(failed){
+  autosaveFailed = failed;
+  $('#autosaveWarn').style.display = failed ? 'flex' : 'none';
+}
+
 function markDirty(){
   setDirty(true);
-  try { localStorage.setItem(DRAFT_KEY, JSON.stringify(CONTENT)); } catch(e){}
+  try {
+    localStorage.setItem(DRAFT_KEY, JSON.stringify(CONTENT));
+    if (autosaveFailed) setAutosaveWarning(false);
+  } catch(e){
+    if (!autosaveFailed){
+      setAutosaveWarning(true);
+      showToast('Sauvegarde locale automatique impossible sur cet appareil (navigation privée ?) — télécharge ton fichier régulièrement pour ne rien perdre.', true);
+    }
+  }
 }
 
 window.addEventListener('beforeunload', (e) => {
@@ -904,29 +1955,53 @@ function showActionToast(kind, label){
    ===================================================================== */
 async function init(){
   let loaded = null;
+  let fetchError = null;
   try {
     const res = await fetch('content.json', { cache: 'no-store' });
-    if (res.ok) loaded = await res.json();
+    if (res.ok){
+      try {
+        loaded = await res.json();
+      } catch(parseErr){
+        fetchError = new Error('content.json a été trouvé sur le serveur mais n\u2019est pas un JSON valide (' + parseErr.message + '). Corrige-le côté serveur, ou choisis un autre fichier ci-dessous.');
+      }
+    }
   } catch(e){ /* pas de serveur / fichier introuvable — on proposera l'import manuel */ }
 
   if (loaded){
-    checkDraftAndStart(loaded);
+    await checkDraftAndStart(loaded);
   } else {
-    $('#loadingOverlay').style.display = 'none';
+    hideLoadingOverlay();
+    if (fetchError){
+      $('#emptyStateErrorText').textContent = fetchError.message;
+      $('#emptyStateError').style.display = 'block';
+    }
     $('#emptyState').style.display = 'block';
   }
 }
 
-function checkDraftAndStart(freshContent){
+async function checkDraftAndStart(freshContent){
   let draft = null;
   try {
     const raw = localStorage.getItem(DRAFT_KEY);
     if (raw) draft = JSON.parse(raw);
-  } catch(e){}
+  } catch(e){
+    // Brouillon illisible (corrompu) : on l'efface plutôt que de le
+    // laisser bloqué là indéfiniment, et on continue sans lui.
+    try { localStorage.removeItem(DRAFT_KEY); } catch(e2){}
+  }
 
   if (draft && JSON.stringify(draft) !== JSON.stringify(freshContent)){
-    const keep = confirm("Un brouillon non téléchargé a été retrouvé (modifications précédentes non publiées). Veux-tu le reprendre ?\n\nOK = reprendre le brouillon\nAnnuler = repartir du fichier content.json actuel");
-    startWith(keep ? draft : freshContent);
+    const keep = await customConfirm({
+      title: 'Brouillon retrouvé',
+      message: 'Un brouillon non téléchargé a été retrouvé (modifications précédentes non publiées).\n\nVeux-tu le reprendre, ou repartir du fichier content.json actuel ?',
+      okText: 'Reprendre le brouillon',
+      cancelText: 'Fichier actuel',
+      icon: '📝'
+    });
+    // Si le choix retenu s'avère finalement inexploitable (brouillon
+    // corrompu par exemple), startWith se replie automatiquement sur
+    // l'autre source plutôt que de bloquer le chargement.
+    startWith(keep ? draft : freshContent, keep ? freshContent : draft);
   } else {
     startWith(freshContent);
   }
@@ -934,19 +2009,68 @@ function checkDraftAndStart(freshContent){
 
 let ORIGINAL_THEME = null;
 
-function startWith(data){
-  CONTENT = normalizeContent(data);
-  ORIGINAL_THEME = JSON.parse(JSON.stringify(CONTENT.theme));
-  $('#loadingOverlay').style.display = 'none';
-  $('#emptyState').style.display = 'none';
-  $('#appMain').style.display = 'block';
-  $('#actionbar').style.display = 'block';
-  $('#previewBtn').style.display = 'inline-flex';
-  renderAll();
-  applyTheme(CONTENT.theme);
-  setDirty(false);
-  seedHistory('État initial');
-  initActionbarSpacing();
+/* Affiche l'écran « fichier inutilisable » (réutilise emptyState) avec
+   un message clair, et propose d'en choisir un autre manuellement. */
+function showLoadError(err){
+  hideLoadingOverlay();
+  $('#appMain').style.display = 'none';
+  $('#actionbar').style.display = 'none';
+  $('#emptyStateErrorText').textContent = (err && err.message) ? err.message : 'Fichier illisible ou dans un format inattendu.';
+  $('#emptyStateError').style.display = 'block';
+  $('#emptyState').style.display = 'block';
+}
+
+/* Démarre l'appli avec `data`. Si `data` s'avère inexploitable et
+   qu'un `fallback` est fourni (ex. l'autre source disponible), on se
+   replie dessus automatiquement au lieu de bloquer le chargement. Si
+   le rendu lui-même échoue de façon inattendue après une donnée valide,
+   on revient à l'état précédent plutôt que de laisser une page cassée. */
+function startWith(data, fallback){
+  let normalized;
+  try {
+    normalized = normalizeContent(data);
+  } catch(err){
+    if (fallback){
+      showToast('Cette source était invalide (' + err.message + ') — reprise de l\u2019autre source disponible.', true);
+      startWith(fallback);
+      return;
+    }
+    showLoadError(err);
+    return;
+  }
+
+  const previousContent = CONTENT;
+  const previousTheme = ORIGINAL_THEME;
+  try {
+    CONTENT = normalized;
+    ORIGINAL_THEME = JSON.parse(JSON.stringify(CONTENT.theme));
+    hideLoadingOverlay();
+    $('#emptyState').style.display = 'none';
+    $('#appMain').style.display = 'block';
+    $('#appMain').classList.add('is-ready');
+    $('#actionbar').style.display = 'block';
+    $('#previewBtn').style.display = 'inline-flex';
+    renderAll();
+    applyTheme(CONTENT.theme);
+    setDirty(false);
+    seedHistory('État initial');
+    initActionbarSpacing();
+    reportRepairsIfAny();
+  } catch(err){
+    console.error('Erreur au rendu du contenu :', err);
+    if (previousContent){
+      // On avait déjà quelque chose de fonctionnel affiché : on y revient
+      // plutôt que de laisser une page à moitié rendue.
+      CONTENT = previousContent;
+      ORIGINAL_THEME = previousTheme;
+      try { renderAll(); applyTheme(CONTENT.theme); } catch(e2){ /* déjà en échec, on laisse la bannière globale gérer */ }
+      showToast('Impossible d\u2019afficher ce fichier (erreur interne) — tes modifications précédentes sont conservées.', true);
+    } else if (fallback){
+      startWith(fallback);
+    } else {
+      showLoadError(new Error('Le fichier semble valide mais son affichage a échoué de façon inattendue.'));
+    }
+  }
 }
 
 /* =====================================================================
@@ -979,53 +2103,237 @@ function initActionbarSpacing(){
   }
 }
 
+/* =====================================================================
+   NORMALISATION ROBUSTE DU CONTENU CHARGÉ
+   Un fichier content.json peut arriver corrompu, modifié à la main,
+   incomplet ou d'une ancienne version du site. L'objectif : ne JAMAIS
+   planter à cause de sa forme — au pire, on répare silencieusement en
+   listant les réparations (LAST_REPAIRS), et on ne rejette le fichier
+   en bloc que s'il n'est vraiment pas exploitable (pas un objet).
+   ===================================================================== */
+let LAST_REPAIRS = [];
+
+function isPlainObject(v){ return !!v && typeof v === 'object' && !Array.isArray(v); }
+
+/* Convertit une valeur en texte sûr pour l'affichage dans un champ.
+   Un objet/tableau égaré à la place d'un texte est ignoré (remis à
+   vide) plutôt que sérialisé en "[object Object]" dans le formulaire. */
+function asString(v, fallback=''){
+  if (typeof v === 'string') return v;
+  if (v === null || v === undefined) return fallback;
+  if (typeof v === 'number' || typeof v === 'boolean') return String(v);
+  return fallback;
+}
+
+function normalizeObjectFields(obj, fields, label){
+  const out = {};
+  fields.forEach(key => {
+    const before = obj[key];
+    const val = asString(before);
+    if (before !== undefined && before !== null && val === '' && String(before) !== ''){
+      LAST_REPAIRS.push(`${label} : le champ « ${key} » n\u2019était pas un texte valide, remis à vide`);
+    }
+    out[key] = val;
+  });
+  return out;
+}
+
+function normalizeArrayOfObjects(arr, fields, label){
+  if (!Array.isArray(arr)){
+    if (arr !== undefined) LAST_REPAIRS.push(`« ${label} » n\u2019était pas une liste valide, remise à zéro`);
+    return [];
+  }
+  const out = [];
+  arr.forEach((item, i) => {
+    if (!isPlainObject(item)){
+      LAST_REPAIRS.push(`« ${label} » : élément #${i+1} invalide ignoré`);
+      return;
+    }
+    out.push(normalizeObjectFields(item, fields, `${label} #${i+1}`));
+  });
+  return out;
+}
+
+const SERVICE_FIELDS_SHAPE = ['categorie','titre','image','description','prix','unite'];
+const GALERIE_FIELDS_SHAPE  = ['src','alt'];
+
+/* Clés du panneau « Visibilité du site ». Une clé absente du fichier (ou
+   valant autre chose que `false`) est considérée visible par défaut — donc
+   un content.json créé avant cette fonctionnalité s'ouvre avec tout affiché. */
+const VISIBILITY_KEYS = ['presentation','pourquoi','tags','galerie','map','facebook','instagram'];
+
+/* Prestations : mêmes champs texte que d'habitude + un booléen "visible"
+   (masquage individuel d'un cours) géré à part, car normalizeArrayOfObjects
+   n'assainit que des champs texte. */
+function normalizeServices(arr){
+  if (!Array.isArray(arr)){
+    if (arr !== undefined) LAST_REPAIRS.push('« Prestations » n\u2019était pas une liste valide, remise à zéro');
+    return [];
+  }
+  const out = [];
+  arr.forEach((item, i) => {
+    if (!isPlainObject(item)){
+      LAST_REPAIRS.push('« Prestations » : élément #' + (i+1) + ' invalide ignoré');
+      return;
+    }
+    const obj = normalizeObjectFields(item, SERVICE_FIELDS_SHAPE, 'Prestations #' + (i+1));
+    obj.visible = item.visible !== false;
+    out.push(obj);
+  });
+  return out;
+}
+
 function normalizeContent(data){
-  data.tags = data.tags || [];
-  data.services = data.services || [];
-  data.nav = data.nav || [];
-  data.galerie = data.galerie || [];
-  data.contact = data.contact || {};
-  data.hero = data.hero || {};
-  data.presentation = data.presentation || {};
-  data.pourquoi = data.pourquoi || {};
-  data.footer = data.footer || {};
-  data.seo = data.seo || {};
-  data.images = data.images || {};
-  data.theme = data.theme || {};
-  return data;
+  LAST_REPAIRS = [];
+  if (!isPlainObject(data)){
+    throw new Error('Le fichier ne contient pas un objet JSON valide (attendu : { "contact": {...}, "services": [...], ... }).');
+  }
+
+  const out = {};
+
+  // Étiquettes : liste de textes
+  if (Array.isArray(data.tags)){
+    const cleaned = data.tags.map(t => asString(t)).filter(t => t.trim() !== '');
+    if (cleaned.length !== data.tags.length) LAST_REPAIRS.push('« tags » : éléments non textuels ou vides ignorés');
+    out.tags = cleaned;
+  } else {
+    if (data.tags !== undefined) LAST_REPAIRS.push('« tags » n\u2019était pas une liste valide, remise à zéro');
+    out.tags = [];
+  }
+
+  out.services = normalizeServices(data.services);
+  out.galerie  = normalizeArrayOfObjects(data.galerie, GALERIE_FIELDS_SHAPE, 'Galerie');
+
+  // Visibilité : objet de booléens, une clé manquante ou invalide retombe sur "visible".
+  if (isPlainObject(data.visibility)){
+    const vis = {};
+    VISIBILITY_KEYS.forEach(k => { vis[k] = data.visibility[k] !== false; });
+    out.visibility = vis;
+  } else {
+    if (data.visibility !== undefined) LAST_REPAIRS.push('« visibility » n\u2019était pas un objet valide, tout remis visible');
+    const vis = {};
+    VISIBILITY_KEYS.forEach(k => { vis[k] = true; });
+    out.visibility = vis;
+  }
+
+  // Menu de navigation : id technique conservé tel quel, label assaini
+  if (Array.isArray(data.nav)){
+    const validItems = data.nav.filter(isPlainObject);
+    if (validItems.length !== data.nav.length) LAST_REPAIRS.push('« nav » : éléments invalides ignorés');
+    out.nav = validItems.map(item => ({ id: asString(item.id), label: asString(item.label) }));
+  } else {
+    if (data.nav !== undefined) LAST_REPAIRS.push('« nav » n\u2019était pas une liste valide, remise à zéro');
+    out.nav = [];
+  }
+
+  // Objets simples : la validation fine des champs texte se fait à
+  // l'affichage (bindSimpleFields utilise asString), on garantit ici
+  // seulement que ce sont bien des objets et non des primitives/tableaux.
+  ['contact','hero','presentation','pourquoi','footer','seo','images'].forEach(key => {
+    const val = data[key];
+    if (isPlainObject(val)){
+      out[key] = val;
+    } else {
+      if (val !== undefined) LAST_REPAIRS.push(`« ${key} » n\u2019était pas un objet valide, remis à zéro`);
+      out[key] = {};
+    }
+  });
+
+  // Thème : objet de couleurs — chaque valeur assainie en texte
+  if (isPlainObject(data.theme)){
+    const theme = {};
+    Object.keys(data.theme).forEach(k => { theme[k] = asString(data.theme[k]); });
+    out.theme = theme;
+  } else {
+    if (data.theme !== undefined) LAST_REPAIRS.push('« theme » n\u2019était pas un objet valide, remis aux couleurs par défaut');
+    out.theme = {};
+  }
+
+  return out;
+}
+
+/* Affiche un résumé transparent si le chargement a nécessité des
+   réparations automatiques (fichier partiellement corrompu). */
+function reportRepairsIfAny(){
+  if (!LAST_REPAIRS.length) return;
+  console.warn('Réparations automatiques appliquées au chargement :', LAST_REPAIRS);
+  showToast(
+    LAST_REPAIRS.length === 1
+      ? '1 élément du fichier était invalide et a été corrigé automatiquement — vérifie le contenu avant de publier.'
+      : LAST_REPAIRS.length + ' éléments du fichier étaient invalides et ont été corrigés automatiquement — vérifie le contenu avant de publier.',
+    true
+  );
 }
 
 /* Import manuel (premier chargement, sans serveur) */
 $('#manualFileInput').addEventListener('change', async (e) => {
   const file = e.target.files[0];
   if (!file) return;
+  $('#emptyStateError').style.display = 'none';
   try {
     const text = await file.text();
-    const data = JSON.parse(text);
-    checkDraftAndStart(data);
+    let data;
+    try {
+      data = JSON.parse(text);
+    } catch(parseErr){
+      throw new Error('Ce fichier n\u2019est pas un JSON valide (' + parseErr.message + '). Vérifie qu\u2019il n\u2019a pas été coupé ou modifié accidentellement.');
+    }
+    await checkDraftAndStart(data);
   } catch(err){
-    showToast('Fichier JSON invalide : ' + err.message, true);
+    showLoadError(err);
   }
+  e.target.value = '';
 });
 
 /* Recharger un fichier depuis la barre d'action (remplace le contenu en cours) */
 $('#reloadFileInput').addEventListener('change', async (e) => {
   const file = e.target.files[0];
   if (!file) return;
-  if (dirty && !confirm("Charger ce fichier remplacera tes modifications en cours (non téléchargées). Continuer ?")) {
-    e.target.value = '';
-    return;
+  if (dirty){
+    const proceed = await customConfirm({
+      title: 'Remplacer les modifications en cours ?',
+      message: 'Charger ce fichier remplacera tes modifications en cours (non téléchargées).',
+      okText: 'Charger le fichier',
+      cancelText: 'Annuler',
+      danger: true,
+      icon: '📂'
+    });
+    if (!proceed){
+      e.target.value = '';
+      return;
+    }
   }
+  const previousContent = CONTENT;
+  const previousTheme = ORIGINAL_THEME;
   try {
     const text = await file.text();
-    const data = JSON.parse(text);
-    CONTENT = normalizeContent(data);
-    renderAll();
+    let data;
+    try {
+      data = JSON.parse(text);
+    } catch(parseErr){
+      throw new Error('Ce fichier n\u2019est pas un JSON valide (' + parseErr.message + ').');
+    }
+    const normalized = normalizeContent(data); // peut lever une erreur claire
+    try {
+      CONTENT = normalized;
+      ORIGINAL_THEME = JSON.parse(JSON.stringify(CONTENT.theme));
+      renderAll();
+      applyTheme(CONTENT.theme);
+    } catch(renderErr){
+      // Le fichier passait la normalisation mais casse l'affichage :
+      // on revient à ce qui fonctionnait, rien n'est perdu.
+      CONTENT = previousContent;
+      ORIGINAL_THEME = previousTheme;
+      renderAll();
+      applyTheme(CONTENT.theme);
+      throw new Error('Ce fichier a provoqué une erreur d\u2019affichage — tes modifications précédentes ont été conservées.');
+    }
     setDirty(false);
     seedHistory('Fichier chargé');
-    showToast('Fichier chargé.');
+    reportRepairsIfAny();
+    if (!LAST_REPAIRS.length) showToast('Fichier chargé.');
   } catch(err){
-    showToast('Fichier JSON invalide : ' + err.message, true);
+    showToast('Fichier non chargé : ' + err.message, true);
   }
   e.target.value = '';
 });
@@ -1034,6 +2342,7 @@ $('#reloadFileInput').addEventListener('change', async (e) => {
    RENDU
    ===================================================================== */
 function renderAll(){
+  renderVisibility();
   bindSimpleFields();
   renderTags();
   renderServices();
@@ -1041,6 +2350,46 @@ function renderAll(){
   renderGalerie();
   renderNav();
   renderTheme();
+}
+
+/* --------------------------- Visibilité du site --------------------------- */
+const VISIBILITY_ITEMS = [
+  { key:'presentation', label:'Section « Présentation »', desc:'Le bloc « Bonjour, je suis Morgane » (photo, texte et étiquettes).' },
+  { key:'pourquoi',     label:'Section « Pourquoi »',      desc:'Le bloc « Pourquoi suivre des cours d\u2019éducation canine ? »' },
+  { key:'tags',         label:'Étiquettes',                desc:'Les petits mots-clés sous la présentation (ex. « Éducation canine »).' },
+  { key:'galerie',      label:'Galerie photo',             desc:'Ne s\u2019affiche que si activée ET s\u2019il y a au moins 5 photos ajoutées.' },
+  { key:'map',          label:'Carte de localisation',     desc:'La carte centrée sur la ville renseignée dans « Coordonnées de contact ».' },
+  { key:'facebook',     label:'Lien Facebook',             desc:'L\u2019icône Facebook dans la section contact.' },
+  { key:'instagram',    label:'Lien Instagram',            desc:'L\u2019icône Instagram dans la section contact.' }
+];
+function renderVisibility(){
+  const grid = $('#visibilityGrid');
+  grid.innerHTML = '';
+  VISIBILITY_ITEMS.forEach(item => {
+    const row = document.createElement('div');
+    row.className = 'visibility-row';
+    row.innerHTML = `
+      <div class="visibility-row-text">
+        <strong>${escapeHtml(item.label)}</strong>
+        <span class="visibility-off-pill">Masqué</span>
+        <p class="desc">${escapeHtml(item.desc)}</p>
+      </div>
+      <label class="switch" title="Afficher / masquer sur le site">
+        <input type="checkbox">
+        <span class="switch-track"><span class="switch-thumb"></span></span>
+      </label>
+    `;
+    const checkbox = row.querySelector('input');
+    const visible = CONTENT.visibility[item.key] !== false;
+    checkbox.checked = visible;
+    row.classList.toggle('is-off', !visible);
+    checkbox.onchange = () => {
+      CONTENT.visibility[item.key] = checkbox.checked;
+      row.classList.toggle('is-off', !checkbox.checked);
+      commitChange((checkbox.checked ? 'Réaffichage' : 'Masquage') + ' : ' + item.label);
+    };
+    grid.appendChild(row);
+  });
 }
 
 function getPath(obj, path){
@@ -1098,7 +2447,7 @@ function bindSimpleFields(){
   $$('[data-bind]').forEach(el => {
     const path = el.getAttribute('data-bind');
     const val = getPath(CONTENT, path);
-    el.value = (val === undefined || val === null) ? '' : val;
+    el.value = asString(val);
     const label = 'Modification : ' + (fieldLabelFor(el) || path);
     el.oninput = () => {
       setPath(CONTENT, path, el.value);
@@ -1161,6 +2510,61 @@ $('#newTagInput').addEventListener('input', function(){
 const SERVICE_REQUIRED = { categorie:true, titre:true, prix:true, unite:false, description:true };
 const SERVICE_FIELD_LABELS = { categorie:'Catégorie', titre:'Titre', prix:'Prix', unite:'Unité', description:'Description' };
 
+/* Déplie/replie une fiche de prestation dans l'admin (indépendant des
+   panneaux) — même logique d'animation que togglePanel, mais réutilisable
+   avec un booléen explicite (open) et un mode sans animation (utilisé au
+   premier rendu et pour révéler un champ en erreur). */
+function setServiceCardOpen(card, open, animate){
+  const body = card.querySelector('[data-role=body]');
+  if (!body) return;
+  const isOpen = card.classList.contains('open');
+  if (open === isOpen) return;
+  if (open){
+    card.classList.add('open');
+    body.style.display = 'block';
+    if (!animate){ body.style.maxHeight = 'none'; body.style.opacity = '1'; return; }
+    const target = body.scrollHeight;
+    body.style.maxHeight = '0px';
+    body.style.opacity = '0';
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        body.style.maxHeight = target + 'px';
+        body.style.opacity = '1';
+      });
+    });
+    const onEnd = (e) => {
+      if (e.propertyName !== 'max-height') return;
+      body.style.maxHeight = 'none';
+      body.removeEventListener('transitionend', onEnd);
+    };
+    body.addEventListener('transitionend', onEnd);
+  } else {
+    if (!animate){
+      card.classList.remove('open');
+      body.style.display = 'none';
+      body.style.maxHeight = '0px';
+      body.style.opacity = '0';
+      return;
+    }
+    const current = body.scrollHeight;
+    body.style.maxHeight = current + 'px';
+    body.style.opacity = '1';
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        body.style.maxHeight = '0px';
+        body.style.opacity = '0';
+      });
+    });
+    const onEnd = (e) => {
+      if (e.propertyName !== 'max-height') return;
+      card.classList.remove('open');
+      body.style.display = 'none';
+      body.removeEventListener('transitionend', onEnd);
+    };
+    body.addEventListener('transitionend', onEnd);
+  }
+}
+
 function renderServices(){
   const list = $('#servicesList');
   list.innerHTML = '';
@@ -1169,31 +2573,65 @@ function renderServices(){
     const card = document.createElement('div');
     card.className = 'service-card';
     card.innerHTML = `
-      <div class="service-card-top">
+      <div class="service-card-top" data-role="header">
         <div class="service-card-title">
           <span class="cat">Prestation ${i+1}</span>
-          ${escapeHtml(svc.titre || '(sans titre)')}
+          <span data-role="titre-text">${escapeHtml(svc.titre || '(sans titre)')}</span>
+          <span class="service-hidden-badge">Masqué sur le site</span>
+          <span class="service-card-subtitle" data-role="subtitle"></span>
         </div>
         <div class="service-actions">
+          <label class="switch" title="Afficher / masquer ce cours sur le site">
+            <input type="checkbox" data-act="visible">
+            <span class="switch-track"><span class="switch-thumb"></span></span>
+          </label>
           <button type="button" class="btn btn-icon btn-outline" data-act="up" title="Monter">↑</button>
           <button type="button" class="btn btn-icon btn-outline" data-act="down" title="Descendre">↓</button>
           <button type="button" class="btn btn-icon btn-outline" data-act="dup" title="Dupliquer">⧉</button>
           <button type="button" class="btn btn-icon btn-danger" data-act="del" title="Supprimer">🗑</button>
+          <button type="button" class="btn btn-icon btn-outline" data-act="collapse" title="Déplier / replier ce cours">
+            <svg class="service-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M6 9l6 6 6-6"/></svg>
+          </button>
         </div>
       </div>
-      <div class="img-fallback" data-img-fallback style="display:none;"></div>
-      <img class="service-img-preview" data-img-preview alt="">
-      <div class="grid-3">
-        <div class="field"><label>Catégorie *</label><input type="text" data-f="categorie"></div>
-        <div class="field"><label>Titre *</label><input type="text" data-f="titre"></div>
-        <div class="field"><label>Nom du fichier image</label><div data-img-field></div><div class="desc">Le fichier doit se trouver dans le dossier <code>images/</code> du site.</div></div>
+      <div class="service-card-body" data-role="body">
+        <div class="img-fallback" data-img-fallback style="display:none;"></div>
+        <img class="service-img-preview" data-img-preview alt="">
+        <div class="grid-3">
+          <div class="field"><label>Catégorie *</label><input type="text" data-f="categorie"></div>
+          <div class="field"><label>Titre *</label><input type="text" data-f="titre"></div>
+          <div class="field"><label>Nom du fichier image</label><div data-img-field></div><div class="desc">Le fichier doit se trouver dans le dossier <code>images/</code> du site.</div></div>
+        </div>
+        <div class="grid-2">
+          <div class="field"><label>Prix *</label><input type="text" data-f="prix" placeholder="ex. 50 €"></div>
+          <div class="field"><label>Unité</label><input type="text" data-f="unite" placeholder="ex. / heure"></div>
+        </div>
+        <div class="field"><label>Description *</label><textarea class="tall" data-f="description"></textarea><div class="desc">Les sauts de ligne, apostrophes et caractères spéciaux (é, «, —…) sont conservés tels quels.</div></div>
       </div>
-      <div class="grid-2">
-        <div class="field"><label>Prix *</label><input type="text" data-f="prix" placeholder="ex. 50 €"></div>
-        <div class="field"><label>Unité</label><input type="text" data-f="unite" placeholder="ex. / heure"></div>
-      </div>
-      <div class="field"><label>Description *</label><textarea class="tall" data-f="description"></textarea><div class="desc">Les sauts de ligne, apostrophes et caractères spéciaux (é, «, —…) sont conservés tels quels.</div></div>
     `;
+
+    // repli/dépli — replié par défaut pour repérer les cours plus facilement
+    // dans la liste ; le titre, la catégorie et le prix restent visibles
+    // même replié.
+    const toggleThisCard = () => setServiceCardOpen(card, !card.classList.contains('open'), true);
+    card.querySelector('.service-card-title').onclick = toggleThisCard;
+    card.querySelector('[data-act=collapse]').onclick = toggleThisCard;
+
+    function updateSubtitle(){
+      const bits = [svc.categorie, [svc.prix, svc.unite].filter(Boolean).join(' ')].filter(Boolean);
+      card.querySelector('[data-role=subtitle]').textContent = bits.join(' · ');
+    }
+    updateSubtitle();
+
+    // visibilité de ce cours (masquage individuel, sans suppression)
+    const visToggle = card.querySelector('[data-act=visible]');
+    visToggle.checked = svc.visible !== false;
+    card.classList.toggle('is-hidden', !visToggle.checked);
+    visToggle.onchange = () => {
+      svc.visible = visToggle.checked;
+      card.classList.toggle('is-hidden', !visToggle.checked);
+      commitChange((visToggle.checked ? 'Réaffichage' : 'Masquage') + ' du cours « ' + (svc.titre || 'Prestation ' + (i+1)) + ' »');
+    };
 
     // valeurs
     card.querySelector('[data-f=categorie]').value = svc.categorie || '';
@@ -1221,7 +2659,8 @@ function renderServices(){
       el.oninput = () => {
         svc[key] = el.value;
         commitChange('Modification : ' + SERVICE_FIELD_LABELS[key] + ' (Prestation ' + (i+1) + ')', { debounce:true });
-        if (key === 'titre'){ card.querySelector('.service-card-title').lastChild.textContent = ' ' + (svc.titre || '(sans titre)'); }
+        if (key === 'titre'){ card.querySelector('[data-role=titre-text]').textContent = svc.titre || '(sans titre)'; }
+        if (key === 'categorie' || key === 'prix' || key === 'unite'){ updateSubtitle(); }
       };
       el.addEventListener('blur', flushHistoryDebounce);
       if (SERVICE_REQUIRED[key]){
@@ -1246,8 +2685,15 @@ function renderServices(){
       CONTENT.services.splice(i+1, 0, copy);
       renderServices(); commitChange('Duplication de « ' + (svc.titre || 'une prestation') + ' »');
     };
-    card.querySelector('[data-act=del]').onclick = () => {
-      if (!confirm(`Supprimer « ${svc.titre || 'cette prestation'} » ?`)) return;
+    card.querySelector('[data-act=del]').onclick = async () => {
+      const ok = await customConfirm({
+        title: 'Supprimer cette prestation ?',
+        message: `« ${svc.titre || 'Cette prestation'} » sera définitivement supprimée.`,
+        okText: 'Supprimer',
+        cancelText: 'Annuler',
+        danger: true
+      });
+      if (!ok) return;
       CONTENT.services.splice(i,1);
       renderServices(); commitChange('Suppression de « ' + (svc.titre || 'une prestation') + ' »');
     };
@@ -1260,11 +2706,15 @@ function renderServices(){
 }
 
 $('#addServiceBtn').addEventListener('click', () => {
-  CONTENT.services.push({ categorie:'', titre:'Nouvelle prestation', image:'', description:'', prix:'', unite:'' });
+  CONTENT.services.push({ categorie:'', titre:'Nouvelle prestation', image:'', description:'', prix:'', unite:'', visible:true });
   renderServices();
   commitChange('Ajout d\u2019une prestation');
   const cards = $$('.service-card');
-  cards[cards.length-1].scrollIntoView({ behavior:'smooth', block:'center' });
+  const newCard = cards[cards.length-1];
+  // Le nouveau cours reste déplié (contrairement aux autres, repliés par
+  // défaut) : il est vide et destiné à être rempli tout de suite.
+  setServiceCardOpen(newCard, true, false);
+  newCard.scrollIntoView({ behavior:'smooth', block:'center' });
 });
 
 function escapeHtml(s){
@@ -1355,7 +2805,17 @@ function renderGalerie(){
 
     card.querySelector('[data-act=up]').onclick = () => { if (i===0) return; [CONTENT.galerie[i-1],CONTENT.galerie[i]]=[CONTENT.galerie[i],CONTENT.galerie[i-1]]; renderGalerie(); commitChange('Réorganisation de la galerie'); };
     card.querySelector('[data-act=down]').onclick = () => { if (i===CONTENT.galerie.length-1) return; [CONTENT.galerie[i+1],CONTENT.galerie[i]]=[CONTENT.galerie[i],CONTENT.galerie[i+1]]; renderGalerie(); commitChange('Réorganisation de la galerie'); };
-    card.querySelector('[data-act=del]').onclick = () => { if(!confirm('Supprimer cette photo de la galerie ?')) return; CONTENT.galerie.splice(i,1); renderGalerie(); commitChange('Suppression d\u2019une photo de la galerie'); };
+    card.querySelector('[data-act=del]').onclick = async () => {
+      const ok = await customConfirm({
+        title: 'Supprimer cette photo ?',
+        message: 'Elle sera retirée définitivement de la galerie.',
+        okText: 'Supprimer',
+        cancelText: 'Annuler',
+        danger: true
+      });
+      if (!ok) return;
+      CONTENT.galerie.splice(i,1); renderGalerie(); commitChange('Suppression d\u2019une photo de la galerie');
+    };
     card.querySelector('[data-act=up]').disabled = (i===0);
     card.querySelector('[data-act=down]').disabled = (i===CONTENT.galerie.length-1);
     list.appendChild(card);
@@ -1404,17 +2864,77 @@ function renderNav(){
 }
 
 /* --------------------------- Couleurs / thème --------------------------- */
-const THEME_FIELDS = [
-  { key:'ink', label:'Texte principal' },
-  { key:'paper', label:'Fond général' },
-  { key:'paperSoft', label:'Fond des sections alternées' },
-  { key:'pineDark', label:'Fonds foncés (héros, pied de page)' },
-  { key:'pine', label:'Accent (boutons, icônes)' },
-  { key:'olive', label:'Accent secondaire (labels, textes)' },
-  { key:'gold', label:'Accent doré' },
-  { key:'goldLight', label:'Beige clair lumineux' },
-  { key:'cream', label:'Texte clair sur fond foncé' }
+/* Champs groupés par usage, avec une explication concrète de où chaque
+   couleur apparaît sur le site — pour comprendre en un coup d'œil quoi
+   on modifie, sans avoir à deviner. */
+const THEME_GROUPS = [
+  {
+    title: 'Fonds',
+    desc: 'Les couleurs derrière le contenu.',
+    fields: [
+      { key:'paper', label:'Fond général', usage:'Le fond de la quasi-totalité des pages du site.' },
+      { key:'paperSoft', label:'Fond des sections alternées', usage:'Sections en alternance claire, fond des cartes (ex. cours &amp; tarifs).' },
+      { key:'pineDark', label:'Fonds foncés', usage:'Le grand bloc d\u2019accueil (héros) et le pied de page.' }
+    ]
+  },
+  {
+    title: 'Textes',
+    desc: 'Les couleurs du texte, à adapter à leur fond.',
+    fields: [
+      { key:'ink', label:'Texte principal', usage:'Titres et texte courant, sur fond clair.' },
+      { key:'olive', label:'Texte secondaire', usage:'Sous-titres, légendes, petits labels en majuscules.' },
+      { key:'cream', label:'Texte clair', usage:'Texte affiché sur les fonds foncés (héros, pied de page).' }
+    ]
+  },
+  {
+    title: 'Accents',
+    desc: 'Les touches de couleur qui font ressortir l\u2019essentiel.',
+    fields: [
+      { key:'gold', label:'Accent doré', usage:'Boutons principaux, mots mis en valeur (ex. <em>sur-mesure</em>).' },
+      { key:'goldLight', label:'Beige clair lumineux', usage:'Dégradé des boutons dorés, petits badges au-dessus des titres.' },
+      { key:'pine', label:'Accent secondaire', usage:'Icônes et détails discrets sur les cartes.' }
+    ]
+  }
 ];
+const THEME_FIELDS = THEME_GROUPS.flatMap(g => g.fields);
+
+/* --------------------------- Préréglages de palette --------------------------- */
+/* Chaque préréglage fournit les 9 couleurs d'un coup. Toujours appliqué
+   via commitChange (donc annulable avec « Annuler ») — rien n'est perdu
+   si le résultat ne plaît pas. */
+const THEME_PRESETS = [
+  { name:'Doré (actuel)', theme:{ ink:'#3d352c', paper:'#fbf7ec', paperSoft:'#f4ecd8', pineDark:'#8c8068', pine:'#b8a47c', olive:'#8f8268', gold:'#ab8f66', goldLight:'#ddd0b0', cream:'#fffaf0' } },
+  { name:'Forêt', theme:{ ink:'#2e3527', paper:'#f6f7ec', paperSoft:'#e9ecd9', pineDark:'#3f5738', pine:'#6f8f5c', olive:'#5c6b4e', gold:'#8ea05a', goldLight:'#cdd9ab', cream:'#f8faf0' } },
+  { name:'Terracotta', theme:{ ink:'#3c2a22', paper:'#fbf1e7', paperSoft:'#f3e0cd', pineDark:'#9c5a3c', pine:'#c17b52', olive:'#8a5f45', gold:'#c17a4a', goldLight:'#e8b98f', cream:'#fff6ec' } },
+  { name:'Ardoise', theme:{ ink:'#2b3238', paper:'#f3f5f6', paperSoft:'#e4e9ec', pineDark:'#48565f', pine:'#7891a0', olive:'#5a6a72', gold:'#8fa6ae', goldLight:'#c9d7dc', cream:'#f8fbfc' } },
+  { name:'Lavande', theme:{ ink:'#332e3d', paper:'#f8f5fb', paperSoft:'#ece4f3', pineDark:'#655a7c', pine:'#8f7fac', olive:'#6c6180', gold:'#9c85b8', goldLight:'#d8c9e8', cream:'#fbf8fd' } }
+];
+
+function renderThemePresets(){
+  const wrap = $('#themePresets');
+  wrap.innerHTML = '';
+  THEME_PRESETS.forEach(preset => {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'theme-preset';
+    const isCurrent = THEME_FIELDS.every(f => (CONTENT.theme[f.key] || '').toLowerCase() === preset.theme[f.key].toLowerCase());
+    if (isCurrent) btn.classList.add('is-current');
+    const dotsKeys = ['pineDark','gold','paperSoft'];
+    btn.innerHTML =
+      '<span class="theme-preset-dots">' +
+        dotsKeys.map(k => '<span style="background:' + preset.theme[k] + '"></span>').join('') +
+      '</span>' +
+      '<span>' + preset.name + '</span>';
+    btn.addEventListener('click', () => {
+      CONTENT.theme = Object.assign({}, CONTENT.theme, preset.theme);
+      renderTheme();
+      applyTheme(CONTENT.theme);
+      commitChange('Application de la palette « ' + preset.name + ' »');
+      showToast('Palette « ' + preset.name + ' » appliquée.');
+    });
+    wrap.appendChild(btn);
+  });
+}
 function hexToRgb(hex){
   if (!hex) return null;
   const m = hex.replace('#','').match(/.{1,2}/g);
@@ -1431,39 +2951,70 @@ function applyTheme(t){
   if (t.cream) root.setProperty('--cream-rgb', hexToRgb(t.cream));
   if (t.paper) root.setProperty('--paper-rgb', hexToRgb(t.paper));
 }
+function setThemeHighlight(key, on){
+  const preview = $('#themePreviewCard');
+  if (!preview) return;
+  $$('[data-role="' + key + '"]', preview).forEach(el => el.classList.toggle('tp-focus', on));
+}
+
 function renderTheme(){
   const body = $('#themeBody');
   body.innerHTML = '';
   const validators = [];
-  THEME_FIELDS.forEach(f => {
-    const wrap = document.createElement('div');
-    wrap.className = 'field';
-    wrap.innerHTML = `<label>${f.label}</label><div class="color-row"><input type="color" data-c><input type="text" data-t></div>`;
-    const colorInp = wrap.querySelector('[data-c]');
-    const textInp = wrap.querySelector('[data-t]');
-    const val = CONTENT.theme[f.key] || '#000000';
-    colorInp.value = /^#[0-9a-fA-F]{6}$/.test(val) ? val : '#000000';
-    textInp.value = CONTENT.theme[f.key] || '';
-    function commitColor(v){
-      CONTENT.theme[f.key] = v;
-      applyTheme(CONTENT.theme);
-      commitChange('Modification de la couleur « ' + f.label + ' »', { debounce:true });
-    }
-    colorInp.oninput = () => { textInp.value = colorInp.value; commitColor(colorInp.value); };
-    textInp.oninput = () => { if (/^#[0-9a-fA-F]{6}$/.test(textInp.value)) colorInp.value = textInp.value; commitColor(textInp.value); };
-    colorInp.addEventListener('change', flushHistoryDebounce);
-    textInp.addEventListener('blur', flushHistoryDebounce);
-    attachFieldValidation(textInp, (v) => {
-      const t = (v || '').trim();
-      if (!t) return 'Ce champ est obligatoire.';
-      return /^#[0-9a-fA-F]{6}$/.test(t) ? null : 'Format hexadécimal invalide, ex. #ab8f66.';
-    }, validators);
-    body.appendChild(wrap);
+  THEME_GROUPS.forEach(group => {
+    const groupEl = document.createElement('div');
+    groupEl.className = 'theme-group';
+    groupEl.innerHTML = `<div class="theme-group-head"><div class="theme-group-title">${group.title}</div><div class="theme-group-desc">${group.desc}</div></div>`;
+    group.fields.forEach(f => {
+      const card = document.createElement('div');
+      card.className = 'theme-field-card';
+      card.innerHTML = `<label>${f.label}</label><div class="theme-usage">${f.usage}</div><div class="color-row"><input type="color" data-c><input type="text" data-t placeholder="#ab8f66"></div>`;
+      const colorInp = card.querySelector('[data-c]');
+      const textInp = card.querySelector('[data-t]');
+      const val = CONTENT.theme[f.key] || '#000000';
+      colorInp.value = /^#[0-9a-fA-F]{6}$/.test(val) ? val : '#000000';
+      textInp.value = CONTENT.theme[f.key] || '';
+      function commitColor(v){
+        CONTENT.theme[f.key] = v;
+        applyTheme(CONTENT.theme);
+        commitChange('Modification de la couleur « ' + f.label + ' »', { debounce:true });
+        renderThemePresets();
+      }
+      colorInp.oninput = () => { textInp.value = colorInp.value; commitColor(colorInp.value); };
+      textInp.oninput = () => { if (/^#[0-9a-fA-F]{6}$/.test(textInp.value)) colorInp.value = textInp.value; commitColor(textInp.value); };
+      colorInp.addEventListener('change', flushHistoryDebounce);
+      textInp.addEventListener('blur', flushHistoryDebounce);
+      attachFieldValidation(textInp, (v) => {
+        const t = (v || '').trim();
+        if (!t) return 'Ce champ est obligatoire.';
+        return /^#[0-9a-fA-F]{6}$/.test(t) ? null : 'Format hexadécimal invalide, ex. #ab8f66.';
+      }, validators);
+      // Aperçu ciblé : survol ou focus du champ met en valeur la zone
+      // correspondante dans la maquette miniature ci-dessus.
+      const activate = () => { card.classList.add('is-active'); setThemeHighlight(f.key, true); };
+      const deactivate = () => { card.classList.remove('is-active'); setThemeHighlight(f.key, false); };
+      card.addEventListener('mouseenter', activate);
+      card.addEventListener('mouseleave', deactivate);
+      colorInp.addEventListener('focus', activate);
+      textInp.addEventListener('focus', activate);
+      colorInp.addEventListener('blur', deactivate);
+      textInp.addEventListener('blur', deactivate);
+      groupEl.appendChild(card);
+    });
+    body.appendChild(groupEl);
   });
   setSectionValidators('theme', validators);
+  renderThemePresets();
 }
-$('#resetThemeBtn').addEventListener('click', () => {
-  if (!confirm('Revenir aux couleurs telles qu\u2019elles étaient au chargement de la page ?')) return;
+$('#resetThemeBtn').addEventListener('click', async () => {
+  const ok = await customConfirm({
+    title: 'Réinitialiser les couleurs ?',
+    message: 'Elles reviendront telles qu\u2019elles étaient au chargement de la page.',
+    okText: 'Réinitialiser',
+    cancelText: 'Annuler',
+    icon: '🎨'
+  });
+  if (!ok) return;
   CONTENT.theme = JSON.parse(JSON.stringify(ORIGINAL_THEME));
   renderTheme();
   applyTheme(CONTENT.theme);
@@ -1534,6 +3085,37 @@ $('#previewDesktopBtn').addEventListener('click', () => $('#previewFrameWrap').c
 $('#previewMobileBtn').addEventListener('click', () => $('#previewFrameWrap').classList.add('mobile'));
 
 /* =====================================================================
+   GUIDE COMPLET — fiche explicative pas à pas, indépendante du chargement
+   de content.json (accessible même si le fichier n'a pas pu être lu).
+   ===================================================================== */
+function openGuide(){
+  $('#guideOverlay').style.display = 'flex';
+  $('#guideOverlay').scrollTop = 0;
+  $('.guide-body').scrollTop = 0;
+}
+function closeGuide(){
+  $('#guideOverlay').style.display = 'none';
+}
+$('#guideBtn').addEventListener('click', openGuide);
+$('#guideCloseBtn').addEventListener('click', closeGuide);
+// Ferme le guide avec Échap, et referme d'abord le guide plutôt que
+// l'aperçu si les deux étaient ouverts en même temps (ne devrait pas
+// arriver en usage normal, mais reste cohérent si ça se produit).
+document.addEventListener('keydown', (e) => {
+  if (e.key !== 'Escape') return;
+  if ($('#guideOverlay').style.display !== 'none') closeGuide();
+});
+// Un lien du sommaire fait défiler la fiche jusqu'à la bonne section
+// (scroll-margin-top en CSS évite qu'elle se cache sous la barre du haut).
+$$('.guide-toc a').forEach(a => {
+  a.addEventListener('click', (e) => {
+    e.preventDefault();
+    const target = document.getElementById(a.getAttribute('href').slice(1));
+    if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
+});
+
+/* =====================================================================
    EXPORT
    ===================================================================== */
 /* Vérifie tous les champs avant une action d'export. En cas d'erreur,
@@ -1567,8 +3149,11 @@ function downloadJson(){
   document.body.removeChild(a);
   URL.revokeObjectURL(url);
   setDirty(false);
-  try { localStorage.removeItem(DRAFT_KEY); } catch(e){}
-  showToast('content.json téléchargé — pense à le remplacer sur le serveur du site.');
+  // Le brouillon local n'est PAS effacé ici : on ne peut pas vérifier que
+  // le téléchargement a réellement abouti (peu fiable sur certains
+  // navigateurs mobiles). Il sert de filet de sécurité et disparaîtra de
+  // lui-même la prochaine fois que le fichier en ligne correspondra.
+  showToast('content.json téléchargé — remplace-le sur le serveur du site pour publier. Ta sauvegarde locale reste en secours jusque-là.');
 }
 $('#downloadBtn').addEventListener('click', downloadJson);
 
@@ -1583,13 +3168,81 @@ $('#copyJsonBtn').addEventListener('click', async () => {
 });
 
 /* =====================================================================
-   PANNEAUX PLIABLES
+   PANNEAUX PLIABLES — animation d'accordéon fluide (hauteur mesurée en
+   JS puis transition CSS sur max-height/opacity). Une fois l'ouverture
+   terminée, max-height repasse à « none » pour laisser le contenu
+   grandir librement (ex. ajout d'un cours) sans être coupé.
    ===================================================================== */
-$$('[data-toggle]').forEach(head => {
-  head.addEventListener('click', () => {
-    head.closest('[data-panel]').classList.toggle('open');
+function togglePanel(panel){
+  const body = panel.querySelector('.panel-body');
+  if (!body) return;
+  const opening = !panel.classList.contains('open');
+  if (opening){
+    panel.classList.add('open');
+    body.style.display = 'block';
+    const target = body.scrollHeight;
+    body.style.maxHeight = '0px';
+    body.style.opacity = '0';
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        body.style.maxHeight = target + 'px';
+        body.style.opacity = '1';
+      });
+    });
+    const onEnd = (e) => {
+      if (e.propertyName !== 'max-height') return;
+      body.style.maxHeight = 'none';
+      body.removeEventListener('transitionend', onEnd);
+    };
+    body.addEventListener('transitionend', onEnd);
+  } else {
+    const current = body.scrollHeight;
+    body.style.maxHeight = current + 'px';
+    body.style.opacity = '1';
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        body.style.maxHeight = '0px';
+        body.style.opacity = '0';
+      });
+    });
+    const onEnd = (e) => {
+      if (e.propertyName !== 'max-height') return;
+      panel.classList.remove('open');
+      body.style.display = 'none';
+      body.removeEventListener('transitionend', onEnd);
+    };
+    body.addEventListener('transitionend', onEnd);
+  }
+}
+/* État initial (sans animation) : les panneaux marqués "open" dans le
+   HTML doivent être visibles dès le chargement, les autres masqués. */
+function initPanelsState(){
+  $$('[data-panel]').forEach(panel => {
+    const body = panel.querySelector('.panel-body');
+    if (!body) return;
+    if (panel.classList.contains('open')){
+      body.style.display = 'block';
+      body.style.maxHeight = 'none';
+      body.style.opacity = '1';
+    } else {
+      body.style.display = 'none';
+      body.style.maxHeight = '0px';
+      body.style.opacity = '0';
+    }
   });
+}
+initPanelsState();
+$$('[data-toggle]').forEach(head => {
+  head.addEventListener('click', () => togglePanel(head.closest('[data-panel]')));
 });
+
+/* =====================================================================
+   POLISH VISUEL — ombre de l'en-tête au scroll, entrée en douceur du
+   contenu principal et masquage progressif de l'écran de chargement.
+   ===================================================================== */
+window.addEventListener('scroll', () => {
+  $('.admin-header').classList.toggle('is-scrolled', window.scrollY > 4);
+}, { passive:true });
 
 init();
 </script>
