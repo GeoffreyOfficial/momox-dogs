@@ -91,6 +91,11 @@ a{ color:inherit; }
 h1,h2,h3{ font-family:var(--font-display); margin:0 0 .3em; font-weight:600; line-height:1.15; }
 p{ margin:0 0 1em; }
 .container{ width:100%; max-width:var(--container); margin:0 auto; padding:0 clamp(16px,4.5vw,24px); }
+/* Grands écrans (2K et plus) : la colonne centrale s'élargit par paliers
+   plutôt que de rester bloquée à 1120px avec de grandes marges vides. */
+@media (min-width:1440px){ :root{ --container:1320px; } }
+@media (min-width:1800px){ :root{ --container:1520px; } }
+@media (min-width:2200px){ :root{ --container:1700px; } }
 .eyebrow{
   font-family:var(--font-body); font-weight:700; letter-spacing:.12em; text-transform:uppercase;
   font-size:.72rem; color:var(--gold);
@@ -659,6 +664,11 @@ input.invalid:focus, textarea.invalid:focus{ box-shadow:0 0 0 3px rgba(180,83,65
 .guide-overlay.guide-collapsed .guide-collapse-label{ display:none; }
 .guide-body{ flex:1; overflow-y:auto; -webkit-overflow-scrolling:touch; }
 .guide-inner{ max-width:820px; margin:0 auto; padding:28px 20px 90px; }
+/* Même logique que .container : le guide plein écran reste lisible sans
+   laisser un vide immense de chaque côté sur les grands écrans. */
+@media (min-width:1440px){ .guide-inner{ max-width:960px; } }
+@media (min-width:1800px){ .guide-inner{ max-width:1100px; } }
+@media (min-width:2200px){ .guide-inner{ max-width:1240px; } }
 
 .guide-toc{
   display:flex; flex-wrap:wrap; gap:8px; margin-bottom:34px;
