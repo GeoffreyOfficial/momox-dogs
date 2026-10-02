@@ -5,30 +5,49 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Momox Dogs — Morgane, éducatrice canine</title>
 <meta name="description" id="metaDescription" content="Momox Dogs — Morgane, éducatrice canine (BPE) : cours individuels et collectifs, cours chiot, désensibilisation, bilans comportementaux, balades et pet sitting.">
+<meta name="robots" content="index, follow">
 
-<!-- Favicon / icônes — générées depuis le logo Momox Dogs (images/logo-mark.png
+<!-- Favicon / icônes — générées depuis le logo Momox Dogs (images/icons/logo-mark.png
      pour les petites tailles, logo complet avec texte pour les grandes). -->
-<link rel="icon" href="images/favicon.ico" sizes="any">
-<link rel="icon" type="image/png" sizes="16x16" href="images/favicon-16x16.png">
-<link rel="icon" type="image/png" sizes="32x32" href="images/favicon-32x32.png">
-<link rel="icon" type="image/png" sizes="48x48" href="images/favicon-48x48.png">
-<link rel="apple-touch-icon" sizes="180x180" href="images/apple-touch-icon.png">
+<link rel="icon" href="images/icons/favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="16x16" href="images/icons/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="images/icons/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="48x48" href="images/icons/favicon-48x48.png">
+<link rel="apple-touch-icon" sizes="180x180" href="images/icons/apple-touch-icon.png">
 <meta name="theme-color" content="#8c8068">
 
 <!-- ============================================================
      RÉSEAUX SOCIAUX (Open Graph / Twitter Card) + DONNÉES STRUCTURÉES
      Le contenu de ces balises (content="") est rempli dynamiquement en JS
      depuis content.json → "seo", au chargement du site (voir initSite()).
-     Rien à modifier ici : change les valeurs dans content.json → seo.
+     Rien à modifier ici : change les valeurs dans content.json → seo
+     (ou dans l'admin, panneau « Référencement (SEO) »).
+
+     IMPORTANT — limite connue : les robots des réseaux sociaux/messagerie
+     (Facebook, Instagram, WhatsApp, LinkedIn, Discord, iMessage…) ne
+     exécutent PAS ce JavaScript quand ils vont chercher un aperçu de lien
+     partagé : ils ne lisent que le HTML brut de cette page. Résultat, tant
+     que og:image/og:url ci-dessous restent vides dans le HTML lui-même,
+     un lien partagé peut afficher un aperçu sans image ni URL correcte
+     pendant un court instant avant que Google (qui exécute le JS, lui)
+     ne les recalcule à l'indexation. og:title/og:description ont donc
+     une valeur de secours statique ci-dessous, identique au titre/à la
+     description ci-dessus, pour ne jamais laisser un aperçu totalement
+     vide. Pour une correction complète (image + URL déjà correctes dès
+     le premier partage), il faudrait que la publication réécrive aussi
+     ces valeurs directement ici au moment du clic sur « Publier » — non
+     fait actuellement, à ajouter côté serveur si besoin.
      ============================================================ -->
-<meta property="og:title" content="" id="ogTitle">
-<meta property="og:description" content="" id="ogDescription">
+<meta property="og:site_name" content="Momox Dogs">
+<meta property="og:locale" content="fr_FR">
+<meta property="og:title" content="Momox Dogs — Morgane, éducatrice canine" id="ogTitle">
+<meta property="og:description" content="Momox Dogs — Morgane, éducatrice canine (BPE) : cours individuels et collectifs, cours chiot, désensibilisation, bilans comportementaux, balades et pet sitting." id="ogDescription">
 <meta property="og:type" content="website" id="ogType">
 <meta property="og:image" content="" id="ogImage">
 <meta property="og:url" content="" id="ogUrl">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="" id="twitterTitle">
-<meta name="twitter:description" content="" id="twitterDescription">
+<meta name="twitter:title" content="Momox Dogs — Morgane, éducatrice canine" id="twitterTitle">
+<meta name="twitter:description" content="Momox Dogs — Morgane, éducatrice canine (BPE) : cours individuels et collectifs, cours chiot, désensibilisation, bilans comportementaux, balades et pet sitting." id="twitterDescription">
 <meta name="twitter:image" content="" id="twitterImage">
 <link rel="canonical" href="" id="canonicalLink">
 <!-- Données structurées schema.org (LocalBusiness), générées en JS à partir de CONTENT -->
@@ -78,6 +97,7 @@
   --pine-dark-rgb: 140,128,104;
   --cream-rgb:     255,250,240;
   --paper-rgb:     251,247,236;
+  --gold-light-rgb: 221,208,176; /* triplet RGB de --gold-light, recalculé par le JS du thème si content.json → theme.goldLight change */
 
   --line:       rgba(var(--ink-rgb),0.14);
   --line-dark:  rgba(var(--cream-rgb),0.16);
@@ -302,6 +322,11 @@ body.modal-open .hero-badge::after{ animation-play-state:paused; }
 /* L'entrée du titre est portée lettre par lettre par .letter (voir JS) plutôt
    que par le fondu de bloc hérité de .hero-fx, qui resterait sinon superposé. */
 .hero h1.hero-fx{ opacity:1; transform:none; animation:none; }
+/* Chaque mot est regroupé dans un span (voir JS) pour empêcher une coupure
+   de ligne au milieu d'un mot : sans ça, les lettres individuelles en
+   display:inline-block (juste en dessous) sont des boîtes atomiques que le
+   navigateur peut couper n'importe où, même en l'absence d'espace. */
+.hero h1 .letter-word{ display:inline-block; }
 .hero h1 .letter{
   display:inline-block; opacity:0; transform:perspective(300px) translateY(.4em) rotateX(-55deg);
   transform-origin:50% 100%;
@@ -497,7 +522,7 @@ body.modal-open .hero-actions .btn-primary::before{ animation-play-state:paused;
 .card-img-parallax{ position:absolute; left:0; top:-14%; width:100%; height:128%; will-change:transform; }
 .card-img{
   width:100%; height:100%; object-fit:cover; display:block;
-  filter:saturate(1.06) contrast(1.03);
+  filter:saturate(1.06) contrast(1.03); object-position:var(--cadrage-mobile,center);
   transition:transform .6s cubic-bezier(.2,.8,.2,1), filter .4s ease;
 }
 .card-img.img-error{ display:none; }
@@ -527,8 +552,14 @@ body.modal-open .hero-actions .btn-primary::before{ animation-play-state:paused;
   display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden;
   line-height:1.55;
 }
-.card-footer{ display:flex; align-items:flex-end; justify-content:space-between; gap:10px; padding-top:12px; border-top:1px dashed var(--line); flex-wrap:wrap; }
-.card-price{ display:flex; flex-direction:column; gap:1px; font-family:var(--font-display); font-weight:600; color:var(--pine-dark); min-width:0; }
+/* justify-content:flex-end (plutôt que space-between) + margin-right:auto sur
+   .card-price ci-dessous : le prix, quand il existe, est poussé à gauche et le
+   bouton "Découvrir" reste collé à droite ; si un cours n'a pas de prix
+   (bloc .card-price absent du DOM, voir priceBlock() en JS), le bouton reste
+   quand même à droite au lieu de sauter à gauche comme le ferait
+   space-between avec un seul enfant flex. */
+.card-footer{ display:flex; align-items:flex-end; justify-content:flex-end; gap:10px; padding-top:12px; border-top:1px dashed var(--line); flex-wrap:wrap; }
+.card-price{ display:flex; flex-direction:column; gap:1px; font-family:var(--font-display); font-weight:600; color:var(--pine-dark); min-width:0; margin-right:auto; }
 .card-price .amount{ font-size:1.1rem; line-height:1.3; color:var(--gold); }
 .card-price span:last-child{ font-family:var(--font-body); font-size:.74rem; font-weight:600; color:var(--olive); text-transform:uppercase; letter-spacing:.03em; }
 .card-open-btn{
@@ -562,10 +593,24 @@ body.modal-open .hero-actions .btn-primary::before{ animation-play-state:paused;
 }
 .modal-overlay.open .modal{ transform:translateY(0) scale(1); opacity:1; }
 
-.modal-scroll{ max-height:min(86vh,780px); overflow-y:auto; -webkit-overflow-scrolling:touch; touch-action:pan-y; overscroll-behavior-x:none; }
+.modal-scroll{ max-height:min(90vh,1100px); overflow-y:auto; -webkit-overflow-scrolling:touch; touch-action:pan-y; overscroll-behavior-x:none; }
 
-.modal-media{ position:relative; height:230px; overflow:hidden; background:var(--pine-dark); }
-.modal-media img{ width:100%; height:100%; object-fit:cover; transition:opacity .28s ease; }
+/* Hauteur du conteneur photo calée sur le ratio réel de chaque image
+   (--photo-ratio, posé en JS une fois l'image chargée — voir fill() plus
+   bas) plutôt qu'une hauteur fixe : une photo très verticale (portrait)
+   obtient un conteneur plus haut, une photo large un conteneur plus bas
+   — jamais de bande noire (l'image reste en object-fit:cover, qui recadre
+   sans jamais laisser de vide) et jamais de recadrage plus serré que
+   nécessaire. La contrainte est exprimée en vh (proportionnelle à la
+   hauteur réelle de l'écran, d'un petit téléphone à un Z Fold déplié)
+   plutôt qu'en px fixes : le plafond en px n'est qu'un garde-fou large,
+   quasiment jamais atteint, pour les cas extrêmes. 16/9 sert de valeur de
+   repli tant que l'image n'a pas fini de charger. */
+.modal-media{
+  position:relative; width:100%; overflow:hidden; background:var(--pine-dark);
+  aspect-ratio:var(--photo-ratio, 16/9); min-height:190px; max-height:min(40vh,560px);
+}
+.modal-media img{ width:100%; height:100%; object-fit:cover; transition:opacity .28s ease; object-position:var(--cadrage-mobile,center); }
 .modal-media::after{
   content:""; position:absolute; inset:0;
   background:linear-gradient(180deg, rgba(var(--pine-dark-rgb),0) 40%, rgba(var(--pine-dark-rgb),.85) 100%);
@@ -593,8 +638,11 @@ body.modal-open .hero-actions .btn-primary::before{ animation-play-state:paused;
 /* Prix et bouton "Réserver" sur la même ligne : le prix à gauche, le
    bouton à droite, qui repasse dessous en colonne si la place manque
    (petits écrans ou prix long). */
+/* Même correctif que .card-footer : flex-end + margin-right:auto sur
+   .modal-price (qui hérite de .card-price) pour que le bouton "Me contacter"
+   reste à droite même quand le bloc prix est masqué (cours sans prix). */
 .modal-price-row{
-  display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:14px;
+  display:flex; align-items:center; justify-content:flex-end; flex-wrap:wrap; gap:14px;
   padding-top:14px; border-top:1px dashed var(--line); margin-bottom:16px;
 }
 .modal-price{ margin:0; }
@@ -638,7 +686,6 @@ body.modal-open .hero-actions .btn-primary::before{ animation-play-state:paused;
 }
 
 @media (max-width:640px){
-  .modal-media{ height:190px; }
   .modal-content{ padding:20px 18px 24px; }
   .modal-media-caption h3{ font-size:1.22rem; }
   /* Flou allégé sur mobile : backdrop-filter est nettement plus coûteux à
@@ -664,6 +711,11 @@ body.modal-open .hero-actions .btn-primary::before{ animation-play-state:paused;
     height:min(82vh,720px); max-height:min(82vh,720px); overflow:hidden;
   }
   .modal-media{ height:100%; }
+  /* À partir de 900px, la photo passe d'une bande large en haut de la
+     fiche à une colonne haute et étroite à côté du texte : un cadrage
+     centré pour la bande large tronque souvent le sujet dans la colonne
+     étroite (et inversement), d'où un point focal dédié à ce format. */
+  .modal-media img{ object-position:var(--cadrage-desktop,center); }
   .modal-media-caption{ left:28px; right:28px; bottom:22px; }
   .modal-media-caption h3{ font-size:1.55rem; }
   .modal-content{
@@ -702,25 +754,288 @@ body.modal-open .hero-actions .btn-primary::before{ animation-play-state:paused;
    JS ne retire cet attribut que si la condition est remplie, donc aucun
    espace vide n'est généré quand la galerie est vide ou incomplète.
    ===================================================================== */
-.gallery{ background:var(--paper-soft); }
+.gallery{ background:var(--paper-soft); position:relative; overflow:hidden; }
 .gallery-head{ max-width:640px; margin-bottom:36px; }
+/* --- Grille (par défaut) --- */
+/* flex + wrap + justify-content:center plutôt que CSS Grid : avec peu de
+   photos (1 à 4), une grille en 1fr aurait étiré chaque tuile pour
+   combler toute la largeur — ici chaque tuile garde une taille sobre
+   et la rangée se centre au lieu de s'étaler n'importe comment.
+   Fonctionne aussi bien avec 1 photo qu'avec 50. La taille des tuiles
+   est en clamp() (vw) plutôt qu'en px fixe : sur un très grand écran
+   (ex. 3200px de large), les tuiles grandissent avec le reste du site
+   au lieu de rester minuscules au milieu d'un océan de blanc. */
 .gallery-grid{
-  display:grid; grid-template-columns:repeat(auto-fill, minmax(190px,1fr)); gap:16px;
+  display:flex; flex-wrap:wrap; gap:clamp(14px,2.2cqw,26px); justify-content:center;
 }
 .gallery-item{
-  position:relative; aspect-ratio:1/1; border-radius:14px; overflow:hidden;
+  --rx:0deg; --ry:0deg; --mx:50%; --my:50%;
+  /* margin:0 indispensable : .gallery-item est un <figure>, qui a par
+     défaut une marge navigateur (souvent ~1em 40px). Sans cette remise à
+     zéro, chaque tuile gagne ~40px de marge invisible à gauche/droite,
+     ce qui pousse la grille/mosaïque à déborder sur la droite — c'était
+     la vraie cause du rognage, indépendante du sujet vw/cqw. */
+  margin:0;
+  position:relative; flex:1 1 clamp(170px,19cqw,230px); max-width:clamp(200px,15cqw,340px);
+  aspect-ratio:1/1; border-radius:14px; overflow:hidden;
   background:linear-gradient(155deg,var(--gold-light) 0%, var(--pine) 60%, var(--pine-dark) 100%);
   box-shadow:0 10px 22px rgba(var(--ink-rgb),.14);
+  cursor:zoom-in;
+  transform:perspective(1000px) rotateX(var(--ry)) rotateY(var(--rx)) translateY(0) scale(1);
+  transition:transform .5s cubic-bezier(.2,.8,.2,1), box-shadow .5s cubic-bezier(.2,.8,.2,1);
+  will-change:transform;
 }
 .gallery-item img{
-  width:100%; height:100%; object-fit:cover; transition:transform .5s cubic-bezier(.2,.8,.2,1);
+  width:100%; height:100%; object-fit:cover; transition:transform .6s cubic-bezier(.2,.8,.2,1);
 }
 /* Photo introuvable (ex. mauvais chemin dans content.json → galerie) : on
    masque l'icône d'image cassée du navigateur et on laisse voir le dégradé
    de fond de la tuile, comme pour les cartes de cours (.card-img.img-error). */
 .gallery-item img.img-error{ display:none; }
-.gallery-item:hover img{ transform:scale(1.08); }
-@media (prefers-reduced-motion: reduce){ .gallery-item img{ transition:none; } }
+/* Effet "wahou" au survol : la tuile s'incline légèrement selon la
+   position du curseur (effet de profondeur/tilt calculé en JS), se
+   soulève avec une ombre plus marquée, la photo zoome légèrement, et un
+   reflet lumineux suit le curseur (façon vernis photo) en plus du
+   balayage diagonal classique. Un halo doré discret entoure la tuile
+   pour suggérer qu'elle est cliquable. Le tilt (--rx/--ry) reste à 0 sur
+   tactile (pas de survol continu) : voir initGalleryTilt() en JS. */
+.gallery-item::after{
+  content:""; position:absolute; inset:0; pointer-events:none; z-index:2;
+  background:linear-gradient(115deg, transparent 25%, rgba(255,255,255,.4) 48%, transparent 68%);
+  transform:translateX(-130%) skewX(-12deg);
+  transition:transform .75s cubic-bezier(.2,.8,.2,1);
+}
+/* Reflet façon "spot" qui suit le curseur, superposé au balayage diagonal
+   ci-dessus — n'apparaît qu'au survol pour ne rien alourdir au repos. */
+.gallery-item::before{
+  content:""; position:absolute; inset:0; pointer-events:none; z-index:2; opacity:0;
+  background:radial-gradient(circle at var(--mx) var(--my), rgba(255,255,255,.35), transparent 42%);
+  transition:opacity .35s ease;
+}
+.gallery-item:hover::before{ opacity:1; }
+.gallery-item:hover{
+  transform:perspective(1000px) rotateX(var(--ry)) rotateY(var(--rx)) translateY(-8px) scale(1.035);
+  box-shadow:0 26px 44px rgba(var(--ink-rgb),.28), 0 0 0 3px rgba(171,143,102,.4);
+  z-index:3;
+}
+.gallery-item:hover::after{ transform:translateX(130%) skewX(-12deg); }
+.gallery-item:hover img{ transform:scale(1.12); }
+.gallery-item:focus-visible{ outline:3px solid var(--gold); outline-offset:3px; }
+/* Petite icône loupe qui apparaît au survol, pour rendre l'invite au
+   clic explicite plutôt qu'implicite (curseur zoom-in seul, trop discret). */
+.gallery-item-zoom{
+  position:absolute; z-index:3; bottom:10px; right:10px; width:30px; height:30px; border-radius:50%;
+  background:rgba(20,16,10,.55); backdrop-filter:blur(3px); color:#fff; display:flex; align-items:center; justify-content:center;
+  font-size:.95rem; opacity:0; transform:scale(.6); transition:opacity .3s ease, transform .3s cubic-bezier(.34,1.56,.64,1);
+}
+.gallery-item:hover .gallery-item-zoom{ opacity:1; transform:scale(1); }
+/* Entrée en scène plus spectaculaire que le fondu générique
+   .reveal-stagger : chaque tuile arrive légèrement pivotée (alternée
+   gauche/droite) et floue, puis se pose nette — effet "polaroid qu'on
+   pose sur la table" plutôt qu'un simple fondu. Sélecteur plus
+   spécifique (deux classes + enfant direct) : l'emporte sur la règle
+   générique .reveal-stagger > * définie plus haut dans la feuille. */
+.gallery-grid.reveal-stagger > .gallery-item{
+  opacity:0; filter:blur(8px); transform:translateY(38px) scale(.85) rotate(-4deg);
+}
+.gallery-grid.reveal-stagger > .gallery-item:nth-child(even){ transform:translateY(38px) scale(.85) rotate(4deg); }
+.gallery-grid.reveal-stagger.in > .gallery-item{
+  opacity:1; filter:blur(0); transform:none;
+}
+@media (prefers-reduced-motion: reduce){
+  .gallery-item, .gallery-item img, .gallery-item::after, .gallery-item::before, .gallery-item-zoom{ transition:none; }
+  .gallery-item:hover{ transform:none; box-shadow:0 10px 22px rgba(var(--ink-rgb),.14); }
+  .gallery-item:hover img{ transform:none; }
+  .gallery-grid.reveal-stagger > .gallery-item{ filter:none; }
+}
+
+/* --- Mosaïque : une photo mise en avant (2×2) tous les 6 éléments,
+   le reste en carrés simples — variété organique sans calcul JS, une
+   pure disposition CSS Grid avec grid-auto-flow:dense pour combler les
+   trous automatiquement. --- */
+.gallery-grid.is-mosaic{
+  display:grid;
+  grid-template-columns:repeat(auto-fit, minmax(clamp(120px,12cqw,190px),1fr));
+  /* Sans ceci, une tuile 2×2 (span 2) qui tombe en fin de ligne peut forcer
+     la création d'une colonne implicite dimensionnée sur son contenu (auto),
+     donc plus large que les colonnes régulières → débordement horizontal.
+     On force cette colonne implicite à suivre le même gabarit que les
+     colonnes explicites. */
+  grid-auto-columns:minmax(clamp(120px,12cqw,190px),1fr);
+  grid-auto-flow:dense;
+  justify-content:center;
+}
+/* width:100% explicite : sans ça, une tuile grid dont la largeur est
+   "auto" ET qui a un aspect-ratio ne s'étire pas pour remplir sa colonne
+   (comportement du standard CSS Grid) — elle retombe à sa taille
+   intrinsèque, minuscule, en laissant de grands vides dans la mosaïque. */
+.gallery-grid.is-mosaic .gallery-item{ width:100%; aspect-ratio:1/1; flex:none; max-width:none; }
+/* aspect-ratio:auto retiré ici à dessein (voir historique) : ça laissait
+   la hauteur de la tuile vedette se caler sur le ratio intrinsèque de sa
+   photo au lieu de rester carrée sur sa zone 2×2. Avec une photo "large"
+   (paysage), l'effet passait presque inaperçu ; avec une photo "haute"
+   (ex. capture d'écran de téléphone), la tuile devenait un rectangle bien
+   plus haut que large, débordait largement de sa zone 2×2 et laissait de
+   grands vides sous les tuiles voisines. En gardant aspect-ratio:1/1
+   (hérité de la règle .is-mosaic .gallery-item ci-dessus), la tuile
+   vedette reste carrée comme les autres — cohérent quel que soit le
+   format d'origine de la photo. */
+.gallery-grid.is-mosaic .gallery-item:nth-child(6n+1){
+  grid-column:span 2; grid-row:span 2;
+}
+/* @container plutôt que @media : ces seuils doivent réagir à la largeur
+   réelle de la zone galerie (voir container-type sur .gallery-carousel-wrap
+   plus haut), pas à celle de la fenêtre du navigateur — sinon la mosaïque
+   se casse dès que la section est affichée dans une zone plus étroite que
+   la fenêtre (aperçu redimensionné, device frame...). */
+/* Sur très grand écran, une seconde tuile mise en avant (décalée dans le
+   motif) évite que le damier ne paraisse trop répétitif quand il y a
+   beaucoup de colonnes disponibles. */
+@container (min-width:1200px){
+  .gallery-grid.is-mosaic .gallery-item:nth-child(6n+4){ grid-column:span 2; grid-row:span 2; }
+}
+@container (max-width:520px){
+  /* Sur très petit écran, les tuiles 2×2 peuvent dépasser la largeur
+     utile — on repasse tout en simple grille régulière pour rester lisible. */
+  .gallery-grid.is-mosaic .gallery-item:nth-child(6n+1),
+  .gallery-grid.is-mosaic .gallery-item:nth-child(6n+4){ grid-column:auto; grid-row:auto; aspect-ratio:1/1; }
+}
+
+/* --- Carrousel : défilement horizontal avec ancrage (scroll-snap),
+   plus naturel qu'une grille quand il y a beaucoup de photos — on garde
+   la molette/le doigt comme seule interaction, sans flèches ajoutées,
+   pour rester simple et ne rien casser au clavier/lecteur d'écran
+   (l'ordre de tabulation suit l'ordre naturel des photos). --- */
+/* container-type:inline-size expose les unités cqw (voir .gallery-grid,
+   .gallery-item et .is-mosaic) : la taille des tuiles se calcule alors par
+   rapport à la largeur réelle de CETTE zone plutôt qu'à celle de la
+   fenêtre du navigateur (vw). Sans ça, si la section galerie s'affiche
+   dans une zone plus étroite que la fenêtre (aperçu redimensionné, device
+   frame, etc.), les tuiles gardaient la taille calculée pour la fenêtre
+   entière et débordaient à droite au lieu de s'adapter — d'où le rognage
+   constaté même en mode mosaïque. */
+.gallery-carousel-wrap{ position:relative; container-type:inline-size; }
+/* flex-wrap:nowrap explicite : .gallery-grid (règle de base, section
+   Grille) pose flex-wrap:wrap pour la disposition par défaut, et cette
+   règle ne le réinitialisait pas — les tuiles retombaient donc à la
+   ligne au lieu de former une seule rangée défilante. */
+.gallery-grid.is-carousel{
+  display:flex; flex-wrap:nowrap; gap:16px; overflow-x:auto; overflow-y:hidden;
+  scroll-snap-type:x proximity; scroll-padding-left:4px;
+  padding-bottom:10px; margin-bottom:-10px; /* la barre de défilement ne pousse pas le contenu suivant */
+  -webkit-overflow-scrolling:touch;
+  justify-content:flex-start;
+}
+/* S'il y a très peu de photos (elles tiennent toutes à l'écran sans
+   avoir besoin de défiler), autant les centrer plutôt que les coller à
+   gauche — évite l'impression d'une rangée "cassée" au milieu de l'écran. */
+.gallery-grid.is-carousel:not(.needs-scroll){ justify-content:center; }
+/* Fondu aux bords quand il y a de quoi défiler : suggère qu'il y a
+   d'autres photos hors champ, plus élégant qu'une simple ombre. */
+.gallery-grid.is-carousel.needs-scroll{
+  mask-image:linear-gradient(to right, transparent 0, black 28px, black calc(100% - 28px), transparent 100%);
+  -webkit-mask-image:linear-gradient(to right, transparent 0, black 28px, black calc(100% - 28px), transparent 100%);
+}
+.gallery-grid.is-carousel .gallery-item{
+  flex:0 0 auto; width:min(72cqw, 320px); max-width:none; aspect-ratio:1/1; scroll-snap-align:start;
+}
+/* Sur grand écran, des tuiles plus larges plutôt que d'en aligner 8
+   minuscules à la suite. */
+@media (min-width:900px){ .gallery-grid.is-carousel .gallery-item{ width:min(30cqw, 360px); } }
+.gallery-grid.is-carousel::-webkit-scrollbar{ height:8px; }
+.gallery-grid.is-carousel::-webkit-scrollbar-thumb{ background:rgba(var(--ink-rgb),.18); border-radius:99px; }
+.gallery-grid.is-carousel::-webkit-scrollbar-track{ background:transparent; }
+/* Souris qui glisse la rangée (desktop) : curseur "attraper" plutôt que
+   le curseur zoom-in par défaut hérité de .gallery-item pendant le drag. */
+.gallery-grid.is-carousel.is-draggable{ cursor:grab; }
+.gallery-grid.is-carousel.is-dragging{ cursor:grabbing; scroll-snap-type:none; user-select:none; }
+.gallery-grid.is-carousel.is-dragging .gallery-item{ pointer-events:none; }
+/* Flèches précédent/suivant — desktop uniquement (souris fine), le
+   tactile garde le glissé naturel. Ajoutées/affichées en JS seulement si
+   la rangée déborde (needs-scroll) et masquées en bout de course. */
+.gallery-carousel-btn{
+  position:absolute; top:50%; transform:translateY(-50%); z-index:4; border:none; cursor:pointer;
+  width:46px; height:46px; border-radius:50%; display:flex; align-items:center; justify-content:center;
+  background:rgba(var(--paper-rgb),.92); color:var(--ink); box-shadow:0 10px 24px rgba(var(--ink-rgb),.22);
+  font-size:1.3rem; line-height:1; opacity:0; visibility:hidden;
+  transition:opacity .25s ease, transform .25s cubic-bezier(.34,1.56,.64,1), box-shadow .2s ease, visibility 0s linear .25s;
+}
+.gallery-carousel-wrap:hover .gallery-carousel-btn.is-active{ opacity:1; visibility:visible; transition-delay:0s; }
+.gallery-carousel-btn:hover{ box-shadow:0 14px 30px rgba(var(--ink-rgb),.3); transform:translateY(-50%) scale(1.08); }
+.gallery-carousel-btn:active{ transform:translateY(-50%) scale(.94); }
+.gallery-carousel-btn.prev{ left:-6px; }
+.gallery-carousel-btn.next{ right:-6px; }
+@media (hover:none), (max-width:760px){ .gallery-carousel-btn{ display:none; } }
+@media (prefers-reduced-motion: reduce){ .gallery-carousel-btn{ transition:opacity .01s linear; } }
+
+/* =====================================================================
+   LIGHTBOX GALERIE — ouverture en grand au clic sur une photo, avec
+   navigation précédent/suivant, clavier et glissé tactile. Volontairement
+   sobre (fond sombre, une seule photo à la fois) pour rester dans
+   l'esprit du site plutôt qu'un composant "plaqué" par-dessus.
+   ===================================================================== */
+.lightbox{
+  position:fixed; inset:0; z-index:400; background:rgba(20,15,10,0);
+  display:flex; align-items:center; justify-content:center;
+  opacity:0; visibility:hidden; transition:opacity .32s ease, background .32s ease, visibility 0s linear .32s;
+}
+.lightbox.show{
+  opacity:1; visibility:visible; background:rgba(20,15,10,.92);
+  transition:opacity .32s ease, background .32s ease, visibility 0s linear 0s;
+}
+.lightbox-stage{
+  position:relative; max-width:min(92vw, 1100px); max-height:88vh; display:flex; flex-direction:column; align-items:center; gap:14px;
+  transform:scale(.94); transition:transform .32s cubic-bezier(.2,.8,.2,1);
+}
+.lightbox.show .lightbox-stage{ transform:scale(1); }
+.lightbox-stage img{
+  max-width:100%; max-height:76vh; border-radius:14px; object-fit:contain;
+  box-shadow:0 30px 60px rgba(0,0,0,.5);
+  animation:lightboxImgIn .4s cubic-bezier(.2,.8,.2,1), lightboxKenBurns 7s ease-out forwards;
+  opacity:1; transition:opacity .22s ease;
+  touch-action:pan-y;
+}
+@keyframes lightboxImgIn{ from{ opacity:0; } to{ opacity:1; } }
+/* Léger zoom continu façon "Ken Burns" sur la photo affichée — donne un
+   peu de vie à une image fixe sans distraire. Discret (4%) et démarre à
+   chaque nouvelle photo grâce au JS qui rejoue l'animation (voir show()). */
+@keyframes lightboxKenBurns{ from{ transform:scale(1); } to{ transform:scale(1.04); } }
+/* Pendant le changement de photo (fondu enchaîné) : l'image sortante
+   s'efface avant que la suivante ne prenne sa place. */
+.lightbox-stage img.is-changing{ opacity:0; animation:none; }
+/* Pendant un glissé tactile, l'image suit le doigt en temps réel (voir
+   JS) — translateX posé en style inline, pas de transition ici pour que
+   le suivi reste collé au doigt sans latence. */
+.lightbox-stage img.is-dragging{ transition:none; animation:none; }
+.lightbox-caption{ color:rgba(var(--cream-rgb),.86); font-size:.92rem; text-align:center; max-width:70ch; padding:0 12px; }
+.lightbox-counter{
+  color:rgba(var(--cream-rgb),.6); font-size:.78rem; font-weight:600; letter-spacing:.03em;
+}
+.lightbox-close, .lightbox-nav{
+  position:absolute; z-index:2; border:none; cursor:pointer; color:#fff;
+  background:rgba(255,255,255,.12); backdrop-filter:blur(4px);
+  display:flex; align-items:center; justify-content:center;
+  transition:background .2s ease, transform .2s ease;
+}
+.lightbox-close:hover, .lightbox-nav:hover{ background:rgba(255,255,255,.24); }
+.lightbox-close:active, .lightbox-nav:active{ transform:scale(.92); }
+.lightbox-close{
+  top:calc(18px + env(safe-area-inset-top)); right:18px; width:42px; height:42px; border-radius:50%; font-size:1.1rem;
+}
+.lightbox-nav{
+  top:50%; transform:translateY(-50%); width:48px; height:48px; border-radius:50%; font-size:1.6rem; line-height:1;
+}
+.lightbox-nav:active{ transform:translateY(-50%) scale(.92); }
+.lightbox-prev{ left:calc(10px + env(safe-area-inset-left)); }
+.lightbox-next{ right:calc(10px + env(safe-area-inset-right)); }
+@media (max-width:640px){
+  .lightbox-nav{ width:40px; height:40px; font-size:1.3rem; }
+  .lightbox-close{ width:38px; height:38px; }
+}
+@media (prefers-reduced-motion: reduce){
+  .lightbox, .lightbox-stage, .lightbox-stage img{ transition:none; animation:none; }
+}
+
 
 /* =====================================================================
    8. CONTACT
@@ -764,7 +1079,14 @@ body.modal-open .hero-actions .btn-primary::before{ animation-play-state:paused;
 .contact-cta:hover .contact-cta-icon{ transform:rotate(-8deg) scale(1.08); }
 .contact-cta-text{ display:flex; flex-direction:column; gap:2px; min-width:0; }
 .contact-cta-label{ font-size:.72rem; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:var(--gold-light); }
-.contact-cta-value{ font-family:var(--font-display); font-size:1.12rem; font-weight:600; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.contact-cta-value{
+  font-family:var(--font-display); font-size:1.12rem; font-weight:600; line-height:1.25;
+  /* white-space:normal + overflow-wrap plutôt que nowrap + ellipsis :
+     l'email/téléphone doit toujours rester entièrement lisible (jamais
+     coupé par "…"), quitte à passer sur deux lignes quand la carte est
+     étroite (ex. quand la carte Maps prend la moitié de la largeur). */
+  white-space:normal; overflow-wrap:break-word; word-break:break-word;
+}
 .contact-cta-value.placeholder{ opacity:.65; font-style:italic; }
 .contact-cta-arrow{ margin-left:auto; flex:none; width:18px; height:18px; opacity:.6; transition:transform .25s cubic-bezier(.34,1.56,.64,1), opacity .25s ease; }
 .contact-cta:hover .contact-cta-arrow{ transform:translateX(5px); opacity:1; }
@@ -938,8 +1260,12 @@ body.modal-open .hero-actions .btn-primary::before{ animation-play-state:paused;
    9. PIED DE PAGE
    ===================================================================== */
 footer{ background:linear-gradient(135deg,var(--pine-dark) 0%,#5f4626 100%); color:rgba(var(--cream-rgb),.78); border-top:1px solid var(--line-dark); padding-bottom:calc(18px + env(safe-area-inset-bottom)); }
-.footer-inner{ display:flex; justify-content:space-between; align-items:center; padding-top:28px; padding-bottom:28px; font-size:.8rem; flex-wrap:wrap; gap:10px; }
-.footer-brand{ display:flex; align-items:center; gap:12px; }
+/* flex-end + margin-right:auto sur .footer-brand : le logo reste à gauche et
+   la formule (footerTagline) à droite quand les deux sont présents ; si
+   footerTagline est vide (masqué via fillOrHide), le logo ne saute pas à
+   gauche/droite de façon incohérente selon les cas. */
+.footer-inner{ display:flex; justify-content:flex-end; align-items:center; padding-top:28px; padding-bottom:28px; font-size:.8rem; flex-wrap:wrap; gap:10px; }
+.footer-brand{ display:flex; align-items:center; gap:12px; margin-right:auto; }
 .footer-logo{
   width:36px; height:36px; border-radius:10px; object-fit:cover; flex:none;
   box-shadow:0 4px 12px rgba(0,0,0,.25); border:1px solid rgba(var(--cream-rgb),.2);
@@ -988,9 +1314,77 @@ body.modal-open .scroll-paw{ animation-play-state:paused; }
 
 /* Focus clavier visible */
 a:focus-visible, button:focus-visible{ outline:3px solid var(--gold); outline-offset:2px; }
+
+/* ---------------------------------------------------------------------
+   Mode maintenance — quand content.json est introuvable, illisible (JSON
+   invalide) ou provoque une erreur pendant le remplissage de la page, ET
+   qu'aucune copie locale récente n'est disponible pour compenser. Plutôt
+   que de laisser un site à moitié rendu (menu qui ne mène nulle part,
+   gros blocs vides, bouton « Me contacter » mort), on masque tout le
+   reste de la page et on affiche un simple message d'attente. */
+body.maintenance-mode > *:not(#maintenanceScreen){ display:none !important; }
+#maintenanceScreen{
+  position:fixed; inset:0; z-index:9999; background:var(--paper); color:var(--ink);
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  text-align:center; gap:16px; padding:32px;
+}
+.maintenance-mark{
+  width:56px; height:56px; border-radius:50%; overflow:hidden; flex:none;
+  background:var(--gold-light); display:flex; align-items:center; justify-content:center;
+}
+.maintenance-mark img{ width:100%; height:100%; object-fit:cover; display:block; }
+#maintenanceScreen h1{ font-family:var(--font-display); font-size:1.5rem; margin:0; }
+#maintenanceScreen p{ font-size:.98rem; color:var(--olive); max-width:34ch; margin:0; line-height:1.55; }
+
+/* ---------------------------------------------------------------------
+   Écran de chargement initial — couvre toute la page pendant que
+   content.json est récupéré, pour ne jamais laisser voir le contenu de
+   secours codé en dur dans le HTML (textes/placeholders génériques) ni,
+   pire, un saut brutal "site → maintenance" si le premier essai réseau
+   échoue avant qu'une nouvelle tentative ne réussisse. Se referme en
+   fondu une fois la page réellement prête (voir hideSiteLoader()) — sur
+   une visite déjà en cache, ça ne dure qu'une fraction de seconde. */
+#siteLoader{
+  position:fixed; inset:0; z-index:9998; background:var(--paper);
+  display:flex; flex-direction:column; align-items:center; justify-content:center; gap:18px;
+  transition:opacity .4s ease, visibility 0s linear 0s;
+}
+#siteLoader.is-hidden{ opacity:0; visibility:hidden; transition:opacity .4s ease, visibility 0s linear .4s; pointer-events:none; }
+.site-loader-mark{
+  width:56px; height:56px; border-radius:50%; overflow:hidden; flex:none;
+  background:var(--gold-light); display:flex; align-items:center; justify-content:center;
+  animation:siteLoaderPulse 1.6s ease-in-out infinite;
+}
+.site-loader-mark img{ width:100%; height:100%; object-fit:cover; display:block; }
+.site-loader-dots{ display:flex; gap:6px; }
+.site-loader-dots span{
+  width:7px; height:7px; border-radius:50%; background:var(--pine);
+  animation:siteLoaderDot 1.1s ease-in-out infinite;
+}
+.site-loader-dots span:nth-child(2){ animation-delay:.15s; }
+.site-loader-dots span:nth-child(3){ animation-delay:.3s; }
+@keyframes siteLoaderPulse{ 0%,100%{ transform:scale(1); } 50%{ transform:scale(1.08); } }
+@keyframes siteLoaderDot{ 0%,60%,100%{ opacity:.3; transform:translateY(0); } 30%{ opacity:1; transform:translateY(-3px); } }
+@media (prefers-reduced-motion: reduce){
+  #siteLoader{ transition:none; }
+  .site-loader-mark, .site-loader-dots span{ animation:none; }
+}
+.visually-hidden{
+  position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden;
+  clip:rect(0,0,0,0); white-space:nowrap; border:0;
+}
 </style>
 </head>
 <body>
+
+<!-- Écran de chargement initial : masque tout le reste tant que
+     content.json n'a pas été récupéré et la page vraiment prête (voir
+     initSite() / hideSiteLoader() en fin de script). -->
+<div id="siteLoader" role="status" aria-live="polite">
+  <div class="site-loader-mark"><img src="images/icons/logo-mark.png" alt="" width="56" height="56" loading="eager" decoding="async"></div>
+  <div class="site-loader-dots" aria-hidden="true"><span></span><span></span><span></span></div>
+  <span class="visually-hidden">Chargement du site…</span>
+</div>
 
 <!-- Trace de pattes qui suit la progression du défilement -->
 <div class="scroll-trail" aria-hidden="true"><div class="scroll-trail-fill" id="scrollTrailFill"></div></div>
@@ -1003,7 +1397,7 @@ a:focus-visible, button:focus-visible{ outline:3px solid var(--gold); outline-of
 <header class="site-header">
   <nav class="nav">
     <a class="brand" href="#accueil">
-      <img class="brand-mark" src="images/logo-mark.png" alt="" width="40" height="40" loading="eager" decoding="async">
+      <img class="brand-mark" src="images/icons/logo-mark.png" alt="" width="40" height="40" loading="eager" decoding="async">
       <span>
         <span class="brand-name">Momox Dogs</span>
         <span class="brand-tag">Morgane, éducatrice canine</span>
@@ -1141,11 +1535,28 @@ a:focus-visible, button:focus-visible{ outline:3px solid var(--gold); outline-of
   <div class="container">
     <div class="gallery-head reveal">
       <span class="eyebrow">Galerie</span>
-      <h2>Les chiens que j'accompagne.</h2>
+      <h2 id="galerieTitle">Les chiens que j'accompagne.</h2>
     </div>
-    <div class="gallery-grid reveal-stagger" id="galleryGrid"><!-- généré automatiquement depuis CONTENT.galerie --></div>
+    <div class="gallery-carousel-wrap" id="galleryCarouselWrap">
+      <div class="gallery-grid reveal-stagger" id="galleryGrid"><!-- généré automatiquement depuis CONTENT.galerie --></div>
+      <button type="button" class="gallery-carousel-btn prev" id="galleryPrevBtn" aria-label="Photos précédentes">‹</button>
+      <button type="button" class="gallery-carousel-btn next" id="galleryNextBtn" aria-label="Photos suivantes">›</button>
+    </div>
   </div>
 </section>
+
+<!-- Visionneuse plein écran de la galerie : masquée par défaut, peuplée
+     et affichée en JS au clic sur une photo (voir initGalleryLightbox()). -->
+<div class="lightbox" id="galleryLightbox" hidden>
+  <div class="lightbox-stage">
+    <button type="button" class="lightbox-close" id="lightboxClose" aria-label="Fermer la photo">✕</button>
+    <button type="button" class="lightbox-nav lightbox-prev" id="lightboxPrev" aria-label="Photo précédente">‹</button>
+    <img id="lightboxImg" src="" alt="">
+    <button type="button" class="lightbox-nav lightbox-next" id="lightboxNext" aria-label="Photo suivante">›</button>
+    <p class="lightbox-caption" id="lightboxCaption"></p>
+    <p class="lightbox-counter" id="lightboxCounter"></p>
+  </div>
+</div>
 
 <!-- ============================================================
      CONTACT
@@ -1273,7 +1684,7 @@ a:focus-visible, button:focus-visible{ outline:3px solid var(--gold); outline-of
 <footer>
   <div class="container footer-inner">
     <div class="footer-brand">
-      <img class="footer-logo" src="images/logo-full.jpg" alt="Logo Momox Dogs" width="40" height="40" loading="lazy" decoding="async">
+      <img class="footer-logo" src="images/icons/logo-full.jpg" alt="Logo Momox Dogs" width="40" height="40" loading="lazy" decoding="async">
       <span>© <span id="year"></span> <span id="footerCopyright">Momox Dogs</span></span>
     </div>
     <span id="footerTagline"></span>
@@ -1295,16 +1706,16 @@ a:focus-visible, button:focus-visible{ outline:3px solid var(--gold); outline-of
    puis ouvre http://localhost:8000).
 
    ROBUSTESSE RÉSEAU : sur une connexion faible ou instable, ce chargement peut
-   échouer ou traîner. Trois filets de sécurité sont en place :
+   échouer ou traîner. Deux filets de sécurité sont en place :
    1) plusieurs tentatives avec délai d'attente, avant d'abandonner ;
    2) une copie du dernier contenu chargé avec succès est gardée en local
-      (localStorage) et réutilisée si le réseau ne répond pas ;
-   3) si vraiment rien n'est disponible (première visite + réseau coupé), la
-      page ne s'efface JAMAIS : l'en-tête, l'accroche, la présentation et les
-      coordonnées de contact restent affichées (elles sont déjà écrites en dur
-      juste au-dessus, dans le HTML), seules les sections qui dépendent
-      entièrement de content.json (tarifs, section "pourquoi") s'effacent
-      proprement avec un message d'attente.
+      (localStorage) et réutilisée si le réseau ne répond pas — le site
+      reste utilisable normalement dans ce cas.
+   Si vraiment rien n'est disponible (première visite + content.json
+   introuvable, illisible, ou une erreur survient pendant le remplissage de
+   la page), on n'affiche jamais un site à moitié cassé (menu mort, gros
+   blocs vides, boutons qui ne mènent nulle part) : toute la page est
+   remplacée par un simple message de maintenance (voir showMaintenanceScreen).
    ===================================================================================== */
 
 const CONTENT_CACHE_KEY = 'momoxdogs_content_cache_v1';
@@ -1344,17 +1755,33 @@ function writeCachedContent(data) {
   try { localStorage.setItem(CONTENT_CACHE_KEY, JSON.stringify(data)); } catch (e) { /* stockage indisponible : tant pis, pas bloquant */ }
 }
 
-// Affiche un message discret sans jamais toucher au reste de la page.
-function showNetworkNotice(text) {
-  const notice = document.createElement('div');
-  notice.setAttribute('role', 'status');
-  notice.style.cssText =
-    'position:fixed;left:12px;right:12px;bottom:12px;z-index:999;max-width:520px;' +
-    'margin:0 auto;background:#3d352c;color:#fffaf0;padding:12px 18px;border-radius:14px;' +
-    'font:600 .85rem/1.4 "Work Sans",sans-serif;box-shadow:0 10px 28px rgba(0,0,0,.35);';
-  notice.textContent = text;
-  document.body.appendChild(notice);
-  setTimeout(() => notice.remove(), 9000);
+// Referme l'écran de chargement initial en fondu — appelée une fois la
+// page réellement prête (succès) ou juste avant le message de maintenance
+// (échec), pour ne jamais laisser les deux se chevaucher ou traîner.
+function hideSiteLoader() {
+  const loader = document.getElementById('siteLoader');
+  if (!loader || loader.classList.contains('is-hidden')) return;
+  loader.classList.add('is-hidden');
+  setTimeout(() => loader.remove(), 450);
+}
+
+// content.json introuvable / illisible / provoque une erreur, et aucune
+// copie locale récente n'est disponible pour prendre le relais : plutôt
+// que de laisser un site à moitié rendu (menu mort, gros blocs vides,
+// boutons qui ne mènent nulle part), on masque tout et on affiche un
+// simple message de maintenance à la place.
+function showMaintenanceScreen() {
+  hideSiteLoader();
+  if (document.getElementById('maintenanceScreen')) return;
+  const screen = document.createElement('div');
+  screen.id = 'maintenanceScreen';
+  screen.setAttribute('role', 'status');
+  screen.innerHTML =
+    '<div class="maintenance-mark"><img src="images/icons/logo-mark.png" alt="" width="56" height="56" loading="eager" decoding="async"></div>' +
+    '<h1>Momox Dogs</h1>' +
+    '<p>Le site est en maintenance — merci de repasser dans quelques instants.</p>';
+  document.body.appendChild(screen);
+  document.body.classList.add('maintenance-mode');
 }
 
 async function initSite() {
@@ -1365,22 +1792,49 @@ const cached = readCachedContent();
 // Chargement "cache d'abord" : si une version précédente existe, on
 // l'affiche tout de suite (site utilisable instantanément, même hors-ligne),
 // puis on retente une mise à jour en tâche de fond sans bloquer l'affichage.
+//
+// PROBLÈME RÉSOLU ICI : avant, on écrivait le contenu frais dans le
+// localStorage sans jamais redemander l'affichage — la page restait donc
+// figée sur l'ancien contenu jusqu'à un F5 (qui relit un localStorage
+// pas encore à jour) puis un 2e F5 (qui, cette fois, le relit à jour).
+// D'où le réflexe Ctrl+F5. Solution : si le contenu frais diffère de celui
+// affiché, on recharge la page nous-mêmes, une seule fois par session
+// (pour ne jamais boucler si content.json varie légèrement d'une requête
+// à l'autre, par ex. via un cache de proxy/CDN intermédiaire).
 if (cached) {
   CONTENT = cached;
-  fetchContentWithRetry('content.json').then(fresh => writeCachedContent(fresh)).catch(() => {});
+  // "?_=" : on ignore aussi un éventuel cache HTTP/proxy sur content.json,
+  // pour être sûr de comparer avec la toute dernière version publiée.
+  fetchContentWithRetry('content.json?_=' + Date.now()).then(fresh => {
+    const freshStr = JSON.stringify(fresh);
+    const cachedStr = JSON.stringify(cached);
+    writeCachedContent(fresh);
+    if (freshStr === cachedStr) return; // rien de nouveau, pas besoin de recharger
+
+    const RELOAD_FLAG = 'momoxdogs_reloaded_once';
+    if (sessionStorage.getItem(RELOAD_FLAG)) return; // déjà rechargé une fois pour cette session
+
+    sessionStorage.setItem(RELOAD_FLAG, '1');
+    location.reload();
+  }).catch(() => {});
 } else {
   try {
-    CONTENT = await fetchContentWithRetry('content.json');
+    // "?_=" : comme pour le rechargement en arrière-plan plus haut, on
+    // évite qu'un cache HTTP intermédiaire (navigateur, hébergeur, CDN)
+    // ne serve une version périmée de content.json — particulièrement
+    // important ici : c'est le tout premier chargement (pas de cache
+    // local existant, ex. navigation privée), donc rien d'autre ne
+    // rattrapera une réponse figée.
+    CONTENT = await fetchContentWithRetry('content.json?_=' + Date.now());
     writeCachedContent(CONTENT);
   } catch (err) {
     console.error('Impossible de charger content.json après plusieurs tentatives :', err);
-    // Pas de cache et réseau indisponible : on ne détruit pas la page. Le
-    // héros, la présentation et les coordonnées de contact restent affichés
-    // (déjà écrits en dur dans le HTML) ; on masque juste proprement les
-    // sections qui n'ont pas de contenu de secours possible (tarifs exacts,
-    // section "pourquoi"), et on prévient discrètement.
-    document.querySelectorAll('[data-requires-content]').forEach(el => { el.hidden = true; });
-    showNetworkNotice('Connexion trop faible pour charger tout le contenu. Les coordonnées ci-dessus restent valables — cette page se complètera automatiquement dès qu\'une meilleure connexion sera disponible.');
+    // Pas de cache et content.json introuvable/illisible : impossible de
+    // savoir quoi afficher (textes, liens, tarifs...). Plutôt que de laisser
+    // le squelette HTML de secours à moitié fonctionnel (menu qui ne mène
+    // nulle part, boutons morts, sections vides), on remplace toute la page
+    // par un simple message de maintenance.
+    showMaintenanceScreen();
     return;
   }
 }
@@ -1430,6 +1884,10 @@ if (CONTENT.theme) {
   if (t.pineDark) root.setProperty('--pine-dark-rgb', hexToRgb(t.pineDark));
   if (t.cream) root.setProperty('--cream-rgb', hexToRgb(t.cream));
   if (t.paper) root.setProperty('--paper-rgb', hexToRgb(t.paper));
+  // Manquait à l'appel : sans ça, les cartes de contact (bordure au survol,
+  // fond de l'icône) restaient figées sur le beige d'origine même après un
+  // changement de theme.goldLight, car rien ne recalculait --gold-light-rgb.
+  if (t.goldLight) root.setProperty('--gold-light-rgb', hexToRgb(t.goldLight));
 }
 
 // Applique une image de fond CSS classique (url()).
@@ -1486,6 +1944,13 @@ if (CONTENT.seo) {
 
   // Données structurées schema.org — générées dynamiquement depuis CONTENT
   // (services, contact) pour rester synchronisées avec le reste du site.
+  // sameAs (profils Facebook/Instagram) aide Google à relier ces comptes
+  // à la fiche de l'entreprise — repris avec la même règle de visibilité
+  // que les icônes de la section contact (masqué = pas inclus ici non plus).
+  const sameAs = [
+    isVisible('facebook') ? (CONTENT.contact && CONTENT.contact.facebook) : '',
+    isVisible('instagram') ? (CONTENT.contact && CONTENT.contact.instagram) : ''
+  ].filter(Boolean);
   const jsonLd = {
     '@context': 'https://schema.org',
     '@type': 'ProfessionalService',
@@ -1501,6 +1966,7 @@ if (CONTENT.seo) {
     } : undefined,
     url: seo.siteUrl || undefined,
     image: shareImageUrl || undefined,
+    sameAs: sameAs.length ? sameAs : undefined,
     hasOfferCatalog: visibleServices.length ? {
       '@type': 'OfferCatalog',
       name: 'Cours et services',
@@ -1525,9 +1991,10 @@ if (CONTENT.seo) {
 
 // Menu de navigation — liens et ordre viennent de CONTENT.nav.
 // Le lien "Galerie" n'est ajouté que si la section correspondante sera
-// effectivement affichée (au moins 5 photos dans CONTENT.galerie), pour
-// ne jamais pointer vers une section masquée.
-const galerieOk = isVisible('galerie') && Array.isArray(CONTENT.galerie) && CONTENT.galerie.length >= 5;
+// effectivement affichée (au moins 1 photo dans CONTENT.galerie), pour
+// ne jamais pointer vers une section masquée. Plus de minimum arbitraire :
+// la mise en page (voir plus bas) reste soignée même avec très peu de photos.
+const galerieOk = isVisible('galerie') && Array.isArray(CONTENT.galerie) && CONTENT.galerie.filter(p => p && p.src).length >= 1;
 const navItems = (galerieOk
   ? [...CONTENT.nav, { id: 'galerie', label: 'Galerie' }]
   : CONTENT.nav
@@ -1578,13 +2045,15 @@ if (!reduceMotion) {
     Array.from(node.childNodes).forEach(child => {
       if (child.nodeType === Node.TEXT_NODE) {
         const frag = document.createDocumentFragment();
+        let wordSpan = null;
         child.textContent.split('').forEach(ch => {
-          if (ch === ' ') { frag.appendChild(document.createTextNode(' ')); return; }
+          if (ch === ' ') { wordSpan = null; frag.appendChild(document.createTextNode(' ')); return; }
+          if (!wordSpan) { wordSpan = document.createElement('span'); wordSpan.className = 'letter-word'; frag.appendChild(wordSpan); }
           const span = document.createElement('span');
           span.className = 'letter';
           span.style.setProperty('--li', letterIndex++);
           span.textContent = ch;
-          frag.appendChild(span);
+          wordSpan.appendChild(span);
         });
         node.replaceChild(frag, child);
       } else if (child.nodeType === Node.ELEMENT_NODE) {
@@ -1645,7 +2114,7 @@ const priceBlock = (s) => {
 document.getElementById('cardsGrid').innerHTML = visibleServices.map((s, i) => `
   <article class="card" data-index="${i}" style="--i:${i}" tabindex="0" role="button" aria-label="Voir le détail : ${s.titre}">
     <div class="card-img-clip"><div class="card-img-parallax">
-      <img class="card-img" src="${s.image}" alt="${s.titre}" loading="lazy" decoding="async" onerror="this.classList.add('img-error')">
+      <img class="card-img" src="${s.image}" alt="${s.titre}" loading="lazy" decoding="async" style="--cadrage-mobile:${s.cadrage || 'center'}" onerror="this.classList.add('img-error')">
     </div></div>
     <div class="card-body">
       <span class="card-cat">${pawSvg} ${s.categorie}</span>
@@ -1681,16 +2150,133 @@ window.addEventListener('resize', () => {
   cardFitResizeTimer = window.setTimeout(fitCardPreviews, 150);
 });
 
-// Galerie — n'est peuplée et affichée que si content.json → galerie
-// contient au moins 5 photos (voir `galerieOk` plus haut, déjà calculé
+// Galerie — n'est peuplée et affichée que s'il y a au moins une photo
+// dans content.json → galerie (voir `galerieOk` plus haut, déjà calculé
 // pour le menu). Sinon la section reste [hidden] et ne prend aucune place.
 if (galerieOk) {
-  document.getElementById('galleryGrid').innerHTML = CONTENT.galerie.map((photo, i) => `
-    <figure class="gallery-item" style="--i:${i}">
+  document.getElementById('galerieTitle').textContent =
+    (CONTENT.galerieTexte && CONTENT.galerieTexte.titre) || "Les chiens que j'accompagne.";
+  // Type d'affichage choisi dans l'admin (grid par défaut) — une simple
+  // classe sur le conteneur, tout le reste (mosaïque, carrousel) est géré
+  // en CSS pur, sans logique de mise en page différente en JS.
+  const galleryLayout = (CONTENT.galerieTexte && CONTENT.galerieTexte.layout) || 'grid';
+  const galleryGridEl = document.getElementById('galleryGrid');
+  galleryGridEl.classList.toggle('is-mosaic', galleryLayout === 'mosaic');
+  galleryGridEl.classList.toggle('is-carousel', galleryLayout === 'carousel');
+  const galleryPhotos = CONTENT.galerie.filter(p => p && p.src);
+  galleryGridEl.innerHTML = galleryPhotos.map((photo, i) => `
+    <figure class="gallery-item" style="--i:${i}" tabindex="0" role="button" aria-label="Agrandir la photo${photo.alt ? ' : ' + photo.alt : ''}">
       <img src="${photo.src}" alt="${photo.alt || ''}" loading="lazy" decoding="async" onerror="this.classList.add('img-error')">
+      <span class="gallery-item-zoom" aria-hidden="true">🔍</span>
     </figure>
   `).join('');
   document.getElementById('galerie').hidden = false;
+
+  // Ouverture en grand au clic (ou Entrée/Espace au clavier) sur une
+  // photo — voir initGalleryLightbox() plus bas pour la navigation. Un
+  // clic qui suit un glissé de carrousel (drag desktop, voir plus bas)
+  // ne doit pas ouvrir la visionneuse par erreur : `suppressClick` sert
+  // de garde-fou, posé le temps d'un drag.
+  let suppressClick = false;
+  Array.from(galleryGridEl.querySelectorAll('.gallery-item')).forEach((el, i) => {
+    const openThis = () => {
+      if (suppressClick) return;
+      window.__openGalleryLightbox && window.__openGalleryLightbox(galleryPhotos, i);
+    };
+    el.addEventListener('click', openThis);
+    el.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' '){ e.preventDefault(); openThis(); } });
+  });
+
+  // Effet "wahou" en grille/mosaïque : tilt 3D léger + reflet qui suit le
+  // curseur, uniquement sur souris fine (pas au doigt, pas de survol
+  // continu possible) et hors "prefers-reduced-motion". Les variables
+  // --rx/--ry/--mx/--my posées ici sont consommées par le CSS ci-dessus.
+  const canTilt = !reduceMotion && window.matchMedia('(hover:hover) and (pointer:fine)').matches
+    && galleryLayout !== 'carousel';
+  if (canTilt) {
+    galleryGridEl.querySelectorAll('.gallery-item').forEach((el) => {
+      el.addEventListener('pointermove', (e) => {
+        const r = el.getBoundingClientRect();
+        const px = (e.clientX - r.left) / r.width;   // 0 → 1
+        const py = (e.clientY - r.top) / r.height;
+        const maxTilt = 9; // degrés — discret, pas un effet gadget
+        el.style.setProperty('--rx', ((px - .5) * maxTilt * 2).toFixed(2) + 'deg');
+        el.style.setProperty('--ry', (-(py - .5) * maxTilt * 2).toFixed(2) + 'deg');
+        el.style.setProperty('--mx', (px * 100).toFixed(1) + '%');
+        el.style.setProperty('--my', (py * 100).toFixed(1) + '%');
+      });
+      el.addEventListener('pointerleave', () => {
+        el.style.setProperty('--rx', '0deg');
+        el.style.setProperty('--ry', '0deg');
+      });
+    });
+  }
+
+  // Carrousel : centre la rangée seulement si toutes les photos tiennent
+  // déjà à l'écran sans avoir besoin de défiler (sinon les coller à
+  // gauche est le comportement attendu, comme n'importe quel carrousel).
+  if (galleryLayout === 'carousel'){
+    const prevBtn = document.getElementById('galleryPrevBtn');
+    const nextBtn = document.getElementById('galleryNextBtn');
+    const pointerFine = window.matchMedia('(hover:hover) and (pointer:fine)').matches;
+
+    const syncCarouselScrollState = () => {
+      const needsScroll = galleryGridEl.scrollWidth > galleryGridEl.clientWidth + 4;
+      galleryGridEl.classList.toggle('needs-scroll', needsScroll);
+      if (!pointerFine) return;
+      const atStart = galleryGridEl.scrollLeft <= 4;
+      const atEnd = galleryGridEl.scrollLeft >= galleryGridEl.scrollWidth - galleryGridEl.clientWidth - 4;
+      prevBtn.classList.toggle('is-active', needsScroll && !atStart);
+      nextBtn.classList.toggle('is-active', needsScroll && !atEnd);
+    };
+    syncCarouselScrollState();
+    window.addEventListener('resize', syncCarouselScrollState);
+    galleryGridEl.addEventListener('scroll', syncCarouselScrollState, { passive:true });
+
+    // Flèches desktop : avance/recule d'environ une tuile et demie.
+    const scrollByTile = (dir) => {
+      const tile = galleryGridEl.querySelector('.gallery-item');
+      const step = tile ? tile.getBoundingClientRect().width + 16 : galleryGridEl.clientWidth * .8;
+      galleryGridEl.scrollBy({ left: dir * step * 1.5, behavior: reduceMotion ? 'auto' : 'smooth' });
+    };
+    prevBtn.addEventListener('click', () => scrollByTile(-1));
+    nextBtn.addEventListener('click', () => scrollByTile(1));
+
+    // Glissé à la souris (desktop) : la rangée devient "attrapable",
+    // comme sur les carrousels d'apps natives — beaucoup plus naturel
+    // qu'une molette seule sur un trackpad/souris classique.
+    if (pointerFine) {
+      galleryGridEl.classList.add('is-draggable');
+      let isDown = false, startX = 0, startScroll = 0, moved = 0;
+      galleryGridEl.addEventListener('pointerdown', (e) => {
+        isDown = true; moved = 0;
+        startX = e.clientX; startScroll = galleryGridEl.scrollLeft;
+        galleryGridEl.classList.add('is-dragging');
+        galleryGridEl.setPointerCapture(e.pointerId);
+      });
+      galleryGridEl.addEventListener('pointermove', (e) => {
+        if (!isDown) return;
+        const dx = e.clientX - startX;
+        moved = Math.max(moved, Math.abs(dx));
+        galleryGridEl.scrollLeft = startScroll - dx;
+      });
+      const endDrag = () => {
+        if (!isDown) return;
+        isDown = false;
+        galleryGridEl.classList.remove('is-dragging');
+        // Un déplacement significatif = c'était un drag, pas un clic sur
+        // une photo : on bloque le prochain clic pour éviter d'ouvrir la
+        // visionneuse par accident juste après avoir lâché la souris.
+        if (moved > 6) {
+          suppressClick = true;
+          window.setTimeout(() => { suppressClick = false; }, 50);
+        }
+      };
+      galleryGridEl.addEventListener('pointerup', endDrag);
+      galleryGridEl.addEventListener('pointercancel', endDrag);
+      galleryGridEl.addEventListener('pointerleave', endDrag);
+    }
+  }
 
   // La section galerie est masquée ([hidden]) au chargement de la page, donc
   // si on arrive directement sur une URL #galerie (lien partagé, favori,
@@ -1704,6 +2290,125 @@ if (galerieOk) {
     });
   }
 }
+
+/* Visionneuse plein écran de la galerie — appelée au clic sur une tuile
+   (voir plus haut) avec la liste des photos et l'index cliqué. Toujours
+   initialisée (même si la galerie est masquée), pour rester prête sans
+   avoir à ré-attacher les écouteurs plus tard. */
+function initGalleryLightbox(){
+  const overlay = document.getElementById('galleryLightbox');
+  if (!overlay) return;
+  const stage = overlay.querySelector('.lightbox-stage');
+  const imgEl = document.getElementById('lightboxImg');
+  const captionEl = document.getElementById('lightboxCaption');
+  const counterEl = document.getElementById('lightboxCounter');
+  const closeBtn = document.getElementById('lightboxClose');
+  const prevBtn = document.getElementById('lightboxPrev');
+  const nextBtn = document.getElementById('lightboxNext');
+  let photos = [];
+  let idx = 0;
+  let lastFocused = null;
+
+  // Remplit réellement l'image/légende/compteur pour l'index donné —
+  // séparé de show() pour pouvoir attendre la fin du fondu de sortie
+  // avant d'y toucher (fondu enchaîné plutôt qu'un cut sec entre deux
+  // photos).
+  function fill(i){
+    idx = ((i % photos.length) + photos.length) % photos.length;
+    const p = photos[idx];
+    imgEl.src = p.src;
+    imgEl.alt = p.alt || '';
+    captionEl.textContent = p.alt || '';
+    captionEl.style.display = p.alt ? 'block' : 'none';
+    const multiple = photos.length > 1;
+    prevBtn.style.display = multiple ? 'flex' : 'none';
+    nextBtn.style.display = multiple ? 'flex' : 'none';
+    counterEl.style.display = multiple ? 'block' : 'none';
+    counterEl.textContent = (idx + 1) + ' / ' + photos.length;
+    // Rejoue l'animation d'entrée + le zoom "Ken Burns" à chaque nouvelle
+    // photo : retirer puis reposer la classe force le navigateur à
+    // considérer que c'est une nouvelle animation plutôt que la même
+    // (un simple changement de `src` ne relance pas une animation CSS
+    // déjà en cours sur un élément qui n'a pas bougé du DOM).
+    imgEl.classList.remove('is-changing');
+    void imgEl.offsetWidth; // force le reflow entre le retrait et l'ajout
+    imgEl.style.animation = 'none';
+    void imgEl.offsetWidth;
+    imgEl.style.animation = '';
+  }
+
+  // Changement de photo (flèches/clavier/glissé) : fondu enchaîné —
+  // l'image sortante s'efface, puis la nouvelle apparaît avec son propre
+  // zoom Ken Burns. Instantané si "prefers-reduced-motion".
+  function show(i){
+    if (reduceMotion) { fill(i); return; }
+    imgEl.classList.add('is-changing');
+    window.setTimeout(() => fill(i), 180);
+  }
+
+  function open(list, startIdx){
+    photos = list || [];
+    if (!photos.length) return;
+    lastFocused = document.activeElement;
+    fill(startIdx || 0);
+    overlay.hidden = false;
+    requestAnimationFrame(() => overlay.classList.add('show'));
+    lockBodyScroll();
+    closeBtn.focus();
+  }
+  function close(){
+    overlay.classList.remove('show');
+    unlockBodyScroll();
+    setTimeout(() => { overlay.hidden = true; }, reduceMotion ? 0 : 320);
+    if (lastFocused && typeof lastFocused.focus === 'function') lastFocused.focus();
+  }
+  closeBtn.addEventListener('click', close);
+  prevBtn.addEventListener('click', () => show(idx - 1));
+  nextBtn.addEventListener('click', () => show(idx + 1));
+  // Clic en dehors de la photo (sur le fond sombre) = fermer, comme
+  // n'importe quelle visionneuse plein écran.
+  overlay.addEventListener('click', (e) => { if (!stage.contains(e.target)) close(); });
+  document.addEventListener('keydown', (e) => {
+    if (overlay.hidden) return;
+    if (e.key === 'Escape') close();
+    else if (e.key === 'ArrowLeft') show(idx - 1);
+    else if (e.key === 'ArrowRight') show(idx + 1);
+  });
+  // Glissé tactile (gauche/droite) pour changer de photo : la photo suit
+  // le doigt en temps réel (comme une app photo native) puis, au
+  // relâchement, termine sa course vers la photo suivante/précédente ou
+  // revient à sa place si le geste était trop court.
+  let touchStartX = null, touchDX = 0, dragging = false;
+  overlay.addEventListener('touchstart', (e) => {
+    if (photos.length < 2) return;
+    touchStartX = e.touches[0].clientX;
+    touchDX = 0;
+    dragging = true;
+    imgEl.classList.add('is-dragging');
+  }, { passive: true });
+  overlay.addEventListener('touchmove', (e) => {
+    if (!dragging || touchStartX === null) return;
+    touchDX = e.touches[0].clientX - touchStartX;
+    imgEl.style.transform = `translateX(${touchDX}px) scale(${1 - Math.min(Math.abs(touchDX) / 4000, .06)})`;
+  }, { passive: true });
+  overlay.addEventListener('touchend', (e) => {
+    if (touchStartX === null) return;
+    dragging = false;
+    imgEl.classList.remove('is-dragging');
+    imgEl.style.transform = '';
+    const dx = e.changedTouches[0].clientX - touchStartX;
+    if (Math.abs(dx) > 55) show(idx + (dx < 0 ? 1 : -1));
+    touchStartX = null; touchDX = 0;
+  }, { passive: true });
+  overlay.addEventListener('touchcancel', () => {
+    dragging = false; touchStartX = null;
+    imgEl.classList.remove('is-dragging');
+    imgEl.style.transform = '';
+  }, { passive: true });
+
+  window.__openGalleryLightbox = open;
+}
+initGalleryLightbox();
 
 // Coordonnées — email et téléphone sont maintenant deux grandes cartes
 // cliquables (mailto: / tel:), calculées automatiquement depuis content.json.
@@ -1906,6 +2611,11 @@ if (scrollPaw && scrollTrailFill) {
     if (!trailTicking) { requestAnimationFrame(updateTrail); trailTicking = true; }
   }, { passive: true });
   window.addEventListener('resize', updateTrail);
+  // Même raison que pour le parallaxe ci-dessous : le calcul de la hauteur
+  // totale de la page peut encore bouger un peu après ce premier appel
+  // (polices, images), donc on le relance une fois que tout est stable.
+  window.addEventListener('load', updateTrail);
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(updateTrail).catch(() => {});
 }
 
 // Léger effet de parallaxe sur les photos de fond (héros + contact) et sur les photos des cartes
@@ -1933,6 +2643,19 @@ if (!reduceMotion) {
     if (!ticking) { requestAnimationFrame(applyParallax); ticking = true; }
   }, { passive: true });
   applyParallax();
+  // Recalcule une fois la mise en page vraiment stabilisée : le calcul
+  // ci-dessus tourne dès l'exécution du script, donc avant que les polices
+  // (Fraunces/Work Sans, chargées en swap) et les images ne finissent de
+  // charger. Or la galerie n'est révélée (retrait de [hidden]) qu'un peu
+  // plus haut dans ce même script, juste avant : tant que tout n'a pas
+  // fini de se stabiliser, la position de la section contact peut encore
+  // bouger un peu après ce premier calcul, ce qui décale le fond parallaxe
+  // (.contact-bg) et laisse apparaître un bref espace vide sous la galerie
+  // — corrigé seulement dès le scroll suivant, qui relance applyParallax()
+  // avec des mesures à jour. En le relançant nous-mêmes une fois que tout
+  // est chargé, la position est déjà correcte avant même le premier scroll.
+  window.addEventListener('load', applyParallax);
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(applyParallax).catch(() => {});
 }
 
 // Effet ripple au clic sur les boutons
@@ -1975,6 +2698,39 @@ if (!reduceMotion) {
 }
 
 // ============================================================
+// Verrouillage du défilement de la page — commun à la fiche cours ET à la
+// visionneuse plein écran de la galerie (auparavant dupliqué en plus fragile
+// dans la lightbox : un simple overflow:hidden, qui n'empêche pas le
+// scroll "élastique" en arrière-plan sur iOS Safari, et ne mettait pas en
+// pause les animations décoratives du héros comme le fait ici modal-open).
+// ============================================================
+let savedScrollY = 0;
+
+function lockBodyScroll() {
+  savedScrollY = window.scrollY || window.pageYOffset || 0;
+  document.body.style.position = 'fixed';
+  document.body.style.top = -savedScrollY + 'px';
+  document.body.style.left = '0';
+  document.body.style.right = '0';
+  document.body.style.width = '100%';
+  document.body.classList.add('modal-open');
+}
+
+function unlockBodyScroll() {
+  document.body.style.position = '';
+  document.body.style.top = '';
+  document.body.style.left = '';
+  document.body.style.right = '';
+  document.body.style.width = '';
+  document.body.classList.remove('modal-open');
+  const htmlEl = document.documentElement;
+  const prevBehavior = htmlEl.style.scrollBehavior;
+  htmlEl.style.scrollBehavior = 'auto';
+  window.scrollTo(0, savedScrollY);
+  htmlEl.style.scrollBehavior = prevBehavior || '';
+}
+
+// ============================================================
 // Modale "fiche cours" — lecture confortable + navigation entre cours
 // ============================================================
 (function () {
@@ -1982,6 +2738,16 @@ if (!reduceMotion) {
   const modal = document.getElementById('modal');
   const scrollBox = modal.querySelector('.modal-scroll');
   const imgEl = document.getElementById('modalImg');
+  const mediaEl = imgEl.closest('.modal-media');
+  // Une fois chaque photo chargée, on pose son ratio réel (largeur/hauteur)
+  // sur le conteneur : c'est ce qui permet à .modal-media (CSS ci-dessus)
+  // de prendre une hauteur adaptée à CETTE photo plutôt qu'une hauteur
+  // fixe identique pour toutes les photos, quelle que soit leur forme.
+  imgEl.addEventListener('load', () => {
+    if (imgEl.naturalWidth && imgEl.naturalHeight) {
+      mediaEl.style.setProperty('--photo-ratio', imgEl.naturalWidth + ' / ' + imgEl.naturalHeight);
+    }
+  });
   const catEl = document.getElementById('modalCat');
   const titleEl = document.getElementById('modalTitleText');
   const counterEl = document.getElementById('modalCounter');
@@ -2018,6 +2784,16 @@ if (!reduceMotion) {
     const s = services[index];
     imgEl.src = s.image;
     imgEl.alt = s.titre;
+    // Cadrage : deux points focaux indépendants, car la photo n'occupe
+    // pas le même format selon l'écran (fiche empilée sur mobile, photo
+    // dans une colonne haute et étroite à côté du texte à partir de
+    // 900px — voir le media query juste après .modal-media img). Chacun
+    // retombe sur "center" séparément si son propre champ est absent ou
+    // vide dans content.json — un réglage mobile ne doit jamais être
+    // repris tel quel côté grand écran (et inversement), le recadrage
+    // pertinent n'étant pas le même dans les deux formats.
+    imgEl.style.setProperty('--cadrage-mobile', s.cadrage || 'center');
+    imgEl.style.setProperty('--cadrage-desktop', s.cadrageDesktop || 'center');
     catEl.innerHTML = pawSvg + ' ' + s.categorie;
     titleEl.textContent = s.titre;
     counterEl.textContent = `Cours ${index + 1} / ${services.length}`;
@@ -2048,39 +2824,6 @@ if (!reduceMotion) {
       // (seule l'ouverture initiale crée une entrée dans l'historique).
       history.replaceState({ modalCours: serviceSlugs[current] }, '', '#cours-' + serviceSlugs[current]);
     }, reduceMotion ? 0 : 180);
-  }
-
-  let savedScrollY = 0;
-
-  function lockBodyScroll() {
-    savedScrollY = window.scrollY || window.pageYOffset || 0;
-    document.body.style.position = 'fixed';
-    document.body.style.top = -savedScrollY + 'px';
-    document.body.style.left = '0';
-    document.body.style.right = '0';
-    document.body.style.width = '100%';
-    // Met en pause les animations décoratives infinies (halo du bouton héros,
-    // reflet du badge, trace de pattes) tant que la modale est ouverte : sinon
-    // elles continuent de tourner sous le flou (backdrop-filter) de la modale,
-    // ce qui force le navigateur à recalculer ce flou en continu et peut
-    // ralentir le défilement de la fiche cours, surtout sur mobile.
-    document.body.classList.add('modal-open');
-  }
-
-  function unlockBodyScroll() {
-    document.body.style.position = '';
-    document.body.style.top = '';
-    document.body.style.left = '';
-    document.body.style.right = '';
-    document.body.style.width = '';
-    document.body.classList.remove('modal-open');
-    // Repositionnement immédiat : on désactive un instant le défilement fluide
-    // du site pour éviter un effet de scroll animé au moment de refermer la fiche.
-    const htmlEl = document.documentElement;
-    const prevBehavior = htmlEl.style.scrollBehavior;
-    htmlEl.style.scrollBehavior = 'auto';
-    window.scrollTo(0, savedScrollY);
-    htmlEl.style.scrollBehavior = prevBehavior || '';
   }
 
   function openModal(index, originEvent, opts = {}) {
@@ -2175,12 +2918,18 @@ if (!reduceMotion) {
 
 } catch (err) {
   // Une erreur inattendue pendant le remplissage de la page (ex. champ
-  // manquant dans content.json) ne doit pas laisser un site à moitié cassé
-  // sans explication : on garde tout ce qui a déjà été affiché avec succès
-  // et on prévient discrètement plutôt que de laisser planter silencieusement.
+  // manquant ou mal formé dans content.json) peut laisser le site à moitié
+  // rendu (sections en partie vides, liens morts) : on remplace toute la
+  // page par un message de maintenance plutôt que de laisser cet état
+  // incohérent visible.
   console.error('Erreur pendant l\'affichage du contenu :', err);
-  showNetworkNotice('Un problème est survenu pendant le chargement de la page. Les coordonnées de contact restent valables ; essayez de recharger la page.');
+  showMaintenanceScreen();
 }
+
+// Page entièrement prête (ou, en cas d'erreur ci-dessus, déjà remplacée
+// par l'écran de maintenance, qui masque aussi l'écran de chargement de
+// son côté) : on referme l'écran de chargement initial dans tous les cas.
+hideSiteLoader();
 
 } // fin de initSite()
 

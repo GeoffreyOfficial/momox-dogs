@@ -1,0 +1,287 @@
+MOMOX DOGS — ADMIN AVEC PUBLICATION DIRECTE SUR OVH
+=====================================================
+
+CE QUI CHANGE
+--------------
+- admin.html devient admin.php (protégé par mot de passe).
+- Un bouton "🚀 Publier en ligne" enregistre content.json DIRECTEMENT
+  sur le serveur (plus besoin de télécharger + FTP). L'ancien
+  content.json est automatiquement sauvegardé dans le dossier content/,
+  sous le nom content-AAAA-MM-JJ_HHhMMmSSs.json
+  (ex. content/content-2026-08-25_22h21m12s.json).
+- Avant chaque publication, une MODALE s'ouvre et liste précisément
+  tous les changements par rapport à la version actuellement en ligne
+  (ajouts en vert, suppressions en rouge, modifications en orange,
+  avec les anciennes et nouvelles valeurs) — il faut cliquer sur
+  "Publier en ligne" dans la modale pour confirmer, ou "Annuler".
+- NOUVEAU — Vérification des photos avant publication : une fois les
+  modifications de texte validées, l'admin vérifie que toutes les
+  photos référencées (cours, images principales, galerie…) existent
+  bien sur le serveur. S'il en manque, une modale "Photos manquantes"
+  s'ouvre : dépose les photos demandées (elles sont associées
+  automatiquement au bon emplacement par leur nom), ou choisis-les une
+  par une. Si un fichier ressemble beaucoup à celui attendu (faute de
+  frappe, extension différente comme .png au lieu de .jpg, ou casse
+  différente) ou si une photo très proche existe déjà sur le serveur,
+  l'admin le signale clairement et propose soit de confirmer ce
+  fichier, soit de corriger le champ pour utiliser directement le
+  fichier déjà en ligne. Tant que toutes les photos ne sont pas
+  résolues, le bouton de publication reste désactivé. Les photos ne
+  sont envoyées qu'à ce moment précis, et le contenu n'est publié
+  qu'une fois TOUTES les photos envoyées avec succès — en cas
+  d'échec d'un envoi, rien n'est publié et un message explicite
+  indique quoi corriger.
+- Un nouveau panneau "🗂 Anciennes versions" liste les sauvegardes
+  disponibles dans content/ et permet d'en recharger une dans
+  l'éditeur : la même modale de comparaison s'affiche d'abord, pour
+  voir précisément ce qui va changer avant de valider. Le rechargement
+  ne modifie l'éditeur que localement — il faut ensuite cliquer sur
+  "🚀 Publier en ligne" pour appliquer réellement cette ancienne
+  version au site.
+- Un nouveau panneau "📷 Envoyer des photos sur le serveur" permet
+  d'envoyer une ou plusieurs photos directement dans le dossier images/.
+  Si une photo du même nom existe déjà, l'envoi est refusé (pour ne
+  jamais écraser une image par erreur) — il faut renommer le fichier
+  ou supprimer l'ancienne photo via le gestionnaire OVH.
+- Le bouton "⬇ Télécharger content.json" reste disponible en secours.
+- NOUVEAU — Réorganisation des icônes : les logos et favicons du site
+  (favicon.ico, favicon-16x16.png, favicon-32x32.png, favicon-48x48.png,
+  apple-touch-icon.png, logo-mark.png, logo-full.jpg) vivent maintenant
+  dans images/icons/ plutôt que directement dans images/ — index.html
+  et admin.php ont été mis à jour pour pointer vers ce nouvel
+  emplacement. Ce dossier n'est jamais touché par le nettoyeur de
+  photos ci-dessous (il n'est pas piloté depuis content.json).
+- NOUVEAU — Nettoyeur de photos inutilisées : un panneau "🧹 Nettoyer
+  les photos inutilisées" recherche les photos présentes sur le
+  serveur (dans images/ et images/galerie/) mais non référencées dans
+  le contenu actuellement en ligne. Chaque photo trouvée est affichée
+  avec sa vignette, sa taille, et — si une ancienne sauvegarde de
+  content.json la référence encore — un avertissement clair indiquant
+  que cette sauvegarde sera supprimée avec elle (impossible de garder
+  un point de restauration qui pointerait vers une photo qui n'existe
+  plus). Une modale de confirmation détaillée liste précisément tout
+  ce qui va être supprimé avant toute action, l'opération étant
+  irréversible.
+
+⚠️ ATTENTION — capture d'écran transmise : le dossier images/icons/
+contient actuellement aussi hero-chien.jpg. Si c'est un déplacement
+involontaire (sélection multiple par erreur), remets ce fichier dans
+images/ — c'est la photo d'accueil du site, gérée depuis
+content.json, et le nettoyeur ne la protégera pas si elle se retrouve
+au mauvais endroit. Si c'est volontaire (nouvelle photo d'accueil),
+mets aussi à jour le champ correspondant dans le panneau « Images
+principales » de l'admin.
+
+MOT DE PASSE
+-------------
+Mot de passe actuel : Momox-Taverny-95!
+
+Pour le changer : ouvre le fichier inc/config.php dans un éditeur de
+texte, remplace le texte entre guillemets après ADMIN_PASSWORD, puis
+renvoie ce fichier sur OVH (il remplace l'ancien, au même endroit).
+Un seul mot de passe protège à la fois l'accès à la page admin.php ET
+les envois (publication du contenu, envoi de photos) : une fois
+connecté·e sur admin.php, tout le reste fonctionne sans le retaper.
+
+INSTALLATION SUR OVH
+----------------------
+1. Va dans le gestionnaire de fichiers OVH (ou FileZilla), dans le
+   dossier "www" du site (là où se trouvent index.html et content.json
+   actuellement).
+2. Supprime l'ancien admin.html s'il existe encore à cet endroit.
+3. Envoie les fichiers de ce zip en conservant leur emplacement :
+     index.html               (à la racine — chemins d'icônes mis à jour)
+     admin.php                (à la racine, à côté d'index.html)
+     .htaccess                (à la racine — voir ⚠️ ci-dessous si tu en as déjà un)
+     .user.ini                (à la racine)
+     inc/config.php
+     inc/auth.php
+     inc/save-content.php
+     inc/upload-image.php
+     inc/list-backups.php
+     inc/get-backup.php
+     inc/check-images.php
+     inc/list-unused-images.php
+     inc/delete-images.php
+     inc/.htaccess
+     images/.htaccess         (dans le dossier images/ EXISTANT — ne remplace pas le dossier, ajoute juste ce fichier dedans)
+     content/.htaccess        (crée le dossier "content" s'il n'existe pas encore)
+   → Le dossier "inc" doit être créé à la racine du site (à côté
+     d'index.html), pas dans le dossier images.
+   ⚠️ Les fichiers .htaccess et .user.ini commencent par un point :
+   certains gestionnaires de fichiers OVH masquent les fichiers cachés
+   par défaut — active "Afficher les fichiers cachés" si tu ne les
+   vois pas après l'envoi, pour vérifier qu'ils sont bien arrivés.
+   ⚠️ Le fichier .htaccess fourni dans ce zip contient déjà TA
+   redirection HTTPS existante (RewriteEngine On / RewriteCond
+   %{ENV:HTTPS}...) en plus des nouvelles règles de protection — il a
+   été fusionné pour toi. Remplace directement l'ancien par celui-ci,
+   pas besoin de fusionner à la main. Si tu avais d'autres règles
+   personnalisées dans ce fichier au-delà de la redirection HTTPS,
+   préviens-moi pour que je les réintègre aussi.
+4. Vérifie que le dossier "images/icons" existe et contient bien
+   favicon.ico, favicon-16x16.png, favicon-32x32.png,
+   favicon-48x48.png, apple-touch-icon.png, logo-mark.png et
+   logo-full.jpg (d'après ta capture, c'est déjà fait — vois
+   l'avertissement plus haut au sujet de hero-chien.jpg). Le dossier
+   "content" (sauvegardes) se crée automatiquement à la première
+   publication si tu ne l'as pas créé toi-même à l'étape 3.
+5. Ouvre https://ton-domaine/admin.php dans le navigateur : la page
+   de connexion doit s'afficher. Entre le mot de passe ci-dessus.
+6. Vérification de sécurité (30 secondes) : essaie d'ouvrir dans le
+   navigateur https://ton-domaine/inc/config.php — tu dois obtenir une
+   page d'erreur ("403 Forbidden" ou "Accès interdit"), jamais le
+   contenu du fichier ni une page blanche silencieuse. Fais de même
+   avec https://ton-domaine/content/ — même résultat attendu. Si ce
+   n'est pas le cas, préviens-moi : cela indiquerait que les fichiers
+   .htaccess n'ont pas été pris en compte par l'hébergement.
+
+VÉRIFICATION RAPIDE
+---------------------
+- Connexion : ouvre admin.php, entre le mot de passe → tu dois arriver
+  sur l'éditeur habituel.
+- Publication : modifie un texte, clique "🚀 Publier en ligne" → une
+  modale liste le changement, clique à nouveau sur "🚀 Publier en
+  ligne" dans la modale → un message confirme la mise à jour et
+  indique le nom du fichier de sauvegarde créé dans content/.
+- Anciennes versions : ouvre le panneau "🗂 Anciennes versions",
+  clique "↻ Rafraîchir la liste" → la sauvegarde précédente doit
+  apparaître avec sa date. Clique "Voir & charger" → la modale doit
+  montrer le changement en sens inverse (retour à l'ancien texte).
+  Valide, puis vérifie que le champ est bien revenu à l'ancienne
+  valeur dans l'éditeur (pense à publier ensuite si tu veux
+  vraiment revenir à cette version sur le site).
+- Photo : dans le nouveau panneau, envoie une photo → elle doit
+  apparaître dans le dossier images/ du site. Renvoie la même photo
+  une deuxième fois : l'envoi doit être refusé avec un message clair.
+- Déconnexion : le bouton "🔒 Déconnexion" en haut à droite ferme la
+  session.
+- Nettoyeur de photos : ouvre "🧹 Nettoyer les photos inutilisées",
+  clique "🔍 Rechercher les photos inutilisées" → une photo présente
+  sur le serveur mais non référencée doit apparaître. Sélectionne-la,
+  clique "🗑 Supprimer la sélection" → la modale de confirmation doit
+  lister exactement cette photo (et toute sauvegarde concernée), puis
+  confirme → la photo doit disparaître du serveur et de la liste au
+  rafraîchissement automatique.
+
+PROTECTION CONTRE L'ACCÈS DIRECT AUX FICHIERS (.htaccess)
+-------------------------------------------------------------
+En plaçant inc/ au même niveau qu'index.html, ses fichiers PHP sont
+techniquement à une adresse web (ex. https://ton-site/inc/config.php).
+En fonctionnement normal, ouvrir cette adresse ne montre rien (PHP
+exécute le fichier, qui ne fait qu'y définir des réglages, sans rien
+afficher) — mais ce n'est pas une vraie protection : une copie de
+sauvegarde oubliée par un éditeur de texte (config.php.bak,
+config.php~) serait, elle, servie telle quelle par le serveur, avec
+le mot de passe en clair dedans.
+
+Quatre fichiers .htaccess ont été ajoutés pour fermer complètement
+cette porte, sans rien casser :
+- .htaccess (racine) : bloque l'accès à .user.ini et aux autres
+  fichiers techniques commençant par un point.
+- inc/.htaccess : bloque explicitement config.php et auth.php (et
+  toute copie de sauvegarde de n'importe quel fichier du dossier).
+  Les vrais points d'entrée (save-content.php, upload-image.php…)
+  restent accessibles — c'est nécessaire, l'admin les appelle en
+  JavaScript.
+- content/.htaccess : bloque tout accès direct aux sauvegardes de
+  content.json (elles ne sont lues que côté serveur, jamais via une
+  adresse web — le blocage ne casse donc rien).
+- images/.htaccess : empêche qu'un fichier .php puisse un jour
+  s'exécuter dans ce dossier, même si un tel fichier s'y retrouvait
+  par un autre moyen que l'admin (l'admin refuse déjà tout envoi qui
+  n'est pas une vraie image, ceci est une sécurité supplémentaire).
+
+Aucun de ces blocages ne gêne le fonctionnement de l'admin : les
+require_once internes à PHP et les lectures de fichiers sur le disque
+ne passent pas par ces règles, qui ne s'appliquent qu'aux requêtes
+faites depuis un navigateur.
+
+RENFORCEMENTS DE ROBUSTESSE (tests réels effectués)
+-------------------------------------------------------
+Cette version a été testée avec un vrai serveur PHP local (pas
+seulement une relecture de code), avec des cas volontairement
+tordus : JSON cassé, fichiers renommés, tentatives de sortir des
+dossiers autorisés, requêtes simultanées, etc. Deux vrais bugs ont
+été trouvés et corrigés :
+
+1. content.json pouvait être écrasé par un contenu invalide.
+   Un JSON techniquement valide mais qui ne ressemble pas à un vrai
+   content.json (ex. vide, incomplet, ou juste un nombre) était
+   accepté et écrasait le site. Corrigé : le serveur vérifie
+   maintenant que tous les champs attendus sont présents et bien
+   formés avant d'écrire quoi que ce soit, relit le fichier une fois
+   écrit pour confirmer qu'il est valide, et restaure automatiquement
+   la sauvegarde précédente si un problème est détecté après coup.
+
+2. Les photos envoyées n'étaient vérifiées que par leur extension.
+   Un fichier texte renommé en .jpg était accepté tel quel. Corrigé :
+   le contenu réel du fichier est maintenant vérifié (via la
+   fonction PHP getimagesize), pas seulement son nom.
+
+Autres renforcements :
+- Verrou de fichier (flock) : si deux publications ou suppressions
+  arrivent presque en même temps (deux onglets, deux appareils),
+  elles sont traitées l'une après l'autre plutôt que de risquer un
+  écrasement ou un entrelacement.
+- Timeout réseau explicite (25 à 90 secondes selon l'opération) sur
+  tous les échanges avec le serveur : plus aucune action ne peut
+  rester bloquée indéfiniment sans message d'erreur si la connexion
+  est mauvaise ou le serveur ne répond pas.
+- Indicateurs de chargement ajoutés partout où c'était manquant :
+  spinner pendant l'envoi de chaque photo, pendant la recherche de
+  photos inutilisées, pendant le chargement d'une ancienne version,
+  avec un bouton "Réessayer" en cas d'échec.
+- Vignettes des photos inutilisées : affichage d'une icône de repli
+  si l'image ne charge pas, plutôt qu'une icône d'image cassée.
+- Un fichier .user.ini a été ajouté pour porter les limites d'envoi
+  du serveur à 10-12 Mo (par défaut, OVH limite souvent à 2-8 Mo, ce
+  qui aurait bloqué l'envoi silencieusement avant même que l'admin
+  ne s'en aperçoive).
+- Une sauvegarde corrompue ou de mauvaise forme ne peut plus être
+  rechargée dans l'éditeur (même contrôle que pour la publication).
+
+NOTE TECHNIQUE (pour toi, Geoffrey)
+-------------------------------------
+- Authentification par session PHP (cookie httponly, régénération de
+  l'id de session à la connexion). Pas de base de données : le mot de
+  passe est un simple constant dans inc/config.php, volontairement
+  simple à éditer pour Morgane... mais en pratique c'est toi qui géreras
+  ce fichier.
+- inc/save-content.php : lit le JSON envoyé en POST, le revalide, sauve
+  l'ancien content.json (copy()), puis écrit le nouveau via un fichier
+  temporaire + rename() (écriture atomique).
+- inc/upload-image.php : vérifie l'extension (jpg/jpeg/png/webp/gif),
+  la taille (10 Mo max, ajustable dans config.php), nettoie le nom de
+  fichier (accents/espaces retirés), et refuse tout nom déjà présent
+  dans images/ (comparaison insensible à la casse).
+- Tous les endpoints de l'API exigent une session admin active
+  (401 sinon) — inaccessibles sans être passé par le mot de passe.
+- inc/list-backups.php / inc/get-backup.php : lecture seule dans
+  content/, nom de fichier strictement validé par expression régulière
+  (empêche toute tentative de lire un autre fichier du serveur).
+- La comparaison des changements (diffContent dans admin.php) est un
+  moteur JS "métier" : il compare champ par champ selon la structure
+  connue de content.json (services appariés par titre, menu par id,
+  couleurs avec pastille visuelle, galerie appariée par src, etc.)
+  plutôt qu'un diff JSON brut, pour rester lisible par quelqu'un de
+  non-technique.
+- inc/check-images.php : reçoit la liste des chemins d'image
+  référencés dans content.json, renvoie lesquels existent déjà sur le
+  serveur, et pour les manquants calcule des suggestions de fichiers
+  déjà présents au nom très proche (même nom/extension différente,
+  casse différente, ou distance de Levenshtein ≤ 2) — utile pour
+  repérer une faute de frappe plutôt qu'une vraie photo absente.
+- inc/upload-image.php accepte maintenant un champ `target_path`
+  optionnel : si fourni, la photo est enregistrée exactement sous ce
+  chemin (utilisé par la modale "Photos manquantes" pour garantir que
+  le fichier envoyé correspond exactement au champ attendu), avec
+  vérification stricte que l'extension du fichier envoyé correspond
+  à celle attendue.
+- momox_collect_image_paths() (inc/config.php) centralise le recensement
+  des chemins d'image utilisés par un content.json ; réutilisé par le
+  nettoyeur (inc/list-unused-images.php, inc/delete-images.php) et par
+  la vérification pré-publication. inc/delete-images.php re-vérifie
+  toujours côté serveur qu'une photo n'est plus référencée dans le
+  content.json en ligne avant de la supprimer, même si le navigateur
+  pense le contraire (état obsolète possible côté client).
