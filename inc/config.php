@@ -6,7 +6,7 @@
  * remplace simplement le texte entre guillemets ci-dessous, puis
  * ré-envoie ce fichier sur OVH (dossier inc/). C'est tout.
  */
-define('ADMIN_PASSWORD', 'AvAtAr1613*');
+define('ADMIN_PASSWORD', 'example*');
 
 /* ---- Chemins (ne pas modifier) ---------------------------------- */
 // Racine du site = dossier qui contient index.html, content.json, images/
